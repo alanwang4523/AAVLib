@@ -1,1 +1,1 @@
-include ':app', ':alvideoplayer'
+include ':app', ':alvideoplayer', ':libaav_video'
