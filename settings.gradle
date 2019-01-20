@@ -1,1 +1,1 @@
-include ':app', ':alvideoplayer', ':LibAudio', ':LibVideo', ':LibAudioEffect', ':LibVideoEffect', ':LibEGLCore', ':LibMediaCore'
+include ':app', ':alvideoplayer', ':LibAudio', ':LibVideo', ':LibAudioEffect', ':LibVideoEffect', ':LibEGLCore', ':LibMediaCore', ':LibUtils'
