@@ -1,14 +1,14 @@
-### AAVLib (Alan Audio & Video Library)
+## AAVLib (Alan Audio & Video Library)
 
----
 
-#### LibAudio:
+**libraries 目录下的各 library 介绍如下，详细信息可见各 lib 下的 README.md 文件：**
+### LibAudio:
 音频库，主要包含以下内容：
 - AudioRecorder: 包括 java 层的 Recorder 和底层的 OpenSL 两种实现；
 - AudioPlayer: 包括 AudioTrack 和 OpenSL 两种实现；
 ---
 
-#### LibAudioEffect:
+### LibAudioEffect:
 音效库，主要包含各音效效果实现：
 - 常用效果器；
 - 升降调：变调不变速；
@@ -18,14 +18,14 @@
 - 音频混合；
 ---
 
-#### LibEGLCore:
+### LibEGLCore:
 EGL 核心库，主要包含：
 - EGL 常用工具类；
 - EGL 环境搭建；
 - 常用的 Render;
 ---
 
-#### LibMediaCore:
+### LibMediaCore:
 音视频核心库，包含以下内容：
 - 音频编解码；
 - 视频编解码；
@@ -33,14 +33,14 @@ EGL 核心库，主要包含：
 - 视频裁剪；
 ---
 
-#### LibVideo:
+### LibVideo:
 视频库，主要包含以下内容：
 - VideoPlayer：视频播放器；
 - Camera：相机相关；
 - 视频相关的控制器；
 ---
 
-#### LibVideoEffect:
+### LibVideoEffect:
 视频效果库，主要包含：
 - 常用的视频滤镜：
     - 1D LUT 类滤镜；
