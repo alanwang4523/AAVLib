@@ -1,14 +1,4 @@
-package com.ushowmedia.stvideosdk.core.opengl;
-
-import android.graphics.SurfaceTexture;
-import android.opengl.EGL14;
-import android.opengl.EGLConfig;
-import android.opengl.EGLContext;
-import android.opengl.EGLDisplay;
-import android.opengl.EGLExt;
-import android.opengl.EGLSurface;
-import android.util.Log;
-import android.view.Surface;
+package com.alanwang.aavlib.libeglcore.egl;
 
 /*
  * Copyright 2013 Google Inc. All rights reserved.
@@ -25,6 +15,16 @@ import android.view.Surface;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import android.graphics.SurfaceTexture;
+import android.opengl.EGL14;
+import android.opengl.EGLConfig;
+import android.opengl.EGLContext;
+import android.opengl.EGLDisplay;
+import android.opengl.EGLExt;
+import android.opengl.EGLSurface;
+import android.util.Log;
+import android.view.Surface;
 
 public class EGLCore {
 

@@ -1,4 +1,4 @@
-package com.ushowmedia.stvideosdk.core.opengl;
+package com.alanwang.aavlib.libeglcore.egl;
 /*
  * Copyright 2014 Google Inc. All rights reserved.
  *
