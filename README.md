@@ -33,6 +33,11 @@ EGL 核心库，主要包含：
 - 视频裁剪；
 ---
 
+### LibUtils:
+Android 常用工具库：
+
+---
+
 ### LibVideo:
 视频库，主要包含以下内容：
 - VideoPlayer：视频播放器；
@@ -43,8 +48,7 @@ EGL 核心库，主要包含：
 ### LibVideoEffect:
 视频效果库，主要包含：
 - **视频滤镜：**
-    - 1D LUT 类滤镜；
-    - 3D LUT 类滤镜；
+    - LUT 类滤镜；
     - ToneCurve 滤镜；
     - 美颜滤镜；
     - 贴纸、水印；
@@ -60,3 +64,10 @@ EGL 核心库，主要包含：
     - 镜像（上下镜像、左右镜像）；
     - 马塞克；
 ---
+
+### 参考项目：
+[grafika](https://github.com/google/grafika)
+
+
+### 个人联系方式：
+email: alanwang4523@gmail.com
