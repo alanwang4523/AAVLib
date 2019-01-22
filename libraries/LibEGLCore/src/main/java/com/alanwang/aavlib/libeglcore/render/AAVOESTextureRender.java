@@ -4,11 +4,6 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import com.alanwang.aavlib.libeglcore.common.AAVCoordinateUtil;
-import com.alanwang.aavlib.libeglcore.egl.GlUtil;
-
-import java.nio.FloatBuffer;
-
 /**
  * AAVOESTextureRender
  * 用于 OES 纹理渲染，OES 纹理可来源于相机、player、编码器
@@ -44,13 +39,6 @@ public class AAVOESTextureRender extends AAVBaseRender {
     private float[] mTextureTransformMatrix = new float[16];
     private int muMVPMatrixLoc;
     private int muTexMatrixLoc;
-
-    private static final FloatBuffer VERTEX_COORDINATE_BUFFER =
-            GlUtil.createFloatBuffer(AAVCoordinateUtil.DEFAULT_VERTEX_COORDS);
-
-    private static final FloatBuffer TEXTURE_COORDINATE_BUFFER =
-            GlUtil.createFloatBuffer(AAVCoordinateUtil.DEFAULT_TEXTURE_COORDS);
-
 
     public AAVOESTextureRender() {
         super(VERTEX_SHADER, FRAGMENT_SHADER, GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
@@ -90,7 +78,7 @@ public class AAVOESTextureRender extends AAVBaseRender {
      * @param textureId
      */
     public void drawFrame(int textureId) {
-        super.drawFrame(textureId, VERTEX_COORDINATE_BUFFER, TEXTURE_COORDINATE_BUFFER);
+        super.drawFrame(textureId, DEFAULT_VERTEX_COORDINATE_BUFFER, DEFAULT_TEXTURE_COORDINATE_BUFFER);
     }
 
     @Override

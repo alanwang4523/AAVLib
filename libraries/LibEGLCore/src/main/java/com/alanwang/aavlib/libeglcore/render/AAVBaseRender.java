@@ -1,6 +1,7 @@
 package com.alanwang.aavlib.libeglcore.render;
 
 import android.opengl.GLES20;
+import com.alanwang.aavlib.libeglcore.common.AAVCoordinateUtil;
 import com.alanwang.aavlib.libeglcore.egl.GlUtil;
 import java.nio.FloatBuffer;
 
@@ -28,6 +29,12 @@ public abstract class AAVBaseRender {
                     "void main() {\n" +
                     "   gl_FragColor = texture2D(uTexture, vTextureCoord);\n" +
                     "}\n";
+
+    protected static final FloatBuffer DEFAULT_VERTEX_COORDINATE_BUFFER =
+            GlUtil.createFloatBuffer(AAVCoordinateUtil.DEFAULT_VERTEX_COORDS);
+
+    protected static final FloatBuffer DEFAULT_TEXTURE_COORDINATE_BUFFER =
+            GlUtil.createFloatBuffer(AAVCoordinateUtil.DEFAULT_TEXTURE_COORDS);
 
     protected int mProgramHandle = -1;
 
