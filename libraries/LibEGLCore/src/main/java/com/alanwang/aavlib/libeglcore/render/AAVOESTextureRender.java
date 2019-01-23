@@ -3,6 +3,7 @@ package com.alanwang.aavlib.libeglcore.render;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import com.alanwang.aavlib.libeglcore.common.AAVSurfaceTexture;
 
 /**
  * AAVOESTextureRender
@@ -71,6 +72,15 @@ public class AAVOESTextureRender extends AAVBaseRender {
      */
     public void resetMVPMatrix() {
         Matrix.setIdentityM(this.mMVPMatrix, 0);
+    }
+
+    /**
+     * 渲染纹理
+     * @param aavSurfaceTexture
+     */
+    public void drawFrame(AAVSurfaceTexture aavSurfaceTexture) {
+        aavSurfaceTexture.updateTexImage(mTextureTransformMatrix);
+        super.drawFrame(aavSurfaceTexture.getTextureId(), DEFAULT_VERTEX_COORDINATE_BUFFER, DEFAULT_TEXTURE_COORDINATE_BUFFER);
     }
 
     /**

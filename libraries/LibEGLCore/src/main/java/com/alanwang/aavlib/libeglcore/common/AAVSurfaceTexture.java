@@ -5,10 +5,8 @@ import android.opengl.GLES20;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.view.Surface;
-
 import com.alanwang.aavlib.libeglcore.egl.GlUtil;
 import com.alanwang.aavlib.libeglcore.render.AAVOESTextureRender;
-
 import java.lang.ref.WeakReference;
 
 /**
@@ -33,7 +31,7 @@ public class AAVSurfaceTexture {
         } else {
             mSurfaceTexture = new SurfaceTexture(mTextureId);
         }
-        mSurfaceTexture.setOnFrameAvailableListener(new InternalFrameAvailableListener(this);
+        mSurfaceTexture.setOnFrameAvailableListener(new InternalFrameAvailableListener(this));
     }
 
     /**
@@ -107,7 +105,7 @@ public class AAVSurfaceTexture {
         frameBuffer.checkInit(width, height);
         frameBuffer.bindFrameBuffer();
         GLES20.glViewport(0, 0, width, height);
-        mTextureRender.drawFrame(mTextureId);
+        mTextureRender.drawFrame(this);
         frameBuffer.unbindFrameBuffer();
 
         return frameBuffer.getOutputTextureId();
@@ -118,7 +116,7 @@ public class AAVSurfaceTexture {
      * @return
      */
     public long getTimestamp() {
-        return this.mSurfaceTexture.getTimestamp();
+        return mSurfaceTexture.getTimestamp();
     }
 
     /**
