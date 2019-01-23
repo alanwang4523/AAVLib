@@ -18,8 +18,8 @@ import java.io.InputStream;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVBitmapUtils {
-    private static final String TAG = AAVBitmapUtils.class.getSimpleName();
+public class BitmapUtils {
+    private static final String TAG = BitmapUtils.class.getSimpleName();
 
     /**
      * 从资源文件获取 bitmap
