@@ -1,6 +1,17 @@
 ## AAVLib (Alan Audio & Video Library)
 
 
+## modules
+**modules 目录下是各个功能模块的集合，可单独对 modules 封装一个 APP, 其依赖于 libraries 下面的 libs**
+### ALVideoEditor:
+视频编辑模块:
+- 视频播放预览
+- 视频编辑
+- 添加视频滤镜、特效
+- 视频效果保存
+
+
+## libraries
 **libraries 目录下的各 library 介绍如下，详细信息可见各 lib 下的 README.md 文件：**
 ### LibAudio:
 音频库，主要包含以下内容：
