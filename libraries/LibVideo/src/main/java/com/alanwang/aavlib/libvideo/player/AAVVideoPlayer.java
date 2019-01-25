@@ -1,4 +1,4 @@
-package com.alanwang.aavlib.libmediacore.video;
+package com.alanwang.aavlib.libvideo.player;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
