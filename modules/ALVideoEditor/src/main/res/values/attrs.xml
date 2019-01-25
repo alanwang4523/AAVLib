@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--自定义的 EnhancedRelativeLayout-->
+    <declare-styleable name="EnhancedRelativeLayout">
+        <attr name="layout_roundCornerRadius" format="dimension" />
+        <attr name="layout_ratio" format="float" />
+        <attr name="layout_backgroundColor" format="color" />
+        <attr name="layout_baseEdge" format="enum">
+            <enum name="width" value="0" />
+            <enum name="height" value="1" />
+            <enum name="shorter" value="2" />
+            <enum name="longer" value="3" />
+        </attr>
+        <attr name="layout_maxWidth" format="dimension" />
+        <attr name="layout_maxHeight" format="dimension" />
+    </declare-styleable>
+
+</resources>
