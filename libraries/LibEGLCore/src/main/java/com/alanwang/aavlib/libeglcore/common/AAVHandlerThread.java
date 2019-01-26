@@ -24,7 +24,7 @@ public class AAVHandlerThread {
         void handleMsg(Message msg);
     }
 
-    private static final int MSG_QUIT = -402181;
+    private static final int MSG_QUIT = 402181;
     private final HandlerThread mHandlerThread;
     private Handler mHandler;
 
@@ -51,7 +51,7 @@ public class AAVHandlerThread {
      * 停止线程
      */
     public void stop() {
-        if (mHandler == null) {
+        if (mHandler != null) {
             mHandler.sendEmptyMessage(MSG_QUIT);
         }
     }
@@ -61,7 +61,7 @@ public class AAVHandlerThread {
      * @param what
      */
     public void postMessage(int what) {
-        if (mHandler == null) {
+        if (mHandler != null) {
             mHandler.sendEmptyMessage(what);
         }
     }
@@ -72,7 +72,7 @@ public class AAVHandlerThread {
      * @param object
      */
     public void postMessage(int what, Object object) {
-        if (mHandler == null) {
+        if (mHandler != null) {
             mHandler.sendMessage(mHandler.obtainMessage(what, object));
         }
     }
@@ -82,7 +82,11 @@ public class AAVHandlerThread {
      * @param runnable
      */
     public void postTask(Runnable runnable) {
-        if (mHandler == null) {
+        if (mHandler != null) {
+            if (Looper.myLooper() == mHandler.getLooper()) {
+                runnable.run();
+                return;
+            }
             mHandler.post(runnable);
         }
     }
