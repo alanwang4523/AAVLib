@@ -3,6 +3,7 @@ package com.alanwang.aavlib.libeglcore.engine;
 import android.media.ImageReader;
 import android.opengl.EGLContext;
 import android.os.Process;
+import android.support.annotation.NonNull;
 import android.view.Surface;
 import com.alanwang.aavlib.libeglcore.common.AAVHandlerThread;
 import com.alanwang.aavlib.libeglcore.common.AAVMessage;
@@ -24,14 +25,16 @@ public class AAVMainGLEngine {
     private final ImageReader mImageReader;
     private final Deque<AAVMessage> mRenderTaskDeque;
     private final RenderTask mRenderTask;
+    private IGLEngineCallback mEngineCallback;
     private volatile boolean mIsEngineValid = false;
 
-    public AAVMainGLEngine() {
+    public AAVMainGLEngine(@NonNull IGLEngineCallback callback) {
         mEGLCoreWrapper = new AAVEGLCoreWrapper(null);
         mHandlerThread = new AAVHandlerThread(TAG, Process.THREAD_PRIORITY_FOREGROUND);
         mImageReader = ImageReader.newInstance(1, 1, 1, 1);
         mRenderTaskDeque = new ArrayDeque<>();
         mRenderTask = new RenderTask(this);
+        mEngineCallback = callback;
     }
 
     /**
@@ -45,6 +48,7 @@ public class AAVMainGLEngine {
                 mEGLCoreWrapper.createSurface(mImageReader.getSurface());
                 mEGLCoreWrapper.makeCurrent();
                 mIsEngineValid = true;
+                mEngineCallback.onEngineStart();
             }
         });
     }
@@ -63,12 +67,13 @@ public class AAVMainGLEngine {
      * @param width
      * @param height
      */
-    public void updateSurface(final Surface surface, int width, int height) {
+    public void updateSurface(final Surface surface, final int width, final int height) {
         mHandlerThread.postTask(new Runnable() {
             @Override
             public void run() {
                 mEGLCoreWrapper.createSurface(surface);
                 mEGLCoreWrapper.makeCurrent();
+                mEngineCallback.onSurfaceUpdate(surface, width, height);
             }
         });
     }
@@ -96,7 +101,7 @@ public class AAVMainGLEngine {
     private void handleRenderMsg(AAVMessage msg) {
         if (mEGLCoreWrapper.isEGLContextValid()) {
             mEGLCoreWrapper.makeCurrent();
-            // TODO alan doRender
+            mEngineCallback.onRender(msg);
             mEGLCoreWrapper.swapBuffers();
         }
     }
@@ -110,6 +115,7 @@ public class AAVMainGLEngine {
             public void run() {
                 mIsEngineValid = false;
                 mEGLCoreWrapper.destroyWindowSurface();
+                mEngineCallback.onSurfaceDestroy();
             }
         });
     }
@@ -122,6 +128,7 @@ public class AAVMainGLEngine {
             @Override
             public void run() {
                 mIsEngineValid = false;
+                mEngineCallback.onEngineRelease();
                 mEGLCoreWrapper.release();
                 mImageReader.close();
             }
