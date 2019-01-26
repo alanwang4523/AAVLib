@@ -5,7 +5,10 @@ import android.opengl.EGLContext;
 import android.os.Process;
 import android.view.Surface;
 import com.alanwang.aavlib.libeglcore.common.AAVHandlerThread;
+import com.alanwang.aavlib.libeglcore.common.AAVMessage;
 import com.alanwang.aavlib.libeglcore.egl.AAVEGLCoreWrapper;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Author: AlanWang4523.
@@ -19,11 +22,16 @@ public class AAVMainGLEngine {
     private final AAVEGLCoreWrapper mEGLCoreWrapper;
     private final AAVHandlerThread mHandlerThread;
     private final ImageReader mImageReader;
+    private final Deque<AAVMessage> mRenderTaskDeque;
+    private final RenderTask mRenderTask;
+    private volatile boolean mIsEngineValid = false;
 
     public AAVMainGLEngine() {
         mEGLCoreWrapper = new AAVEGLCoreWrapper(null);
         mHandlerThread = new AAVHandlerThread(TAG, Process.THREAD_PRIORITY_FOREGROUND);
         mImageReader = ImageReader.newInstance(1, 1, 1, 1);
+        mRenderTaskDeque = new ArrayDeque<>();
+        mRenderTask = new RenderTask(this);
     }
 
     /**
@@ -36,6 +44,7 @@ public class AAVMainGLEngine {
             public void run() {
                 mEGLCoreWrapper.createSurface(mImageReader.getSurface());
                 mEGLCoreWrapper.makeCurrent();
+                mIsEngineValid = true;
             }
         });
     }
@@ -65,12 +74,41 @@ public class AAVMainGLEngine {
     }
 
     /**
+     * 发送一个渲染消息
+     * @param msg
+     */
+    public void postRenderMessage(AAVMessage msg) {
+        if (mIsEngineValid) {
+            synchronized (mRenderTaskDeque) {
+                if (mRenderTaskDeque.size() > 100) {
+                    mRenderTaskDeque.clear();
+                }
+                mRenderTaskDeque.add(msg);
+            }
+            mHandlerThread.postTask(mRenderTask);
+        }
+    }
+
+    /**
+     * 真正的处理渲染消息
+     * @param msg
+     */
+    private void handleRenderMsg(AAVMessage msg) {
+        if (mEGLCoreWrapper.isEGLContextValid()) {
+            mEGLCoreWrapper.makeCurrent();
+            // TODO alan doRender
+            mEGLCoreWrapper.swapBuffers();
+        }
+    }
+
+    /**
      * 销毁 Surface
      */
     public void destroySurface() {
         mHandlerThread.postTask(new Runnable() {
             @Override
             public void run() {
+                mIsEngineValid = false;
                 mEGLCoreWrapper.destroyWindowSurface();
             }
         });
@@ -83,10 +121,33 @@ public class AAVMainGLEngine {
         mHandlerThread.postTask(new Runnable() {
             @Override
             public void run() {
+                mIsEngineValid = false;
                 mEGLCoreWrapper.release();
                 mImageReader.close();
             }
         });
+    }
+
+    /**
+     * 渲染任务
+     */
+    private static class RenderTask implements  Runnable {
+        private final AAVMainGLEngine mMainGLEngine;
+
+        public RenderTask(AAVMainGLEngine mainGLEngine) {
+            this.mMainGLEngine = mainGLEngine;
+        }
+
+        @Override
+        public void run() {
+            AAVMessage msg;
+            synchronized (mMainGLEngine.mRenderTaskDeque) {
+                msg = mMainGLEngine.mRenderTaskDeque.poll();
+            }
+            if (msg != null) {
+                mMainGLEngine.handleRenderMsg(msg);
+            }
+        }
     }
 
 }
