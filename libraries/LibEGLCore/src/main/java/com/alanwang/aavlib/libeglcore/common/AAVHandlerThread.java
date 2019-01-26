@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Process;
 
 /**
  * Author: AlanWang4523.
@@ -24,11 +25,15 @@ public class AAVHandlerThread {
     }
 
     private static final int MSG_QUIT = -402181;
-    private Handler mHandler;
     private final HandlerThread mHandlerThread;
+    private Handler mHandler;
 
     public AAVHandlerThread(String name) {
-        mHandlerThread = new HandlerThread(name);
+        this(name, Process.THREAD_PRIORITY_DEFAULT);
+    }
+
+    public AAVHandlerThread(String name, int priority) {
+        mHandlerThread = new HandlerThread(name, priority);
     }
 
     /**
