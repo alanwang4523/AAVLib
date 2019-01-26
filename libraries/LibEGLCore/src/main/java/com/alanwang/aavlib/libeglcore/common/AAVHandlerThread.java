@@ -46,7 +46,40 @@ public class AAVHandlerThread {
      * 停止线程
      */
     public void stop() {
-        mHandler.sendEmptyMessage(MSG_QUIT);
+        if (mHandler == null) {
+            mHandler.sendEmptyMessage(MSG_QUIT);
+        }
+    }
+
+    /**
+     * 发送一个只含 what 的消息
+     * @param what
+     */
+    public void postMessage(int what) {
+        if (mHandler == null) {
+            mHandler.sendEmptyMessage(what);
+        }
+    }
+
+    /**
+     * 发送一个含 what 和 object 的消息
+     * @param what
+     * @param object
+     */
+    public void postMessage(int what, Object object) {
+        if (mHandler == null) {
+            mHandler.sendMessage(mHandler.obtainMessage(what, object));
+        }
+    }
+
+    /**
+     * 发送一个任务到子线程执行
+     * @param runnable
+     */
+    public void postTask(Runnable runnable) {
+        if (mHandler == null) {
+            mHandler.post(runnable);
+        }
     }
 
     private static class InternalHandler extends Handler {
