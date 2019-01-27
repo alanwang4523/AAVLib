@@ -133,6 +133,7 @@ public class AAVMainGLEngine {
                 mImageReader.close();
             }
         });
+        mHandlerThread.stop();
     }
 
     /**
