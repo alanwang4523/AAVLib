@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AAVLib</string>
+    <string name="module_video_editor">ALVideoEditor</string>
 </resources>
