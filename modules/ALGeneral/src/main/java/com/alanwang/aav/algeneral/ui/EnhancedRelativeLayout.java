@@ -1,4 +1,4 @@
-package com.alanwang.aav.alvideoeditor.ui;
+package com.alanwang.aav.algeneral.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,7 +10,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
-import com.alanwang.aav.alvideoeditor.R;
+import com.alanwang.aav.algeneral.R;
 
 /**
  * 可设置圆角和宽高比的增强型 RelativeLayout
