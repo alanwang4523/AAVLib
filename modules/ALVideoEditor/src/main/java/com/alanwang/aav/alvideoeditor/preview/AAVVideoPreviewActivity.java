@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Surface;
 import android.view.Window;
 import android.view.WindowManager;
-
 import com.alanwang.aav.alvideoeditor.R;
 import com.alanwang.aavlib.libvideo.player.AAVVideoPlayer;
 import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
@@ -18,9 +17,9 @@ import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVVideoPreviewActivity extends AppCompatActivity implements ISurfaceCallback{
+public class AAVVideoPreviewActivity extends AppCompatActivity implements ISurfaceCallback, IVideoPlayer.OnPlayReadyListener {
 
-    private static final String VIDEO_PATH = "";
+    private static final String VIDEO_PATH = "/sdcard/Alan/video/huahua.mp4";
     private AAVSurfaceView mAAVSurfaceView;
     private IVideoPlayer mVideoPlayer;
 
@@ -38,6 +37,7 @@ public class AAVVideoPreviewActivity extends AppCompatActivity implements ISurfa
 
         mVideoPlayer = new AAVVideoPlayer();
         mVideoPlayer.preparePlayer(VIDEO_PATH);
+        mVideoPlayer.setOnPlayReadyListener(this);
     }
 
     @Override
@@ -48,5 +48,16 @@ public class AAVVideoPreviewActivity extends AppCompatActivity implements ISurfa
     @Override
     public void onSurfaceDestroyed(Object surface) {
         mVideoPlayer.stop();
+    }
+
+    @Override
+    public void onPlayReady(int width, int height) {
+        mVideoPlayer.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mVideoPlayer.release();
+        super.onDestroy();
     }
 }
