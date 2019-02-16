@@ -20,7 +20,7 @@ public class AAVSurfaceRender extends AAVBaseRender {
 
     public AAVSurfaceRender() {
         super();
-        mTextureCoordinateFBuffer = GlUtil.createFloatBuffer(AAVCoordinateUtil.TEXTURE_NO_ROTATION);
+        mTextureCoordinateFBuffer = GlUtil.createFloatBuffer(AAVCoordinateUtil.DEFAULT_TEXTURE_COORDS);
     }
 
     /**

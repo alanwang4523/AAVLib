@@ -8,8 +8,7 @@ import android.view.WindowManager;
 
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
-import com.alanwang.aavlib.libvideo.player.AAVVideoPlayer;
-import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
+import com.alanwang.aav.alvideoeditor.core.AAVVideoPlayController;
 import com.alanwang.aavlib.libvideo.surface.AAVSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
 
@@ -19,12 +18,12 @@ import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVVideoPreviewActivity extends AppCompatActivity implements ISurfaceCallback, IVideoPlayer.OnPlayReadyListener {
+public class AAVVideoPreviewActivity extends AppCompatActivity implements ISurfaceCallback, AAVVideoPlayController.IControllerCallback {
 
     private static final String VIDEO_PATH = "/sdcard/Alan/video/huahua.mp4";
     private EnhancedRelativeLayout mVideoLayout;
     private AAVSurfaceView mAAVSurfaceView;
-    private IVideoPlayer mVideoPlayer;
+    private AAVVideoPlayController mVideoPlayController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,30 +39,29 @@ public class AAVVideoPreviewActivity extends AppCompatActivity implements ISurfa
         mAAVSurfaceView = findViewById(R.id.video_surface_view);
         mAAVSurfaceView.setSurfaceCallback(this);
 
-        mVideoPlayer = new AAVVideoPlayer();
-        mVideoPlayer.preparePlayer(VIDEO_PATH);
-        mVideoPlayer.setOnPlayReadyListener(this);
+        mVideoPlayController = new AAVVideoPlayController();
+        mVideoPlayController.setControllerCallback(this);
+        mVideoPlayController.setVideoPath(VIDEO_PATH);
     }
 
     @Override
     public void onSurfaceChanged(Object surface, int w, int h) {
-        mVideoPlayer.setSurface((Surface) surface);
+        mVideoPlayController.updateSurface((Surface) surface, w, h);
     }
 
     @Override
     public void onSurfaceDestroyed(Object surface) {
-        mVideoPlayer.stop();
+        mVideoPlayController.destroySurface();
     }
 
     @Override
-    public void onPlayReady(int width, int height) {
+    public void onPlayReady(int width, int height, long duration) {
         mVideoLayout.setRatio(1.0f * height / width);
-        mVideoPlayer.start();
     }
 
     @Override
     protected void onDestroy() {
-        mVideoPlayer.release();
+        mVideoPlayController.release();
         super.onDestroy();
     }
 }

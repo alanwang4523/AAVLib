@@ -1,5 +1,6 @@
 package com.alanwang.aav.alvideoeditor.core;
 
+import android.opengl.GLES20;
 import android.view.Surface;
 
 import com.alanwang.aavlib.libeglcore.common.AAVFrameAvailableListener;
@@ -8,6 +9,8 @@ import com.alanwang.aavlib.libeglcore.common.AAVMessage;
 import com.alanwang.aavlib.libeglcore.common.AAVSurfaceTexture;
 import com.alanwang.aavlib.libeglcore.engine.AAVMainGLEngine;
 import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
+import com.alanwang.aavlib.libeglcore.render.AAVBaseRender;
+import com.alanwang.aavlib.libeglcore.render.AAVSurfaceRender;
 import com.alanwang.aavlib.libvideo.player.AAVVideoPlayer;
 import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
 import com.alanwang.aavlib.libvideoeffect.effects.AAVGrayEffect;
@@ -39,12 +42,14 @@ public class AAVVideoPlayController implements
     private AAVFrameBufferObject mFrameBuffer;
     private AAVMainGLEngine mMainGLEngine;
     private IControllerCallback iControllerCallback;
-    private AAVGrayEffect mVideoEffect;
+    private AAVSurfaceRender mVideoRender;
 
     private volatile boolean mIsPlayerReady = false;
     private volatile boolean mIsSurfaceReady = false;
     private int mVideoWidth;
     private int mVideoHeight;
+    private int mViewportWidth;
+    private int mViewportHeight;
 
 
     public AAVVideoPlayController() {
@@ -145,18 +150,24 @@ public class AAVVideoPlayController implements
         mAAVSurface = new AAVSurfaceTexture();
         mAAVSurface.setFrameAvailableListener(this);
         mVideoPlayer.setSurface(mAAVSurface.getSurface());
-        mVideoEffect = new AAVGrayEffect();
+        mVideoRender = new AAVSurfaceRender();
     }
 
     @Override
     public void onSurfaceUpdate(Surface surface, int width, int height) {
+        GLES20.glViewport(0, 0, width, height);
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
+        mViewportWidth = width;
+        mViewportHeight = height;
         mIsSurfaceReady = true;
         tryToStartPlay();
     }
 
     @Override
     public void onRender(AAVMessage msg) {
-        mVideoEffect.drawFrame(mFrameBuffer.getOutputTextureId());
+        mVideoRender.drawFrame(mFrameBuffer.getOutputTextureId(), mViewportWidth, mViewportHeight);
     }
 
     @Override
@@ -169,6 +180,7 @@ public class AAVVideoPlayController implements
         if (mAAVSurface != null) {
             mAAVSurface.release();
         }
+        mVideoRender.release();
         mVideoPlayer.stop();
         mVideoPlayer.release();
     }
@@ -188,7 +200,7 @@ public class AAVVideoPlayController implements
     }
 
     private void tryToStartPlay() {
-        if (isAllReady()) {
+        if (isAllReady() && !mVideoPlayer.isPlaying()) {
             mVideoPlayer.start();
         }
     }
