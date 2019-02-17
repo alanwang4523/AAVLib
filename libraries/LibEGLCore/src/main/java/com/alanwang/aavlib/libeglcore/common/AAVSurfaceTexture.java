@@ -10,6 +10,7 @@ import com.alanwang.aavlib.libeglcore.render.AAVOESTextureRender;
 import java.lang.ref.WeakReference;
 
 /**
+ * 自定义 SurfaceTexture ，注意其需要在 GL 线程初始化
  * Author: AlanWang4523.
  * Date: 19/1/23 23:41.
  * Mail: alanwang4523@gmail.com
