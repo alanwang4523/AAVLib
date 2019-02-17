@@ -26,11 +26,11 @@ public class AAVFrameBufferObject {
     public boolean checkInit(int width, int height) {
         long id = Thread.currentThread().getId();
         if (mLastThreadID != id && mLastThreadID > 0) {
-            releaseFrameBuffer();
+            release();
         } else if (mWidth == width && mHeight == height && mOutputTextureId != -1) {
             return true;
         } else {
-            releaseFrameBuffer();
+            release();
         }
         mLastThreadID = id;
         return createAndBindTexture(width, height);
@@ -80,7 +80,7 @@ public class AAVFrameBufferObject {
     /**
      * 释放 FrameBuffer
      */
-    public void releaseFrameBuffer() {
+    public void release() {
         mFrameBuffer.release();
         if (mOutputTextureId != -1) {
             GLES20.glDeleteTextures(1, new int[]{mOutputTextureId}, 0);

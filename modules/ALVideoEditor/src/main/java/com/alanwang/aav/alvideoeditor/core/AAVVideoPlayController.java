@@ -9,7 +9,6 @@ import com.alanwang.aavlib.libeglcore.common.AAVMessage;
 import com.alanwang.aavlib.libeglcore.common.AAVSurfaceTexture;
 import com.alanwang.aavlib.libeglcore.engine.AAVMainGLEngine;
 import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
-import com.alanwang.aavlib.libeglcore.render.AAVBaseRender;
 import com.alanwang.aavlib.libeglcore.render.AAVSurfaceRender;
 import com.alanwang.aavlib.libvideo.player.AAVVideoPlayer;
 import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
@@ -39,9 +38,11 @@ public class AAVVideoPlayController implements
     private final static int MSG_DRAW = 0x0101;
     private IVideoPlayer mVideoPlayer;
     private AAVSurfaceTexture mAAVSurface;
-    private AAVFrameBufferObject mFrameBuffer;
+    private AAVFrameBufferObject mSrcFrameBuffer;
+    private AAVFrameBufferObject mEffectFrameBuffer;
     private AAVMainGLEngine mMainGLEngine;
     private IControllerCallback iControllerCallback;
+    private AAVGrayEffect mTestEffect;
     private AAVSurfaceRender mVideoRender;
 
     private volatile boolean mIsPlayerReady = false;
@@ -146,10 +147,12 @@ public class AAVVideoPlayController implements
     //***************** IGLEngineCallback start ******************
     @Override
     public void onEngineStart() {
-        mFrameBuffer = new AAVFrameBufferObject();
+        mSrcFrameBuffer = new AAVFrameBufferObject();
+        mEffectFrameBuffer = new AAVFrameBufferObject();
         mAAVSurface = new AAVSurfaceTexture();
         mAAVSurface.setFrameAvailableListener(this);
         mVideoPlayer.setSurface(mAAVSurface.getSurface());
+        mTestEffect = new AAVGrayEffect();
         mVideoRender = new AAVSurfaceRender();
     }
 
@@ -167,7 +170,12 @@ public class AAVVideoPlayController implements
 
     @Override
     public void onRender(AAVMessage msg) {
-        mVideoRender.drawFrame(mFrameBuffer.getOutputTextureId(), mViewportWidth, mViewportHeight);
+        mEffectFrameBuffer.checkInit(mVideoWidth, mVideoHeight);
+        mEffectFrameBuffer.bindFrameBuffer();
+        mTestEffect.drawFrame(mSrcFrameBuffer.getOutputTextureId());
+        mEffectFrameBuffer.unbindFrameBuffer();
+
+        mVideoRender.drawFrame(mEffectFrameBuffer.getOutputTextureId(), mViewportWidth, mViewportHeight);
     }
 
     @Override
@@ -180,17 +188,20 @@ public class AAVVideoPlayController implements
         if (mAAVSurface != null) {
             mAAVSurface.release();
         }
+        mTestEffect.release();
         mVideoRender.release();
+
         mVideoPlayer.stop();
         mVideoPlayer.release();
+        mSrcFrameBuffer.release();
+        mEffectFrameBuffer.release();
     }
     //***************** OnPlayReadyListener end ******************
 
     //***************** AAVFrameAvailableListener start ******************
     @Override
     public void onFrameAvailable(AAVSurfaceTexture surfaceTexture) {
-        mFrameBuffer.checkInit(mVideoWidth, mVideoHeight);
-        surfaceTexture.drawFrame(mFrameBuffer, mVideoWidth, mVideoHeight);
+        surfaceTexture.drawFrame(mSrcFrameBuffer, mVideoWidth, mVideoHeight);
         mMainGLEngine.postRenderMessage(new AAVMessage(MSG_DRAW));
     }
     //***************** AAVFrameAvailableListener end ******************
