@@ -222,6 +222,10 @@ public abstract class AAVVideoEncodeCore {
      */
     protected abstract void handleEncodedData(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo);
 
+    /**
+     * 发送编码结束信号
+     * @param endOfStream
+     */
     private void signalEndOfInputStream(boolean endOfStream) {
         if (endOfStream) {
             try {
