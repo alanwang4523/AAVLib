@@ -1,4 +1,4 @@
-package com.alanwang.aav.alvideoeditor.core;
+package com.alanwang.aavlib.libvideo.core;
 
 import android.opengl.GLES20;
 import android.view.Surface;
@@ -18,10 +18,7 @@ import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVVideoPlayController implements
-        IVideoPlayer.OnPlayReadyListener,
-        IGLEngineCallback,
-        AAVFrameAvailableListener {
+public class AAVVideoPlayController {
 
     public interface IControllerCallback {
         /**
@@ -48,8 +45,8 @@ public class AAVVideoPlayController implements
 
     public AAVVideoPlayController() {
         mVideoPlayer = new AAVVideoPlayer();
-        mVideoPlayer.setOnPlayReadyListener(this);
-        mMainGLEngine = new AAVMainGLEngine(this);
+        mVideoPlayer.setOnPlayReadyListener(mOnPlayReadyListener);
+        mMainGLEngine = new AAVMainGLEngine(mIGLEngineCallback);
         mMainGLEngine.start();
     }
 
@@ -124,71 +121,6 @@ public class AAVVideoPlayController implements
         mMainGLEngine.release();
     }
 
-    //***************** OnPlayReadyListener start ******************
-    @Override
-    public void onPlayReady(int width, int height) {
-        mIsPlayerReady = true;
-        if (iControllerCallback != null) {
-            iControllerCallback.onPlayReady(width, height, mVideoPlayer.getDuration());
-        }
-        mVideoWidth = width;
-        mVideoHeight = height;
-        tryToStartPlay();
-    }
-    //***************** OnPlayReadyListener end ******************
-
-    //***************** IGLEngineCallback start ******************
-    @Override
-    public void onEngineStart() {
-        mSrcFrameBuffer = new AAVFrameBufferObject();
-        mAAVSurface = new AAVSurfaceTexture();
-        mAAVSurface.setFrameAvailableListener(this);
-        mVideoPlayer.setSurface(mAAVSurface.getSurface());
-        mPreviewRender = new AAVVideoPreviewRender();
-    }
-
-    @Override
-    public void onSurfaceUpdate(Surface surface, int width, int height) {
-        GLES20.glViewport(0, 0, width, height);
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
-        mPreviewRender.updatePreviewSize(width, height);
-        mIsSurfaceReady = true;
-        tryToStartPlay();
-    }
-
-    @Override
-    public void onRender(AAVMessage msg) {
-        mPreviewRender.draw(mSrcFrameBuffer.getOutputTextureId(), mVideoWidth, mVideoHeight);
-    }
-
-    @Override
-    public void onSurfaceDestroy() {
-        mIsSurfaceReady = false;
-    }
-
-    @Override
-    public void onEngineRelease() {
-        if (mAAVSurface != null) {
-            mAAVSurface.release();
-        }
-
-        mVideoPlayer.stop();
-        mVideoPlayer.release();
-        mSrcFrameBuffer.release();
-        mPreviewRender.release();
-    }
-    //***************** OnPlayReadyListener end ******************
-
-    //***************** AAVFrameAvailableListener start ******************
-    @Override
-    public void onFrameAvailable(AAVSurfaceTexture surfaceTexture) {
-        surfaceTexture.drawFrame(mSrcFrameBuffer, mVideoWidth, mVideoHeight);
-        mMainGLEngine.postRenderMessage(new AAVMessage(MSG_DRAW));
-    }
-    //***************** AAVFrameAvailableListener end ******************
-
     private boolean isAllReady() {
         return mIsPlayerReady && mIsSurfaceReady;
     }
@@ -198,4 +130,69 @@ public class AAVVideoPlayController implements
             mVideoPlayer.start();
         }
     }
+
+    private AAVFrameAvailableListener mFrameAvailableListener = new AAVFrameAvailableListener() {
+        @Override
+        public void onFrameAvailable(AAVSurfaceTexture surfaceTexture) {
+            surfaceTexture.drawFrame(mSrcFrameBuffer, mVideoWidth, mVideoHeight);
+            mMainGLEngine.postRenderMessage(new AAVMessage(MSG_DRAW));
+        }
+    };
+
+    private IGLEngineCallback mIGLEngineCallback = new IGLEngineCallback() {
+        @Override
+        public void onEngineStart() {
+            mSrcFrameBuffer = new AAVFrameBufferObject();
+            mAAVSurface = new AAVSurfaceTexture();
+            mAAVSurface.setFrameAvailableListener(mFrameAvailableListener);
+            mVideoPlayer.setSurface(mAAVSurface.getSurface());
+            mPreviewRender = new AAVVideoPreviewRender();
+        }
+
+        @Override
+        public void onSurfaceUpdate(Surface surface, int width, int height) {
+            GLES20.glViewport(0, 0, width, height);
+            GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
+            mPreviewRender.updatePreviewSize(width, height);
+            mIsSurfaceReady = true;
+            tryToStartPlay();
+        }
+
+        @Override
+        public void onRender(AAVMessage msg) {
+            mPreviewRender.draw(mSrcFrameBuffer.getOutputTextureId(), mVideoWidth, mVideoHeight);
+        }
+
+        @Override
+        public void onSurfaceDestroy() {
+            mIsSurfaceReady = false;
+        }
+
+        @Override
+        public void onEngineRelease() {
+            if (mAAVSurface != null) {
+                mAAVSurface.release();
+            }
+
+            mVideoPlayer.stop();
+            mVideoPlayer.release();
+            mSrcFrameBuffer.release();
+            mPreviewRender.release();
+        }
+    };
+
+    private IVideoPlayer.OnPlayReadyListener mOnPlayReadyListener = new IVideoPlayer.OnPlayReadyListener() {
+        @Override
+        public void onPlayReady(int width, int height) {
+            mIsPlayerReady = true;
+            if (iControllerCallback != null) {
+                iControllerCallback.onPlayReady(width, height, mVideoPlayer.getDuration());
+            }
+            mVideoWidth = width;
+            mVideoHeight = height;
+            tryToStartPlay();
+        }
+    };
 }

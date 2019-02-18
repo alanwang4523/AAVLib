@@ -1,4 +1,4 @@
-package com.alanwang.aav.alvideoeditor.core;
+package com.alanwang.aavlib.libvideo.core;
 
 import com.alanwang.aavlib.libeglcore.common.AAVFrameBufferObject;
 import com.alanwang.aavlib.libeglcore.render.AAVSurfaceRender;

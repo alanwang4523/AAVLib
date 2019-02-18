@@ -27,8 +27,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':libraries:LibVideo')
-    implementation project(':libraries:LibVideoEffect')
-    implementation project(':libraries:LibEGLCore')
     implementation project(':libraries:LibUtils')
     implementation project(':modules:ALGeneral')
     implementation 'com.android.support:appcompat-v7:26.1.0'

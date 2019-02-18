@@ -8,7 +8,7 @@ import android.view.WindowManager;
 
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
-import com.alanwang.aav.alvideoeditor.core.AAVVideoPlayController;
+import com.alanwang.aavlib.libvideo.core.AAVVideoPlayController;
 import com.alanwang.aavlib.libvideo.surface.AAVSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
 
