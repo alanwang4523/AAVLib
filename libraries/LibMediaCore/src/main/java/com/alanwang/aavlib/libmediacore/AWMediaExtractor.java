@@ -126,7 +126,7 @@ public abstract class AWMediaExtractor {
      * MediaFormat 已确认，子类继承该方法可以通过 MediaFormat 获取需要的信息
      * @param mediaFormat
      */
-    protected void onMediaFormatConfirmed(MediaFormat mediaFormat) throws IllegalArgumentException {
+    protected void onMediaFormatConfirmed(MediaFormat mediaFormat) throws IllegalArgumentException, IOException {
         int maxInputSize = mediaFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
         mByteBuffer = ByteBuffer.allocate(maxInputSize);
     }
@@ -171,7 +171,7 @@ public abstract class AWMediaExtractor {
         return trackIndex;
     }
 
-    private void release() {
+    protected void release() {
         if (mExtractor != null) {
             mExtractor.release();
             mExtractor = null;
