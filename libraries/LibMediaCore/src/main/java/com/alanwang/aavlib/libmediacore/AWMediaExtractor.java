@@ -18,6 +18,7 @@ public abstract class AWMediaExtractor {
     private final static String TAG = AWMediaExtractor.class.getSimpleName();
     protected MediaExtractor mExtractor = null;
     protected long mDurationMs = -1;
+    private ByteBuffer mByteBuffer;
     private MediaCodec.BufferInfo mBufferInfo;
     private AWExtractorListener mExtractorListener;
     private boolean mIsExtractorReady = false;
@@ -31,7 +32,7 @@ public abstract class AWMediaExtractor {
      * @param mediaPath
      * @throws IOException
      */
-    public void setDataSource(String mediaPath) throws IOException, IllegalAccessException {
+    public void setDataSource(String mediaPath) throws IOException, IllegalArgumentException {
         mExtractor = new MediaExtractor();
         mExtractor.setDataSource(mediaPath);
 
@@ -48,7 +49,7 @@ public abstract class AWMediaExtractor {
 
         int trackIndex = getTrackIndex(mExtractor);
         if (trackIndex < 0) {
-            throw new IllegalAccessException("Cannot access the track index!");
+            throw new IllegalArgumentException("Cannot access the track index!");
         }
         onMediaFormatConfirmed(mExtractor.getTrackFormat(trackIndex));
         mBufferInfo = new MediaCodec.BufferInfo();
@@ -92,16 +93,21 @@ public abstract class AWMediaExtractor {
     protected abstract boolean isTheInterestedTrack(String keyMimeString);
 
     /**
-     * MediaFormat 已确认，子类实现该方法可以通过 MediaFormat 获取需要的信息
+     * MediaFormat 已确认，子类继承该方法可以通过 MediaFormat 获取需要的信息
      * @param mediaFormat
      */
-    protected abstract void onMediaFormatConfirmed(MediaFormat mediaFormat);
+    protected void onMediaFormatConfirmed(MediaFormat mediaFormat) throws IllegalArgumentException {
+        int maxInputSize = mediaFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
+        mByteBuffer = ByteBuffer.allocate(maxInputSize);
+    }
 
     /**
      * 获取接受抽取输出的数据
      * @return
      */
-    protected abstract ByteBuffer getBufferForOutputData();
+    protected ByteBuffer getBufferForOutputData() {
+        return mByteBuffer;
+    }
 
     /**
      * 有数据抽出的回调
@@ -151,11 +157,15 @@ public abstract class AWMediaExtractor {
             int readCount;
             while (mIsRunning) {
                 ByteBuffer byteBuffer = getBufferForOutputData();
+                if (byteBuffer == null && mExtractorListener != null) {
+                    mExtractorListener.onError("Buffer cannot be null！");
+                    break;
+                }
                 byteBuffer.clear();
+
                 try {
                     readCount = mExtractor.readSampleData(byteBuffer, 0);
                 } catch (IllegalArgumentException e) {
-                    isSuccess = false;
                     if (mExtractorListener != null) {
                         mExtractorListener.onError("Buffer not enough！");
                     }
