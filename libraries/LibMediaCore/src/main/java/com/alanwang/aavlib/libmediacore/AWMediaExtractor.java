@@ -97,8 +97,9 @@ public abstract class AWMediaExtractor {
     /**
      * 有数据抽出的回调
      * @param extractBuffer
+     * @param bufferInfo
      */
-    protected abstract void onDataAvailable(ByteBuffer extractBuffer);
+    protected abstract void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo);
 
     /**
      * 获取 track index, 此处视频和音频获取 index 的方法不一样，需要子类去实现
@@ -142,8 +143,9 @@ public abstract class AWMediaExtractor {
         public void run() {
             while (mIsRunning) {
                 int readedCount = 0;
+                ByteBuffer byteBuffer = getBufferForOutputData();
                 try {
-                    readedCount = mExtractor.readSampleData(getBufferForOutputData(), 0);
+                    readedCount = mExtractor.readSampleData(byteBuffer, 0);
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 }
@@ -156,6 +158,7 @@ public abstract class AWMediaExtractor {
                 mBufferInfo.offset = 0;
                 mBufferInfo.flags = mExtractor.getSampleFlags();
                 mBufferInfo.presentationTimeUs = mExtractor.getSampleTime();
+                onDataAvailable(byteBuffer, mBufferInfo);
             }
             release();
         }
