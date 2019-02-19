@@ -5,6 +5,7 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.text.TextUtils;
+import com.alanwang.aavlib.libmediacore.common.AWExtractorListener;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -18,6 +19,7 @@ public abstract class AWMediaExtractor {
     protected MediaExtractor mExtractor = null;
     protected long mDurationMs = -1;
     private MediaCodec.BufferInfo mBufferInfo;
+    private AWExtractorListener mExtractorListener;
     private boolean mIsExtractorReady = false;
     private volatile boolean mIsRunning = false;
 
@@ -51,6 +53,14 @@ public abstract class AWMediaExtractor {
         onMediaFormatConfirmed(mExtractor.getTrackFormat(trackIndex));
         mBufferInfo = new MediaCodec.BufferInfo();
         mIsExtractorReady = true;
+    }
+
+    /**
+     * 设置监听器
+     * @param extractorListener
+     */
+    public void setExtractorListener(AWExtractorListener extractorListener) {
+        this.mExtractorListener = extractorListener;
     }
 
     /**
@@ -98,7 +108,11 @@ public abstract class AWMediaExtractor {
      * @param extractBuffer
      * @param bufferInfo
      */
-    protected abstract void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo);
+    protected void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo) {
+        if (mExtractorListener != null) {
+            mExtractorListener.onDataAvailable(extractBuffer, bufferInfo);
+        }
+    }
 
     /**
      * 获取 track index, 此处视频和音频获取 index 的方法不一样，需要子类去实现
@@ -133,16 +147,22 @@ public abstract class AWMediaExtractor {
     private final Runnable workRunnable = new Runnable() {
         @Override
         public void run() {
+            boolean isSuccess = false;
             int readCount;
             while (mIsRunning) {
-                readCount = 0;
                 ByteBuffer byteBuffer = getBufferForOutputData();
+                byteBuffer.clear();
                 try {
                     readCount = mExtractor.readSampleData(byteBuffer, 0);
                 } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
+                    isSuccess = false;
+                    if (mExtractorListener != null) {
+                        mExtractorListener.onError("Buffer not enough！");
+                    }
+                    break;
                 }
                 if (readCount < 0) {
+                    isSuccess = true;
                     break;
                 }
 
@@ -157,6 +177,11 @@ public abstract class AWMediaExtractor {
                 }
             }
             release();
+            if (isSuccess) {
+                if (mExtractorListener != null) {
+                    mExtractorListener.onFinish();
+                }
+            }
         }
     };
 }

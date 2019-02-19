@@ -1,5 +1,8 @@
 package com.alanwang.aavlib.libmediacore.common;
 
+import android.media.MediaCodec;
+import java.nio.ByteBuffer;
+
 /**
  * Author: AlanWang4523.
  * Date: 19/2/19 01:09.
@@ -8,9 +11,10 @@ package com.alanwang.aavlib.libmediacore.common;
 public interface AWExtractorListener {
     /**
      * 有数据到来
-     * @param codecFrame
+     * @param extractBuffer
+     * @param bufferInfo
      */
-    void onDataAvailable(AWCodecFrame codecFrame);
+    void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo);
 
     /**
      * 抽取结束
