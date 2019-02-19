@@ -18,9 +18,12 @@ public abstract class AWMediaExtractor {
     private final static String TAG = AWMediaExtractor.class.getSimpleName();
     protected MediaExtractor mExtractor = null;
     protected long mDurationMs = -1;
+
     private ByteBuffer mByteBuffer;
     private MediaCodec.BufferInfo mBufferInfo;
     private AWExtractorListener mExtractorListener;
+    private long mStartPosTimeUs = 0; // 需要抽取的起始时间，单位微秒
+    private long mEndPosTimeUs = 0; // 需要抽取的截止时间，单位微秒
     private boolean mIsExtractorReady = false;
     private volatile boolean mIsRunning = false;
 
@@ -53,7 +56,27 @@ public abstract class AWMediaExtractor {
         }
         onMediaFormatConfirmed(mExtractor.getTrackFormat(trackIndex));
         mBufferInfo = new MediaCodec.BufferInfo();
+
+        mStartPosTimeUs = 0;
+        mEndPosTimeUs = mDurationMs * 1000;
         mIsExtractorReady = true;
+    }
+
+    /**
+     * 设置需要抽取的起止时间，必须在 {@link #setDataSource} 之后调用
+     * @param startTimeMs
+     * @param endTimeMs
+     */
+    public void setExtractTime(long startTimeMs, long endTimeMs) {
+        if (startTimeMs < 0 || endTimeMs < 0 || startTimeMs >= endTimeMs) {
+            throw new IllegalArgumentException("The times is invalid!");
+        }
+        if (!mIsExtractorReady) {
+            throw new IllegalArgumentException("Must be called after call setDataSource successfully!");
+        }
+        mStartPosTimeUs = startTimeMs * 1000;
+        mEndPosTimeUs = endTimeMs * 1000;
+        mExtractor.seekTo(mStartPosTimeUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
     }
 
     /**
@@ -62,6 +85,14 @@ public abstract class AWMediaExtractor {
      */
     public void setExtractorListener(AWExtractorListener extractorListener) {
         this.mExtractorListener = extractorListener;
+    }
+
+    /**
+     * 获取文件时长，必须在 {@link #setDataSource} 之后调用
+     * @return
+     */
+    public long getDurationMs() {
+        return mDurationMs;
     }
 
     /**
@@ -180,6 +211,11 @@ public abstract class AWMediaExtractor {
                 mBufferInfo.offset = 0;
                 mBufferInfo.flags = mExtractor.getSampleFlags();
                 mBufferInfo.presentationTimeUs = 1000 * mExtractor.getSampleTime();
+
+                if (mBufferInfo.presentationTimeUs >= mEndPosTimeUs) {
+                    isSuccess = true;
+                    break;
+                }
 
                 if (mIsRunning) {
                     onDataAvailable(byteBuffer, mBufferInfo);
