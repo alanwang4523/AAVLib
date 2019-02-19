@@ -14,7 +14,6 @@ import java.nio.ByteBuffer;
  * Mail: alanwang4523@gmail.com
  */
 public abstract class AWMediaExtractor {
-
     private final static String TAG = AWMediaExtractor.class.getSimpleName();
     protected MediaExtractor mExtractor = null;
     protected long mDurationMs = -1;
@@ -122,13 +121,6 @@ public abstract class AWMediaExtractor {
         return trackIndex;
     }
 
-    private void resetBufferInfo(MediaCodec.BufferInfo bufferInfo) {
-        bufferInfo.offset = 0;
-        bufferInfo.flags = MediaCodec.BUFFER_FLAG_SYNC_FRAME;
-        bufferInfo.size = 0;
-        bufferInfo.presentationTimeUs = 0L;
-    }
-
     private void release() {
         if (mExtractor != null) {
             mExtractor.release();
@@ -138,27 +130,31 @@ public abstract class AWMediaExtractor {
         mIsExtractorReady = false;
     }
 
-    private Runnable workRunnable = new Runnable() {
+    private final Runnable workRunnable = new Runnable() {
         @Override
         public void run() {
+            int readCount;
             while (mIsRunning) {
-                int readedCount = 0;
+                readCount = 0;
                 ByteBuffer byteBuffer = getBufferForOutputData();
                 try {
-                    readedCount = mExtractor.readSampleData(byteBuffer, 0);
+                    readCount = mExtractor.readSampleData(byteBuffer, 0);
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 }
-                if (readedCount < 0) {
+                if (readCount < 0) {
                     break;
                 }
-                resetBufferInfo(mBufferInfo);
 
-                mBufferInfo.size = readedCount;
+                mBufferInfo.size = readCount;
                 mBufferInfo.offset = 0;
                 mBufferInfo.flags = mExtractor.getSampleFlags();
-                mBufferInfo.presentationTimeUs = mExtractor.getSampleTime();
-                onDataAvailable(byteBuffer, mBufferInfo);
+                mBufferInfo.presentationTimeUs = 1000 * mExtractor.getSampleTime();
+
+                if (mIsRunning) {
+                    onDataAvailable(byteBuffer, mBufferInfo);
+                    mExtractor.advance();
+                }
             }
             release();
         }
