@@ -5,7 +5,6 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.text.TextUtils;
-import com.alanwang.aavlib.libmediacore.common.AWExtractorListener;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -64,8 +63,8 @@ public abstract class AWMediaExtractor {
 
     /**
      * 设置需要抽取的起止时间，必须在 {@link #setDataSource} 之后调用
-     * @param startTimeMs
-     * @param endTimeMs
+     * @param startTimeMs 单位：毫秒
+     * @param endTimeMs 单位：毫秒
      */
     public void setExtractTime(long startTimeMs, long endTimeMs) {
         if (startTimeMs < 0 || endTimeMs < 0 || startTimeMs >= endTimeMs) {

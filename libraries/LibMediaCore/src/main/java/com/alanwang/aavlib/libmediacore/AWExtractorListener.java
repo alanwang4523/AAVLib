@@ -1,4 +1,4 @@
-package com.alanwang.aavlib.libmediacore.common;
+package com.alanwang.aavlib.libmediacore;
 
 import android.media.MediaCodec;
 import java.nio.ByteBuffer;

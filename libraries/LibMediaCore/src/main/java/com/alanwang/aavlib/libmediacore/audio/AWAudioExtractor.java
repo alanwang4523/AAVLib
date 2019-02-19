@@ -1,4 +1,4 @@
-package com.alanwang.aavlib.libmediacore.common;
+package com.alanwang.aavlib.libmediacore.audio;
 
 import android.text.TextUtils;
 import com.alanwang.aavlib.libmediacore.AWMediaExtractor;
