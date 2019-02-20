@@ -1,9 +1,9 @@
-package com.alanwang.aavlib.libmediacore.audio;
+package com.alanwang.aavlib.libmediacore.extractor;
 
 import android.media.MediaCodec;
 import android.text.TextUtils;
-import com.alanwang.aavlib.libmediacore.AWExtractorListener;
-import com.alanwang.aavlib.libmediacore.AWMediaExtractor;
+import com.alanwang.aavlib.libmediacore.listener.AWExtractorListener;
+
 import java.nio.ByteBuffer;
 
 /**

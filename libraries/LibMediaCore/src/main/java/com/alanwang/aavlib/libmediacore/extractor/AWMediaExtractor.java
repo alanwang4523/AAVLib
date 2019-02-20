@@ -1,10 +1,13 @@
-package com.alanwang.aavlib.libmediacore;
+package com.alanwang.aavlib.libmediacore.extractor;
 
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.text.TextUtils;
+
+import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 

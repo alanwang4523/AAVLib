@@ -1,8 +1,8 @@
-package com.alanwang.aavlib.libmediacore.audio;
+package com.alanwang.aavlib.libmediacore.clipper;
 
 import android.text.TextUtils;
 
-import com.alanwang.aavlib.libmediacore.AWAbstractAVClipper;
+import com.alanwang.aavlib.libmediacore.clipper.AWAbstractAVClipper;
 
 /**
  * Author: AlanWang4523.

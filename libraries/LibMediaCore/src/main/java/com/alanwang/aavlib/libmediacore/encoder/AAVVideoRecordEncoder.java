@@ -1,4 +1,4 @@
-package com.alanwang.aavlib.libmediacore.video;
+package com.alanwang.aavlib.libmediacore.encoder;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;

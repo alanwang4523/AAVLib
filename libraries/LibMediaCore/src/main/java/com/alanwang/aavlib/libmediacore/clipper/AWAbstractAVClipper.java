@@ -1,8 +1,10 @@
-package com.alanwang.aavlib.libmediacore;
+package com.alanwang.aavlib.libmediacore.clipper;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+
+import com.alanwang.aavlib.libmediacore.extractor.AWMediaExtractor;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
