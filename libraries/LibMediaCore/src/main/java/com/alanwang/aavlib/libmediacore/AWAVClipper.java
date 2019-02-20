@@ -18,18 +18,19 @@ public class AWAVClipper {
     private AWAudioExtractor mAudioExtractor;
     private AWVideoExtractor mVideoExtractor;
     private MediaMuxer mMediaMuxer;
+    private AWProcessListener mProcessListener;
+
     private boolean mIsHaveAudio = false;
     private boolean mIsHaveVideo = false;
     private int mAudioTrackIndex;
     private int mVideoTrackIndex;
-    private boolean mIsAllReady = false;
-    private volatile boolean mIsStart = false;
-    private AWProcessListener mProcessListener;
     private volatile boolean mIsAudioProcessFinish = false;
     private volatile boolean mIsVideoProcessFinish = false;
     private int mMaxProgress = 0;
     private volatile int mAudioProgress = 0;
     private volatile int mVideoProgress = 0;
+    private boolean mIsAllReady = false;
+    private volatile boolean mIsStart = false;
 
     public AWAVClipper() {
         mAudioExtractor = new AWAudioExtractor();
@@ -47,7 +48,7 @@ public class AWAVClipper {
         try {
             mAudioExtractor.setDataSource(srcMediaPath);
             mAudioExtractor.setExtractorListener(mAudioDataListener);
-            mAudioExtractor.setProcessListener(mAudioProcessListener);
+            mAudioExtractor.setProcessListener(new AVProcessListener(AVProcessListener.TYPE_AUDIO));
             mMaxProgress += 100;
             mIsHaveAudio = true;
         } catch (IllegalArgumentException e) {
@@ -62,7 +63,7 @@ public class AWAVClipper {
         try {
             mVideoExtractor.setDataSource(srcMediaPath);
             mVideoExtractor.setExtractorListener(mVideoDataListener);
-            mAudioExtractor.setProcessListener(mAudioProcessListener);
+            mVideoExtractor.setProcessListener(new AVProcessListener(AVProcessListener.TYPE_VIDEO));
             mMaxProgress += 100;
             mIsHaveVideo = true;
         } catch (IllegalArgumentException e) {
@@ -170,73 +171,55 @@ public class AWAVClipper {
         }
     };
 
-    /**
-     * 音频处理回调
-     */
-    private AWProcessListener mAudioProcessListener = new AWProcessListener() {
+    private class AVProcessListener implements AWProcessListener {
+        static final int TYPE_AUDIO = 0x01;
+        static final int TYPE_VIDEO = 0x02;
+
+        private int mediaType;
+
+        public AVProcessListener(int mediaType) {
+            this.mediaType = mediaType;
+        }
+
         @Override
         public void onProgress(int percent) {
-            mAudioProgress = percent;
+            if (mediaType == TYPE_AUDIO) {
+                mAudioProgress = percent;
+            } else if (mediaType == TYPE_VIDEO) {
+                mVideoProgress = percent;
+            }
             notifyProcess();
         }
 
         @Override
         public void onFinish() {
-            tryToNotifyFinish();
+            if (isAllFinish() && mProcessListener != null) {
+                mProcessListener.onFinish();
+            }
         }
 
         @Override
         public void onError(String error) {
-            // 当音频出错时，将视频停止
-            if (mIsHaveVideo) {
+            if (mediaType == TYPE_AUDIO && mIsHaveVideo) {
+                // 当音频出错时，将视频停止
                 mVideoExtractor.stop();
-            }
-            if (mProcessListener != null) {
-                mProcessListener.onError(error);
-            }
-        }
-    };
-
-    /**
-     * 视频处理回调
-     */
-    private AWProcessListener mVideoProcessListener = new AWProcessListener() {
-        @Override
-        public void onProgress(int percent) {
-            mVideoProgress = percent;
-            notifyProcess();
-        }
-
-        @Override
-        public void onFinish() {
-            tryToNotifyFinish();
-        }
-
-        @Override
-        public void onError(String error) {
-            // 当视频出错时，将音频停止
-            if (mIsHaveAudio) {
+            } else if (mediaType == TYPE_VIDEO && mIsHaveAudio) {
+                // 当视频出错时，将音频停止
                 mAudioExtractor.stop();
             }
             if (mProcessListener != null) {
                 mProcessListener.onError(error);
             }
         }
-    };
 
-    private void tryToNotifyFinish() {
-        if (isAllFinish() && mProcessListener != null) {
-            mProcessListener.onFinish();
+        private boolean isAllFinish() {
+            return mIsAudioProcessFinish && mIsVideoProcessFinish;
         }
-    }
 
-    private boolean isAllFinish() {
-        return mIsAudioProcessFinish && mIsVideoProcessFinish;
-    }
-
-    private void notifyProcess() {
-        if (mProcessListener != null) {
-            mProcessListener.onProgress((int) (100.0f * (mAudioProgress + mVideoProgress) / mMaxProgress));
+        private void notifyProcess() {
+            if (mProcessListener != null) {
+                mProcessListener.onProgress((int) (100.0f * (mAudioProgress + mVideoProgress) / mMaxProgress));
+            }
         }
     }
 
