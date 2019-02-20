@@ -25,6 +25,12 @@ public class AWMediaClipper {
         mVideoExtractor = new AWVideoExtractor();
     }
 
+    /**
+     * 设置资源文件
+     * @param srcMediaPath
+     * @param dstSavePath
+     * @throws IOException
+     */
     public void setDataSource(String srcMediaPath, String dstSavePath) throws IOException {
         mMediaMuxer = new MediaMuxer(dstSavePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
         try {

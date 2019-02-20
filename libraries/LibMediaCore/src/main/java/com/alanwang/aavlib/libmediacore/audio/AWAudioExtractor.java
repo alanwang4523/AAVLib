@@ -1,7 +1,10 @@
 package com.alanwang.aavlib.libmediacore.audio;
 
+import android.media.MediaCodec;
 import android.text.TextUtils;
+import com.alanwang.aavlib.libmediacore.AWExtractorListener;
 import com.alanwang.aavlib.libmediacore.AWMediaExtractor;
+import java.nio.ByteBuffer;
 
 /**
  * Author: AlanWang4523.
@@ -10,12 +13,29 @@ import com.alanwang.aavlib.libmediacore.AWMediaExtractor;
  */
 public class AWAudioExtractor extends AWMediaExtractor {
 
+    private AWExtractorListener mAWExtractorListener;
+
+    /**
+     * 设置抽取数据的监听器
+     * @param extractorListener
+     */
+    public void setAWExtractorListener(AWExtractorListener extractorListener) {
+        this.mAWExtractorListener = extractorListener;
+    }
+
     @Override
     protected boolean isTheInterestedTrack(String keyMimeString) {
         if (!TextUtils.isEmpty(keyMimeString) && keyMimeString.startsWith("audio")) {
             return true;
         } else {
             return false;
+        }
+    }
+
+    @Override
+    protected void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo) {
+        if (mAWExtractorListener != null) {
+            mAWExtractorListener.onDataAvailable(extractBuffer, bufferInfo);
         }
     }
 }

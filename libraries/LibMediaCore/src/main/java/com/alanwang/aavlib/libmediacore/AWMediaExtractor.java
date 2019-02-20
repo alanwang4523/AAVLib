@@ -21,7 +21,7 @@ public abstract class AWMediaExtractor {
     private int mTrackIndex = -1;
     private ByteBuffer mByteBuffer;
     private MediaCodec.BufferInfo mBufferInfo;
-    private AWExtractorListener mExtractorListener;
+    private AWProcessListener mProcessListener;
     private long mStartPosTimeUs = 0; // 需要抽取的起始时间，单位微秒
     private long mEndPosTimeUs = 0; // 需要抽取的截止时间，单位微秒
     private boolean mIsExtractorReady = false;
@@ -46,7 +46,7 @@ public abstract class AWMediaExtractor {
         String durationStr = metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         if (!TextUtils.isEmpty(durationStr)) {
             try {
-                mDurationMs = Long.parseLong(durationStr) * 1000;
+                mDurationMs = Long.parseLong(durationStr);
             } catch (NumberFormatException ex) { }
         }
 
@@ -83,8 +83,8 @@ public abstract class AWMediaExtractor {
      * 设置监听器
      * @param extractorListener
      */
-    public void setExtractorListener(AWExtractorListener extractorListener) {
-        this.mExtractorListener = extractorListener;
+    public void setExtractorListener(AWProcessListener extractorListener) {
+        this.mProcessListener = extractorListener;
     }
 
     /**
@@ -156,11 +156,7 @@ public abstract class AWMediaExtractor {
      * @param extractBuffer
      * @param bufferInfo
      */
-    protected void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo) {
-        if (mExtractorListener != null) {
-            mExtractorListener.onDataAvailable(extractBuffer, bufferInfo);
-        }
-    }
+    protected abstract void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo);
 
     /**
      * 获取 track index, 此处视频和音频获取 index 的方法不一样，需要子类去实现
@@ -199,8 +195,8 @@ public abstract class AWMediaExtractor {
             int readCount;
             while (mIsRunning) {
                 ByteBuffer byteBuffer = getBufferForOutputData();
-                if (byteBuffer == null && mExtractorListener != null) {
-                    mExtractorListener.onError("Buffer cannot be null！");
+                if (byteBuffer == null && mProcessListener != null) {
+                    mProcessListener.onError("Buffer cannot be null！");
                     break;
                 }
                 byteBuffer.clear();
@@ -208,8 +204,8 @@ public abstract class AWMediaExtractor {
                 try {
                     readCount = mExtractor.readSampleData(byteBuffer, 0);
                 } catch (IllegalArgumentException e) {
-                    if (mExtractorListener != null) {
-                        mExtractorListener.onError("Buffer not enough！");
+                    if (mProcessListener != null) {
+                        mProcessListener.onError("Buffer not enough！");
                     }
                     break;
                 }
@@ -232,11 +228,17 @@ public abstract class AWMediaExtractor {
                     onDataAvailable(byteBuffer, mBufferInfo);
                     mExtractor.advance();
                 }
+                if (mProcessListener != null) {
+                    mProcessListener.onProgress((int) (100.0f *
+                            (mBufferInfo.presentationTimeUs - mStartPosTimeUs) /
+                            (mEndPosTimeUs - mStartPosTimeUs)));
+                }
             }
             release();
             if (isSuccess) {
-                if (mExtractorListener != null) {
-                    mExtractorListener.onFinish();
+                if (mProcessListener != null) {
+                    mProcessListener.onProgress(100);
+                    mProcessListener.onFinish();
                 }
             }
         }
