@@ -19,7 +19,7 @@ public class AWAudioExtractor extends AWMediaExtractor {
      * 设置抽取数据的监听器
      * @param extractorListener
      */
-    public void setAWExtractorListener(AWExtractorListener extractorListener) {
+    public void setExtractorListener(AWExtractorListener extractorListener) {
         this.mAWExtractorListener = extractorListener;
     }
 

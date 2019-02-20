@@ -83,7 +83,7 @@ public abstract class AWMediaExtractor {
      * 设置监听器
      * @param extractorListener
      */
-    public void setExtractorListener(AWProcessListener extractorListener) {
+    public void setProcessListener(AWProcessListener extractorListener) {
         this.mProcessListener = extractorListener;
     }
 

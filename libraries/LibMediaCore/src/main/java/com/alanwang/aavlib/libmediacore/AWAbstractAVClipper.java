@@ -18,7 +18,7 @@ public abstract class AWAbstractAVClipper extends AWMediaExtractor {
 
     private MediaMuxer mMediaMuxer = null;
     private String mOutputPath;
-    private int mMuxerTrackIndex;
+    private int mAddedTrackIndex;
 
     public AWAbstractAVClipper(String outputPath) {
         this.mOutputPath = outputPath;
@@ -28,13 +28,13 @@ public abstract class AWAbstractAVClipper extends AWMediaExtractor {
     protected void onMediaFormatConfirmed(MediaFormat mediaFormat) throws IllegalArgumentException, IOException {
         super.onMediaFormatConfirmed(mediaFormat);
         mMediaMuxer = new MediaMuxer(mOutputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-        mMuxerTrackIndex = mMediaMuxer.addTrack(mediaFormat);
+        mAddedTrackIndex = mMediaMuxer.addTrack(mediaFormat);
         mMediaMuxer.start();
     }
 
     @Override
     protected void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo) {
-        mMediaMuxer.writeSampleData(mMuxerTrackIndex, extractBuffer, bufferInfo);
+        mMediaMuxer.writeSampleData(mAddedTrackIndex, extractBuffer, bufferInfo);
     }
 
     @Override
