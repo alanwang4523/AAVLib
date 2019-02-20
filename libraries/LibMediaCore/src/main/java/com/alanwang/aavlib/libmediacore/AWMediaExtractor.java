@@ -18,6 +18,7 @@ public abstract class AWMediaExtractor {
     protected MediaExtractor mExtractor = null;
     protected long mDurationMs = -1;
 
+    private int mTrackIndex = -1;
     private ByteBuffer mByteBuffer;
     private MediaCodec.BufferInfo mBufferInfo;
     private AWExtractorListener mExtractorListener;
@@ -49,11 +50,11 @@ public abstract class AWMediaExtractor {
             } catch (NumberFormatException ex) { }
         }
 
-        int trackIndex = getTrackIndex(mExtractor);
-        if (trackIndex < 0) {
+        mTrackIndex = getTrackIndex(mExtractor);
+        if (mTrackIndex < 0) {
             throw new IllegalArgumentException("Cannot access the track index!");
         }
-        onMediaFormatConfirmed(mExtractor.getTrackFormat(trackIndex));
+        onMediaFormatConfirmed(mExtractor.getTrackFormat(mTrackIndex));
         mBufferInfo = new MediaCodec.BufferInfo();
 
         mStartPosTimeUs = 0;
@@ -92,6 +93,17 @@ public abstract class AWMediaExtractor {
      */
     public long getDurationMs() {
         return mDurationMs;
+    }
+
+    /**
+     * 获取 MediaFormat
+     * @return
+     */
+    public MediaFormat getMediaFormat() {
+        if (!mIsExtractorReady) {
+            throw new IllegalStateException("Must be called after call setDataSource successfully!");
+        }
+        return mExtractor.getTrackFormat(mTrackIndex);
     }
 
     /**

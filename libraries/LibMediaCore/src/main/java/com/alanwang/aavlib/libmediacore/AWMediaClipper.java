@@ -1,46 +1,57 @@
 package com.alanwang.aavlib.libmediacore;
 
-import android.media.MediaCodec;
-import android.media.MediaFormat;
 import android.media.MediaMuxer;
 
+import com.alanwang.aavlib.libmediacore.audio.AWAudioExtractor;
+import com.alanwang.aavlib.libmediacore.video.AWVideoExtractor;
+
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
- *
- * 媒体文件裁剪器，可设置起始时间裁剪到指定的输出文件，具体裁视频还是裁音频由子类实现
+ * 裁剪音频和视频
  * Author: AlanWang4523.
- * Date: 19/2/20 01:25.
+ * Date: 19/2/20 01:48.
  * Mail: alanwang4523@gmail.com
  */
-public abstract class AWMediaClipper extends AWMediaExtractor {
+public class AWMediaClipper {
+    private AWAudioExtractor mAudioExtractor;
+    private AWVideoExtractor mVideoExtractor;
+    private MediaMuxer mMediaMuxer;
+    private boolean mIsHaveAudio = false;
+    private boolean mIsHaveVideo = false;
 
-    private MediaMuxer mMediaMuxer = null;
-    private String mOutputPath;
-    private int mMuxerTrackIndex;
-
-    public AWMediaClipper(String outputPath) {
-        this.mOutputPath = outputPath;
+    public AWMediaClipper() {
+        mAudioExtractor = new AWAudioExtractor();
+        mVideoExtractor = new AWVideoExtractor();
     }
 
-    @Override
-    protected void onMediaFormatConfirmed(MediaFormat mediaFormat) throws IllegalArgumentException, IOException {
-        super.onMediaFormatConfirmed(mediaFormat);
-        mMediaMuxer = new MediaMuxer(mOutputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-        mMuxerTrackIndex = mMediaMuxer.addTrack(mediaFormat);
-        mMediaMuxer.start();
-    }
+    public void setDataSource(String srcMediaPath, String dstSavePath) throws IOException {
+        mMediaMuxer = new MediaMuxer(dstSavePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+        try {
+            mAudioExtractor.setDataSource(srcMediaPath);
+            mIsHaveAudio = true;
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            mIsHaveAudio = false;
+        }
+        if (mIsHaveAudio) {
+            mMediaMuxer.addTrack(mAudioExtractor.getMediaFormat());
+        }
 
-    @Override
-    protected void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo) {
-        mMediaMuxer.writeSampleData(mMuxerTrackIndex, extractBuffer, bufferInfo);
-    }
+        try {
+            mVideoExtractor.setDataSource(srcMediaPath);
+            mIsHaveVideo = true;
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            mIsHaveVideo = false;
+        }
+        if (mIsHaveVideo) {
+            mMediaMuxer.addTrack(mVideoExtractor.getMediaFormat());
+        }
 
-    @Override
-    protected void release() {
-        mMediaMuxer.stop();
-        mMediaMuxer.release();
-        super.release();
+        if (!mIsHaveAudio && !mIsHaveVideo) {
+            throw new IllegalArgumentException("There is neither audio nor video!");
+        }
+
     }
 }
