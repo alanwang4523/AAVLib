@@ -9,6 +9,7 @@ import com.alanwang.aavlib.libmediacore.clipper.AWAVClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWAudioClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWVideoClipper;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
+import com.alanwang.aavlib.libmediacore.muxer.AWAVAndroidMuxer;
 import com.alanwang.aavlib.libutils.ALog;
 import java.io.File;
 import java.io.IOException;
@@ -61,13 +62,13 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
      * 测试从视频文件中抽取出音频
      */
     private void testExtractAudio() {
-        final String outputPath = "/sdcard/Alan/video/huahua_audio.m4a";
+        final String outputPath = "/sdcard/Alan/video/AlanTest_audio.m4a";
         File outputFile = new File(outputPath);
         if (outputFile.exists()) {
             outputFile.delete();
         }
 
-        String mediaPath = "/sdcard/Alan/video/huahua.mp4";
+        String mediaPath = "/sdcard/Alan/video/AlanTest.mp4";
         if (!checkIfFileExist(mediaPath)) {
             return;
         }
@@ -75,7 +76,7 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         AWAudioClipper audioClipper = new AWAudioClipper(outputPath);
         try {
             audioClipper.setDataSource(mediaPath);
-//            audioClipper.setExtractTime(5 * 1000, 15 * 1000);// 不调用该函数则默认抽取全部音频
+            audioClipper.setExtractTime(5 * 1000, 15 * 1000);// 不调用该函数则默认抽取全部音频
             audioClipper.setProcessListener(new CommonProgressListener("AWAudioClipper", outputPath));
             audioClipper.start();
         } catch (IOException e) {
@@ -87,13 +88,13 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
      * 测试从视频文件中抽取出无声视频
      */
     private void testExtractVideo() {
-        final String outputPath = "/sdcard/Alan/video/huahua_video.mp4";
+        final String outputPath = "/sdcard/Alan/video/AlanTest_video.mp4";
         File outputFile = new File(outputPath);
         if (outputFile.exists()) {
             outputFile.delete();
         }
 
-        String mediaPath = "/sdcard/Alan/video/huahua.mp4";
+        String mediaPath = "/sdcard/Alan/video/AlanTest.mp4";
         if (!checkIfFileExist(mediaPath)) {
             return;
         }
@@ -101,7 +102,7 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         AWVideoClipper videoClipper = new AWVideoClipper(outputPath);
         try {
             videoClipper.setDataSource(mediaPath);
-//            videoClipper.setExtractTime(5 * 1000, 15 * 1000);// 不调用该函数则默认抽取全部音频
+            videoClipper.setExtractTime(5 * 1000, 15 * 1000);// 不调用该函数则默认抽取全部音频
             videoClipper.setProcessListener(new CommonProgressListener("AWVideoClipper", outputPath));
             videoClipper.start();
         } catch (IOException e) {
@@ -113,13 +114,13 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
      * 测试音视频裁剪
      */
     private void testClipper() {
-        final String outputPath = "/sdcard/Alan/video/huahua_clip.mp4";
+        final String outputPath = "/sdcard/Alan/video/AlanTest_clip.mp4";
         File outputFile = new File(outputPath);
         if (outputFile.exists()) {
             outputFile.delete();
         }
 
-        String mediaPath = "/sdcard/Alan/video/huahua.mp4";
+        String mediaPath = "/sdcard/Alan/video/AlanTest.mp4";
         if (!checkIfFileExist(mediaPath)) {
             return;
         }
@@ -135,14 +136,35 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     /**
      * 测试音视频合成
      */
     private void testMuxer() {
-        // TODo Alan test muxer
+        final String outputPath = "/sdcard/Alan/video/AlanTest_muxer.mp4";
+        File outputFile = new File(outputPath);
+        if (outputFile.exists()) {
+            outputFile.delete();
+        }
+
+        String audioPath = "/sdcard/Alan/video/AlanTest_audio.m4a";
+        if (!checkIfFileExist(audioPath)) {
+            return;
+        }
+        String videoPath = "/sdcard/Alan/video/AlanTest_video.mp4";
+        if (!checkIfFileExist(videoPath)) {
+            return;
+        }
+
+        AWAVAndroidMuxer avMuxer = new AWAVAndroidMuxer();
+        try {
+            avMuxer.setDataSource(audioPath, videoPath, outputPath);
+            avMuxer.setProcessListener(new CommonProgressListener("AWAVAndroidMuxer", outputPath));
+            avMuxer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -177,6 +199,7 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
     private class CommonProgressListener implements AWProcessListener {
         private String Tag;
         private String outPath;
+        private int lastProgress = 0;
 
         public CommonProgressListener(String tag, String outPath) {
             Tag = tag;
@@ -185,7 +208,10 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
 
         @Override
         public void onProgress(int percent) {
-            ALog.d(Tag + "::onProgress()-->" + percent);
+            if (percent - lastProgress >= 5) {
+                lastProgress = percent;
+                ALog.d(Tag + "::onProgress()-->" + percent);
+            }
         }
 
         @Override
