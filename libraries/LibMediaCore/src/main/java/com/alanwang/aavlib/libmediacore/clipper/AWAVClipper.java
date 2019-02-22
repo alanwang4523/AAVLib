@@ -55,7 +55,7 @@ public class AWAVClipper {
     /**
      * 停止/取消裁剪
      */
-    public void stop() {
-        mAVAndroidMuxer.stop();
+    public void cancel() {
+        mAVAndroidMuxer.cancel();
     }
 }

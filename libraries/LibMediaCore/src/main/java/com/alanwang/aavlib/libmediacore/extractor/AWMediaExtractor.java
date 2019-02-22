@@ -126,7 +126,7 @@ public abstract class AWMediaExtractor {
     /**
      * 停止抽取数据
      */
-    public void stop() {
+    public void cancel() {
         mIsRunning = false;
     }
 

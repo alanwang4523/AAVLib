@@ -131,7 +131,7 @@ public class AWAVAndroidMuxer {
     /**
      * 停止/取消裁剪
      */
-    public void stop() {
+    public void cancel() {
         synchronized (this) {
             if (mIsStart) {
                 mIsStart = false;
@@ -139,10 +139,10 @@ public class AWAVAndroidMuxer {
                 mMediaMuxer.release();
 
                 if (mIsHaveAudio) {
-                    mAudioExtractor.stop();
+                    mAudioExtractor.cancel();
                 }
                 if (mIsHaveVideo) {
-                    mVideoExtractor.stop();
+                    mVideoExtractor.cancel();
                 }
 
             }
@@ -204,10 +204,10 @@ public class AWAVAndroidMuxer {
         public void onError(String error) {
             if (mediaType == TYPE_AUDIO && mIsHaveVideo) {
                 // 当音频出错时，将视频停止
-                mVideoExtractor.stop();
+                mVideoExtractor.cancel();
             } else if (mediaType == TYPE_VIDEO && mIsHaveAudio) {
                 // 当视频出错时，将音频停止
-                mAudioExtractor.stop();
+                mAudioExtractor.cancel();
             }
             if (mProcessListener != null) {
                 mProcessListener.onError(error);
