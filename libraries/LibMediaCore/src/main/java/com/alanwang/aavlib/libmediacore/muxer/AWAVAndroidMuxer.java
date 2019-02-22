@@ -134,9 +134,8 @@ public class AWAVAndroidMuxer {
     public void cancel() {
         synchronized (this) {
             if (mIsStart) {
+                release();
                 mIsStart = false;
-                mMediaMuxer.stop();
-                mMediaMuxer.release();
 
                 if (mIsHaveAudio) {
                     mAudioExtractor.cancel();
@@ -173,6 +172,20 @@ public class AWAVAndroidMuxer {
         }
     };
 
+    /**
+     * 释放资源
+     */
+    private void release() {
+        if (mIsStart) {
+            try {
+                mMediaMuxer.stop();
+                mMediaMuxer.release();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private class AVProcessListener implements AWProcessListener {
         static final int TYPE_AUDIO = 0x01;
         static final int TYPE_VIDEO = 0x02;
@@ -195,8 +208,16 @@ public class AWAVAndroidMuxer {
 
         @Override
         public void onFinish() {
-            if (isAllFinish() && mProcessListener != null) {
-                mProcessListener.onFinish();
+            if (mediaType == TYPE_AUDIO) {
+                mIsAudioProcessFinish = true;
+            } else if (mediaType == TYPE_VIDEO) {
+                mIsVideoProcessFinish = true;
+            }
+            if (isAllFinish()) {
+                release();
+                if (mProcessListener != null) {
+                    mProcessListener.onFinish();
+                }
             }
         }
 
@@ -209,6 +230,7 @@ public class AWAVAndroidMuxer {
                 // 当视频出错时，将音频停止
                 mAudioExtractor.cancel();
             }
+            release();
             if (mProcessListener != null) {
                 mProcessListener.onError(error);
             }

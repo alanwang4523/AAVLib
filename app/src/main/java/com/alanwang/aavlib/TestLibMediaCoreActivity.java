@@ -5,7 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.alanwang.aavlib.libmediacore.clipper.AWAVClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWAudioClipper;
+import com.alanwang.aavlib.libmediacore.clipper.AWVideoClipper;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
 import com.alanwang.aavlib.libutils.ALog;
 import java.io.File;
@@ -59,7 +61,12 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
      * 测试从视频文件中抽取出音频
      */
     private void testExtractAudio() {
-        final String outputPath = "/sdcard/Alan/video/huahua_clip.m4a";
+        final String outputPath = "/sdcard/Alan/video/huahua_audio.m4a";
+        File outputFile = new File(outputPath);
+        if (outputFile.exists()) {
+            outputFile.delete();
+        }
+
         String mediaPath = "/sdcard/Alan/video/huahua.mp4";
         if (!checkIfFileExist(mediaPath)) {
             return;
@@ -80,14 +87,55 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
      * 测试从视频文件中抽取出无声视频
      */
     private void testExtractVideo() {
-        // TODo Alan test extract video
+        final String outputPath = "/sdcard/Alan/video/huahua_video.mp4";
+        File outputFile = new File(outputPath);
+        if (outputFile.exists()) {
+            outputFile.delete();
+        }
+
+        String mediaPath = "/sdcard/Alan/video/huahua.mp4";
+        if (!checkIfFileExist(mediaPath)) {
+            return;
+        }
+
+        AWVideoClipper videoClipper = new AWVideoClipper(outputPath);
+        try {
+            videoClipper.setDataSource(mediaPath);
+//            videoClipper.setExtractTime(5 * 1000, 15 * 1000);// 不调用该函数则默认抽取全部音频
+            videoClipper.setProcessListener(new CommonProgressListener("AWVideoClipper", outputPath));
+            videoClipper.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * 测试音视频裁剪
      */
     private void testClipper() {
-        // TODo Alan test clipper
+        final String outputPath = "/sdcard/Alan/video/huahua_clip.mp4";
+        File outputFile = new File(outputPath);
+        if (outputFile.exists()) {
+            outputFile.delete();
+        }
+
+        String mediaPath = "/sdcard/Alan/video/huahua.mp4";
+        if (!checkIfFileExist(mediaPath)) {
+            return;
+        }
+
+        AWAVClipper avClipper = new AWAVClipper();
+        try {
+            avClipper.setDataSource(mediaPath, outputPath);
+            long clipStartTimeMs = 5 * 1000;
+            long clipEndTimeMs = 15 * 1000;
+            avClipper.setExtractTime(clipStartTimeMs, clipEndTimeMs);
+            avClipper.setProcessListener(new CommonProgressListener("AWAVClipper", outputPath));
+            avClipper.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
