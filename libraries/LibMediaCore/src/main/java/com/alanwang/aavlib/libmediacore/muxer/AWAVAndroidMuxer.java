@@ -33,10 +33,7 @@ public class AWAVAndroidMuxer {
     private boolean mIsAllReady = false;
     private volatile boolean mIsStart = false;
 
-    private String mOutputPath;
-
-    public AWAVAndroidMuxer(String outputPath) {
-        this.mOutputPath = outputPath;
+    public AWAVAndroidMuxer() {
         mAudioExtractor = new AWAudioExtractor();
         mVideoExtractor = new AWVideoExtractor();
     }
@@ -47,8 +44,8 @@ public class AWAVAndroidMuxer {
      * @param videoPath
      * @throws IOException
      */
-    public void setDataSource(String audioPath, String videoPath) throws IOException {
-        mMediaMuxer = new MediaMuxer(mOutputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+    public void setDataSource(String audioPath, String videoPath, String outputPath) throws IOException {
+        mMediaMuxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
         try {
             mAudioExtractor.setDataSource(audioPath);
             mAudioExtractor.setExtractorListener(mAudioDataListener);
