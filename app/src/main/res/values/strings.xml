@@ -4,6 +4,8 @@
     <string name="test_lib_media_core">Test LibMediaCore</string>
 
     <!-- LibMediaCore tests-->
+    <string name="lib_media_core_test_extract_audio">Test Extract Audio</string>
+    <string name="lib_media_core_test_extract_video">Test Extract Video</string>
     <string name="lib_media_core_test_clipper">Test AV Clipper</string>
     <string name="lib_media_core_test_muxer">Test AV Muxer</string>
 </resources>

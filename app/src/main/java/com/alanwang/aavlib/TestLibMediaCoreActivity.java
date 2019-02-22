@@ -4,6 +4,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.alanwang.aavlib.libmediacore.clipper.AWAudioClipper;
+import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
+import com.alanwang.aavlib.libutils.ALog;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Author: AlanWang4523.
@@ -17,16 +23,29 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_libmediacore);
 
-        TextView btn_libmediacore_test_cliper = findViewById(R.id.btn_libmediacore_test_cliper);
-        btn_libmediacore_test_cliper.setOnClickListener(this);
-        TextView btn_libmediacore_test_muxer = findViewById(R.id.btn_libmediacore_test_muxer);
-        btn_libmediacore_test_muxer.setOnClickListener(this);
+        TextView btn_test_extract_audio = findViewById(R.id.btn_libmediacore_test_extract_audio);
+        btn_test_extract_audio.setOnClickListener(this);
+
+        TextView btn_test_extract_video = findViewById(R.id.btn_libmediacore_test_extract_video);
+        btn_test_extract_video.setOnClickListener(this);
+
+        TextView btn_test_clipper = findViewById(R.id.btn_libmediacore_test_clipper);
+        btn_test_clipper.setOnClickListener(this);
+
+        TextView btn_test_muxer = findViewById(R.id.btn_libmediacore_test_muxer);
+        btn_test_muxer.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_libmediacore_test_cliper:
+            case R.id.btn_libmediacore_test_extract_audio:
+                testExtractAudio();
+                break;
+            case R.id.btn_libmediacore_test_extract_video:
+                testExtractVideo();
+                break;
+            case R.id.btn_libmediacore_test_clipper:
                 testClipper();
                 break;
             case R.id.btn_libmediacore_test_muxer:
@@ -37,16 +56,101 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
     }
 
     /**
+     * 测试从视频文件中抽取出音频
+     */
+    private void testExtractAudio() {
+        final String outputPath = "/sdcard/Alan/video/huahua_clip.m4a";
+        String mediaPath = "/sdcard/Alan/video/huahua.mp4";
+        if (!checkIfFileExist(mediaPath)) {
+            return;
+        }
+
+        AWAudioClipper audioClipper = new AWAudioClipper(outputPath);
+        try {
+            audioClipper.setDataSource(mediaPath);
+//            audioClipper.setExtractTime(5 * 1000, 15 * 1000);// 不调用该函数则默认抽取全部音频
+            audioClipper.setProcessListener(new CommonProgressListener("AWAudioClipper", outputPath));
+            audioClipper.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 测试从视频文件中抽取出无声视频
+     */
+    private void testExtractVideo() {
+        // TODo Alan test extract video
+    }
+
+    /**
      * 测试音视频裁剪
      */
     private void testClipper() {
-
+        // TODo Alan test clipper
     }
 
     /**
      * 测试音视频合成
      */
     private void testMuxer() {
-
+        // TODo Alan test muxer
     }
+
+    /**
+     * 检测文件是否存在
+     * @param mediaPath
+     * @return
+     */
+    private boolean checkIfFileExist(String mediaPath) {
+        File file = new File(mediaPath);
+        if (!file.exists()) {
+            Toast.makeText(this, mediaPath + " is not exists!", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 在 UI 线程弹出 toast
+     * @param toastMsg
+     * @param isShowLong
+     */
+    private void toastInUiThread(final String toastMsg, final boolean isShowLong) {
+        TestLibMediaCoreActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(TestLibMediaCoreActivity.this, toastMsg,
+                        isShowLong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private class CommonProgressListener implements AWProcessListener {
+        private String Tag;
+        private String outPath;
+
+        public CommonProgressListener(String tag, String outPath) {
+            Tag = tag;
+            this.outPath = outPath;
+        }
+
+        @Override
+        public void onProgress(int percent) {
+            ALog.d(Tag + "::onProgress()-->" + percent);
+        }
+
+        @Override
+        public void onFinish() {
+            ALog.d(Tag + "::onFinish()-->" + outPath);
+            toastInUiThread(Tag + " success!", true);
+        }
+
+        @Override
+        public void onError(String error) {
+            ALog.d(Tag + "::onError()-->" + error);
+            toastInUiThread(Tag + " error!-->" + error, true);
+        }
+    }
+
 }

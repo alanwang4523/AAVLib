@@ -57,6 +57,8 @@ public abstract class AWMediaExtractor {
         if (mTrackIndex < 0) {
             throw new IllegalArgumentException("Cannot access the track index!");
         }
+        mExtractor.selectTrack(mTrackIndex);
+
         onMediaFormatConfirmed(mExtractor.getTrackFormat(mTrackIndex));
         mBufferInfo = new MediaCodec.BufferInfo();
 
@@ -220,7 +222,7 @@ public abstract class AWMediaExtractor {
                 mBufferInfo.size = readCount;
                 mBufferInfo.offset = 0;
                 mBufferInfo.flags = mExtractor.getSampleFlags();
-                mBufferInfo.presentationTimeUs = 1000 * mExtractor.getSampleTime();
+                mBufferInfo.presentationTimeUs = mExtractor.getSampleTime();
 
                 if (mBufferInfo.presentationTimeUs >= mEndPosTimeUs) {
                     isSuccess = true;
