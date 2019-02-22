@@ -21,10 +21,10 @@
             android:orientation="vertical"
             >
             <TextView
-                android:id="@+id/btn_goto_video_editor"
+                android:id="@+id/btn_libmediacore_test_cliper"
                 android:layout_width="match_parent"
                 android:layout_height="45dip"
-                android:text="@string/test_module_video_editor"
+                android:text="@string/lib_media_core_test_clipper"
                 android:textSize="@dimen/text_size_16"
                 android:textColor="@color/white"
                 android:layout_centerInParent="true"
@@ -32,11 +32,11 @@
                 android:gravity="center"/>
 
             <TextView
-                android:id="@+id/btn_goto_test_libmediacore"
+                android:id="@+id/btn_libmediacore_test_muxer"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/margin_normal_45"
                 android:layout_marginTop="@dimen/margin_normal_20"
-                android:text="@string/test_lib_media_core"
+                android:text="@string/lib_media_core_test_muxer"
                 android:textSize="@dimen/text_size_16"
                 android:textColor="@color/white"
                 android:layout_centerInParent="true"
