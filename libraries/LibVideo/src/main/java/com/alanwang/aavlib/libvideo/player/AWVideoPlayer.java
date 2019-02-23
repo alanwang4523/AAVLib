@@ -10,7 +10,7 @@ import android.view.Surface;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVVideoPlayer implements IVideoPlayer {
+public class AWVideoPlayer implements IVideoPlayer {
 
     private MediaPlayer mMediaPlayer;
 
@@ -20,7 +20,7 @@ public class AAVVideoPlayer implements IVideoPlayer {
     private OnPlayReadyListener mPlayReadyListener;
     private OnSeekCompleteListener mOnSeekCompleteListener;
 
-    public AAVVideoPlayer() {
+    public AWVideoPlayer() {
         mMediaPlayer = new MediaPlayer();
     }
 

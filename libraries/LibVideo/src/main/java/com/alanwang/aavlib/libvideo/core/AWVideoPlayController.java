@@ -9,7 +9,7 @@ import com.alanwang.aavlib.libeglcore.common.AAVMessage;
 import com.alanwang.aavlib.libeglcore.common.AAVSurfaceTexture;
 import com.alanwang.aavlib.libeglcore.engine.AAVMainGLEngine;
 import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
-import com.alanwang.aavlib.libvideo.player.AAVVideoPlayer;
+import com.alanwang.aavlib.libvideo.player.AWVideoPlayer;
 import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
 
 /**
@@ -18,7 +18,7 @@ import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVVideoPlayController {
+public class AWVideoPlayController {
 
     public interface IControllerCallback {
         /**
@@ -36,15 +36,15 @@ public class AAVVideoPlayController {
     private AAVFrameBufferObject mSrcFrameBuffer;
     private AAVMainGLEngine mMainGLEngine;
     private IControllerCallback iControllerCallback;
-    private AAVVideoPreviewRender mPreviewRender;
+    private AWVideoPreviewRender mPreviewRender;
 
     private volatile boolean mIsPlayerReady = false;
     private volatile boolean mIsSurfaceReady = false;
     private int mVideoWidth;
     private int mVideoHeight;
 
-    public AAVVideoPlayController() {
-        mVideoPlayer = new AAVVideoPlayer();
+    public AWVideoPlayController() {
+        mVideoPlayer = new AWVideoPlayer();
         mVideoPlayer.setOnPlayReadyListener(mOnPlayReadyListener);
         mMainGLEngine = new AAVMainGLEngine(mIGLEngineCallback);
         mMainGLEngine.start();
@@ -146,7 +146,7 @@ public class AAVVideoPlayController {
             mAAVSurface = new AAVSurfaceTexture();
             mAAVSurface.setFrameAvailableListener(mFrameAvailableListener);
             mVideoPlayer.setSurface(mAAVSurface.getSurface());
-            mPreviewRender = new AAVVideoPreviewRender();
+            mPreviewRender = new AWVideoPreviewRender();
         }
 
         @Override

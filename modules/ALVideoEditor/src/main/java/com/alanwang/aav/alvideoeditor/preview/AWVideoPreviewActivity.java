@@ -8,8 +8,8 @@ import android.view.WindowManager;
 
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
-import com.alanwang.aavlib.libvideo.core.AAVVideoPlayController;
-import com.alanwang.aavlib.libvideo.surface.AAVSurfaceView;
+import com.alanwang.aavlib.libvideo.core.AWVideoPlayController;
+import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
 
 /**
@@ -18,12 +18,12 @@ import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVVideoPreviewActivity extends AppCompatActivity implements ISurfaceCallback, AAVVideoPlayController.IControllerCallback {
+public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfaceCallback, AWVideoPlayController.IControllerCallback {
 
-    private static final String VIDEO_PATH = "/sdcard/Alan/video/huahua.mp4";
+    private static final String VIDEO_PATH = "/sdcard/Alan/video/AlanTest.mp4";
     private EnhancedRelativeLayout mVideoLayout;
-    private AAVSurfaceView mAAVSurfaceView;
-    private AAVVideoPlayController mVideoPlayController;
+    private AWSurfaceView mAWSurfaceView;
+    private AWVideoPlayController mVideoPlayController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +36,10 @@ public class AAVVideoPreviewActivity extends AppCompatActivity implements ISurfa
 
         mVideoLayout = findViewById(R.id.video_lyt);
 
-        mAAVSurfaceView = findViewById(R.id.video_surface_view);
-        mAAVSurfaceView.setSurfaceCallback(this);
+        mAWSurfaceView = findViewById(R.id.video_surface_view);
+        mAWSurfaceView.setSurfaceCallback(this);
 
-        mVideoPlayController = new AAVVideoPlayController();
+        mVideoPlayController = new AWVideoPlayController();
         mVideoPlayController.setControllerCallback(this);
         mVideoPlayController.setVideoPath(VIDEO_PATH);
     }

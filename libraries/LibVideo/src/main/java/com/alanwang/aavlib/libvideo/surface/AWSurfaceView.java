@@ -11,22 +11,22 @@ import android.view.SurfaceView;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVSurfaceView extends SurfaceView implements SurfaceHolder.Callback2 {
+public class AWSurfaceView extends SurfaceView implements SurfaceHolder.Callback2 {
 
     private int mSurfaceWidth;
     private int mSurfaceHeight;
     private SurfaceHolder mSurfaceHolder;
     private ISurfaceCallback mSurfaceCallback;
 
-    public AAVSurfaceView(Context context) {
+    public AWSurfaceView(Context context) {
         this(context, null);
     }
 
-    public AAVSurfaceView(Context context, AttributeSet attrs) {
+    public AWSurfaceView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public AAVSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AWSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }

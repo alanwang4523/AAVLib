@@ -10,7 +10,7 @@ import com.alanwang.aavlib.libvideoeffect.effects.AAVGrayEffect;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVVideoPreviewRender {
+public class AWVideoPreviewRender {
     private final AAVFrameBufferObject mEffectFrameBuffer;
     private final AAVGrayEffect mTestEffect;
     private final AAVSurfaceRender mVideoRender;
@@ -18,7 +18,7 @@ public class AAVVideoPreviewRender {
     private int mViewportWidth;
     private int mViewportHeight;
 
-    public AAVVideoPreviewRender() {
+    public AWVideoPreviewRender() {
         mEffectFrameBuffer = new AAVFrameBufferObject();
         mTestEffect = new AAVGrayEffect();
         mVideoRender = new AAVSurfaceRender();

@@ -4,7 +4,7 @@
     <application>
 
         <activity
-            android:name=".preview.AAVVideoPreviewActivity"
+            android:name=".preview.AWVideoPreviewActivity"
             android:resizeableActivity="false"
             android:screenOrientation="portrait">
         </activity>
