@@ -16,8 +16,8 @@ import java.nio.ByteBuffer;
  * Mail: alanwang4523@gmail.com
  */
 
-public abstract class AAVVideoEncodeCore {
-    private static final String TAG = AAVVideoEncodeCore.class.getSimpleName();
+public abstract class AWVideoEncodeCore {
+    private static final String TAG = AWVideoEncodeCore.class.getSimpleName();
 
     private static final String MIME_TYPE = "video/avc";
     protected static final int FRAME_RATE = 30;
@@ -33,7 +33,7 @@ public abstract class AAVVideoEncodeCore {
     private int mEosSpinCount = 0;
     private final int MAX_EOS_SPINS = 10;
 
-    public AAVVideoEncodeCore(int width, int height, int bitRate, int frameRate, int iFrameInterval) {
+    public AWVideoEncodeCore(int width, int height, int bitRate, int frameRate, int iFrameInterval) {
         mFormat = MediaFormat.createVideoFormat(MIME_TYPE, width, height);
         mFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
         mFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);

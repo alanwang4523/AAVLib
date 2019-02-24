@@ -13,12 +13,12 @@ import java.nio.ByteBuffer;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVVideoRecordEncoder extends AAVVideoEncodeCore {
+public class AWVideoRecordEncoder extends AWVideoEncodeCore {
 
     private MediaMuxer mMediaMuxer;
     private int mTrackIndex = -1;
 
-    public AAVVideoRecordEncoder(int width, int height, int bitRate) {
+    public AWVideoRecordEncoder(int width, int height, int bitRate) {
         super(width, height, bitRate, FRAME_RATE, DEFAULT_I_FRAME_INTERVAL);
     }
 
