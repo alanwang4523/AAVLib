@@ -11,12 +11,12 @@ import java.util.List;
  * Mail: alanwang4523@gmail.com
  */
 
-public abstract class AAVBaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class AWBaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     protected Context mContext;
     protected List<T> mItemList = new ArrayList<>();
 
-    public AAVBaseAdapter(Context mContext) {
+    public AWBaseAdapter(Context mContext) {
         this.mContext = mContext;
     }
 
