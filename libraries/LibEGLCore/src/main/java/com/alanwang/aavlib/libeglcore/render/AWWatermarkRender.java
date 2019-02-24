@@ -3,8 +3,8 @@ package com.alanwang.aavlib.libeglcore.render;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.opengl.GLES20;
-import com.alanwang.aavlib.libeglcore.common.AAVCoordinateUtil;
-import com.alanwang.aavlib.libeglcore.common.AAVRect;
+import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
+import com.alanwang.aavlib.libeglcore.common.AWRect;
 import com.alanwang.aavlib.libeglcore.egl.GlUtil;
 import java.nio.FloatBuffer;
 
@@ -14,19 +14,19 @@ import java.nio.FloatBuffer;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVWatermarkRender extends AAVBaseRender {
+public class AWWatermarkRender extends AWBaseRender {
 
-    private static FloatBuffer TEXTURE_COORDINATE_BUFFER = GlUtil.createFloatBuffer(AAVCoordinateUtil.TEXTURE_NO_ROTATION);
+    private static FloatBuffer TEXTURE_COORDINATE_BUFFER = GlUtil.createFloatBuffer(AWCoordinateUtil.TEXTURE_NO_ROTATION);
 
     private FloatBuffer mVertexCoordinateBuffer;
     private int mWatermarkTextureId = -1;
     private Bitmap mWatermarkBmp;
-    private AAVRect mWatermarkPos;
+    private AWRect mWatermarkPos;
     private int mSrcTextureWidth = -1;
     private int mSrcTextureHeight = -1;
     private volatile boolean mIsNeedUpdate = false;
 
-    public AAVWatermarkRender() {
+    public AWWatermarkRender() {
         super();
     }
 
@@ -35,8 +35,8 @@ public class AAVWatermarkRender extends AAVBaseRender {
      * @param bitmap
      * @param position
      */
-    public void setWatermark(Bitmap bitmap, AAVRect position) {
-        synchronized (AAVWatermarkRender.this) {
+    public void setWatermark(Bitmap bitmap, AWRect position) {
+        synchronized (AWWatermarkRender.this) {
             mWatermarkBmp = bitmap;
             mWatermarkPos = position;
             mIsNeedUpdate = true;
@@ -47,8 +47,8 @@ public class AAVWatermarkRender extends AAVBaseRender {
      * 更新水印位置
      * @param position
      */
-    public void updatePostion(AAVRect position) {
-        synchronized (AAVWatermarkRender.this) {
+    public void updatePostion(AWRect position) {
+        synchronized (AWWatermarkRender.this) {
             mWatermarkPos = position;
             mIsNeedUpdate = true;
         }
@@ -76,7 +76,7 @@ public class AAVWatermarkRender extends AAVBaseRender {
      */
     private void updateWatermark() {
         if (mIsNeedUpdate) {
-            synchronized (AAVWatermarkRender.this) {
+            synchronized (AWWatermarkRender.this) {
                 if (mWatermarkBmp != null) {
                     mWatermarkTextureId = GlUtil.loadImageTexture(mWatermarkBmp);
                     mWatermarkBmp = null;

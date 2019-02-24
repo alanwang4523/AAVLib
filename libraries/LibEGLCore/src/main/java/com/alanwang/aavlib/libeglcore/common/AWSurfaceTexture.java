@@ -6,7 +6,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.view.Surface;
 import com.alanwang.aavlib.libeglcore.egl.GlUtil;
-import com.alanwang.aavlib.libeglcore.render.AAVOESTextureRender;
+import com.alanwang.aavlib.libeglcore.render.AWOESTextureRender;
 import java.lang.ref.WeakReference;
 
 /**
@@ -16,16 +16,16 @@ import java.lang.ref.WeakReference;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVSurfaceTexture {
+public class AWSurfaceTexture {
 
     private int mTextureId;
     private final SurfaceTexture mSurfaceTexture;
     private Surface mSurface;
-    private final AAVOESTextureRender mTextureRender;
-    private AAVFrameAvailableListener mFrameAvailableListener;
+    private final AWOESTextureRender mTextureRender;
+    private AWFrameAvailableListener mFrameAvailableListener;
 
-    public AAVSurfaceTexture() {
-        mTextureRender = new AAVOESTextureRender();
+    public AWSurfaceTexture() {
+        mTextureRender = new AWOESTextureRender();
         mTextureId = GlUtil.createOESTexture();
         if (Build.VERSION.SDK_INT >= 19) {
             mSurfaceTexture = new SurfaceTexture(mTextureId, false);
@@ -36,10 +36,10 @@ public class AAVSurfaceTexture {
     }
 
     /**
-     * 设置 AAVFrameAvailableListener
+     * 设置 AWFrameAvailableListener
      * @param frameAvailableListener
      */
-    public void setFrameAvailableListener(AAVFrameAvailableListener frameAvailableListener) {
+    public void setFrameAvailableListener(AWFrameAvailableListener frameAvailableListener) {
         mFrameAvailableListener = frameAvailableListener;
     }
 
@@ -102,7 +102,7 @@ public class AAVSurfaceTexture {
      * @param height
      * @return
      */
-    public int drawFrame(@NonNull AAVFrameBufferObject frameBuffer, int width, int height) {
+    public int drawFrame(@NonNull AWFrameBufferObject frameBuffer, int width, int height) {
         frameBuffer.checkInit(width, height);
         frameBuffer.bindFrameBuffer();
         GLES20.glViewport(0, 0, width, height);
@@ -139,20 +139,20 @@ public class AAVSurfaceTexture {
 
     private static class InternalFrameAvailableListener implements SurfaceTexture.OnFrameAvailableListener {
 
-        private WeakReference<AAVSurfaceTexture> weakReference;
+        private WeakReference<AWSurfaceTexture> weakReference;
 
-        public InternalFrameAvailableListener(AAVSurfaceTexture aavSurfaceTexture) {
-            weakReference = new WeakReference<>(aavSurfaceTexture);
+        public InternalFrameAvailableListener(AWSurfaceTexture AWSurfaceTexture) {
+            weakReference = new WeakReference<>(AWSurfaceTexture);
         }
 
         @Override
         public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-            AAVSurfaceTexture aavSurfaceTexture = weakReference.get();
-            if (aavSurfaceTexture == null) {
+            AWSurfaceTexture AWSurfaceTexture = weakReference.get();
+            if (AWSurfaceTexture == null) {
                 return;
             }
-            if (aavSurfaceTexture.mFrameAvailableListener != null) {
-                aavSurfaceTexture.mFrameAvailableListener.onFrameAvailable(aavSurfaceTexture);
+            if (AWSurfaceTexture.mFrameAvailableListener != null) {
+                AWSurfaceTexture.mFrameAvailableListener.onFrameAvailable(AWSurfaceTexture);
             }
         }
     }

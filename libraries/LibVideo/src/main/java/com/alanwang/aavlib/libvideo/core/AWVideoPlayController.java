@@ -3,11 +3,11 @@ package com.alanwang.aavlib.libvideo.core;
 import android.opengl.GLES20;
 import android.view.Surface;
 
-import com.alanwang.aavlib.libeglcore.common.AAVFrameAvailableListener;
-import com.alanwang.aavlib.libeglcore.common.AAVFrameBufferObject;
-import com.alanwang.aavlib.libeglcore.common.AAVMessage;
-import com.alanwang.aavlib.libeglcore.common.AAVSurfaceTexture;
-import com.alanwang.aavlib.libeglcore.engine.AAVMainGLEngine;
+import com.alanwang.aavlib.libeglcore.common.AWFrameAvailableListener;
+import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
+import com.alanwang.aavlib.libeglcore.common.AWMessage;
+import com.alanwang.aavlib.libeglcore.common.AWSurfaceTexture;
+import com.alanwang.aavlib.libeglcore.engine.AWMainGLEngine;
 import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
 import com.alanwang.aavlib.libvideo.player.AWVideoPlayer;
 import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
@@ -32,9 +32,9 @@ public class AWVideoPlayController {
 
     private final static int MSG_DRAW = 0x0101;
     private IVideoPlayer mVideoPlayer;
-    private AAVSurfaceTexture mAAVSurface;
-    private AAVFrameBufferObject mSrcFrameBuffer;
-    private AAVMainGLEngine mMainGLEngine;
+    private AWSurfaceTexture mAAVSurface;
+    private AWFrameBufferObject mSrcFrameBuffer;
+    private AWMainGLEngine mMainGLEngine;
     private IControllerCallback iControllerCallback;
     private AWVideoPreviewRender mPreviewRender;
 
@@ -46,7 +46,7 @@ public class AWVideoPlayController {
     public AWVideoPlayController() {
         mVideoPlayer = new AWVideoPlayer();
         mVideoPlayer.setOnPlayReadyListener(mOnPlayReadyListener);
-        mMainGLEngine = new AAVMainGLEngine(mIGLEngineCallback);
+        mMainGLEngine = new AWMainGLEngine(mIGLEngineCallback);
         mMainGLEngine.start();
     }
 
@@ -131,19 +131,19 @@ public class AWVideoPlayController {
         }
     }
 
-    private AAVFrameAvailableListener mFrameAvailableListener = new AAVFrameAvailableListener() {
+    private AWFrameAvailableListener mFrameAvailableListener = new AWFrameAvailableListener() {
         @Override
-        public void onFrameAvailable(AAVSurfaceTexture surfaceTexture) {
+        public void onFrameAvailable(AWSurfaceTexture surfaceTexture) {
             surfaceTexture.drawFrame(mSrcFrameBuffer, mVideoWidth, mVideoHeight);
-            mMainGLEngine.postRenderMessage(new AAVMessage(MSG_DRAW));
+            mMainGLEngine.postRenderMessage(new AWMessage(MSG_DRAW));
         }
     };
 
     private IGLEngineCallback mIGLEngineCallback = new IGLEngineCallback() {
         @Override
         public void onEngineStart() {
-            mSrcFrameBuffer = new AAVFrameBufferObject();
-            mAAVSurface = new AAVSurfaceTexture();
+            mSrcFrameBuffer = new AWFrameBufferObject();
+            mAAVSurface = new AWSurfaceTexture();
             mAAVSurface.setFrameAvailableListener(mFrameAvailableListener);
             mVideoPlayer.setSurface(mAAVSurface.getSurface());
             mPreviewRender = new AWVideoPreviewRender();
@@ -161,7 +161,7 @@ public class AWVideoPlayController {
         }
 
         @Override
-        public void onRender(AAVMessage msg) {
+        public void onRender(AWMessage msg) {
             mPreviewRender.draw(mSrcFrameBuffer.getOutputTextureId(), mVideoWidth, mVideoHeight);
         }
 

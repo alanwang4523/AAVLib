@@ -9,7 +9,7 @@ import android.opengl.EGLSurface;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVWindowSurface {
+public class AWWindowSurface {
 
     private EGLSurface mEGLSurface = EGL14.EGL_NO_SURFACE;
 

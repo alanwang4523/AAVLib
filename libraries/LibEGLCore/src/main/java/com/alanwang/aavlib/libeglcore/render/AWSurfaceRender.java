@@ -1,26 +1,26 @@
 package com.alanwang.aavlib.libeglcore.render;
 
 import android.opengl.GLES20;
-import com.alanwang.aavlib.libeglcore.common.AAVCoordinateUtil;
+import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
 import com.alanwang.aavlib.libeglcore.egl.GlUtil;
 import java.nio.FloatBuffer;
 
 /**
- * AAVSurfaceRender
- * 通用的 AAVSurfaceRender ，支持将纹理渲染到 FrameBuffer、屏幕、编码器
+ * AWSurfaceRender
+ * 通用的 AWSurfaceRender ，支持将纹理渲染到 FrameBuffer、屏幕、编码器
  *
  * Author: AlanWang4523.
  * Date: 19/1/23 00:29.
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVSurfaceRender extends AAVBaseRender {
+public class AWSurfaceRender extends AWBaseRender {
 
     private FloatBuffer mTextureCoordinateFBuffer;
 
-    public AAVSurfaceRender() {
+    public AWSurfaceRender() {
         super();
-        mTextureCoordinateFBuffer = GlUtil.createFloatBuffer(AAVCoordinateUtil.DEFAULT_TEXTURE_COORDS);
+        mTextureCoordinateFBuffer = GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
     }
 
     /**

@@ -12,7 +12,7 @@ import android.os.Process;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVHandlerThread {
+public class AWHandlerThread {
     /**
      * 消息回调接口
      */
@@ -28,11 +28,11 @@ public class AAVHandlerThread {
     private final HandlerThread mHandlerThread;
     private Handler mHandler;
 
-    public AAVHandlerThread(String name) {
+    public AWHandlerThread(String name) {
         this(name, Process.THREAD_PRIORITY_DEFAULT);
     }
 
-    public AAVHandlerThread(String name, int priority) {
+    public AWHandlerThread(String name, int priority) {
         mHandlerThread = new HandlerThread(name, priority);
     }
 

@@ -1,7 +1,7 @@
 package com.alanwang.aavlib.libeglcore.engine;
 
 import android.view.Surface;
-import com.alanwang.aavlib.libeglcore.common.AAVMessage;
+import com.alanwang.aavlib.libeglcore.common.AWMessage;
 
 /**
  * Author: AlanWang4523.
@@ -27,7 +27,7 @@ public interface IGLEngineCallback {
      * to render
      * @param msg
      */
-    void onRender(AAVMessage msg);
+    void onRender(AWMessage msg);
 
     /**
      * Surface destroy

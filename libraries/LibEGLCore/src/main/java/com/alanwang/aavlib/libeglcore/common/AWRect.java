@@ -8,7 +8,7 @@ import android.graphics.Rect;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVRect {
+public class AWRect {
     /**
      * 左上角的 x 坐标
      */
@@ -31,14 +31,14 @@ public class AAVRect {
 
     private Rect rect = new Rect();
 
-    public AAVRect(int x, int y, int width, int height) {
+    public AWRect(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
     }
 
-    public AAVRect(Rect rect) {
+    public AWRect(Rect rect) {
         this.x = rect.left;
         this.y = rect.top;
         this.width = (rect.right - rect.left);
@@ -59,7 +59,7 @@ public class AAVRect {
 
     @Override
     public String toString() {
-        return "AAVRect{" +
+        return "AWRect{" +
                 "x=" + x +
                 ", y=" + y +
                 ", width=" + width +

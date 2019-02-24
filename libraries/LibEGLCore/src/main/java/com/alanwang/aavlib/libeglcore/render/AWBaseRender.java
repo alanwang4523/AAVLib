@@ -1,7 +1,7 @@
 package com.alanwang.aavlib.libeglcore.render;
 
 import android.opengl.GLES20;
-import com.alanwang.aavlib.libeglcore.common.AAVCoordinateUtil;
+import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
 import com.alanwang.aavlib.libeglcore.egl.GlUtil;
 import java.nio.FloatBuffer;
 
@@ -11,7 +11,7 @@ import java.nio.FloatBuffer;
  * Mail: alanwang4523@gmail.com
  */
 
-public abstract class AAVBaseRender {
+public abstract class AWBaseRender {
 
     protected static final String DEFAULT_VERTEX_SHADER =
             "attribute vec4 aPosition;\n" +
@@ -31,10 +31,10 @@ public abstract class AAVBaseRender {
                     "}\n";
 
     protected static final FloatBuffer DEFAULT_VERTEX_COORDINATE_BUFFER =
-            GlUtil.createFloatBuffer(AAVCoordinateUtil.DEFAULT_VERTEX_COORDS);
+            GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_VERTEX_COORDS);
 
     protected static final FloatBuffer DEFAULT_TEXTURE_COORDINATE_BUFFER =
-            GlUtil.createFloatBuffer(AAVCoordinateUtil.DEFAULT_TEXTURE_COORDS);
+            GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
 
     protected int mProgramHandle = -1;
 
@@ -46,11 +46,11 @@ public abstract class AAVBaseRender {
     private String mFragmentShader;
     private boolean mIsInit = false;
 
-    protected AAVBaseRender() {
+    protected AWBaseRender() {
         this(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER, GLES20.GL_TEXTURE_2D);
     }
 
-    protected AAVBaseRender(String vertexShader, String fragmentShader, int textureTarget) {
+    protected AWBaseRender(String vertexShader, String fragmentShader, int textureTarget) {
         mTextureTarget = textureTarget;
         mVertexShader = vertexShader;
         mFragmentShader = fragmentShader;

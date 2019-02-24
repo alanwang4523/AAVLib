@@ -6,21 +6,21 @@ package com.alanwang.aavlib.libeglcore.common;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVMessage {
+public class AWMessage {
     public final int msgWhat;
     public int msgArg1;
     public int msgArg2;
     public Object msgObj;
 
-    public AAVMessage(int msgWhat) {
+    public AWMessage(int msgWhat) {
         this(msgWhat, 0, 0, null);
     }
 
-    public AAVMessage(int msgWhat, Object msgObj) {
+    public AWMessage(int msgWhat, Object msgObj) {
         this(msgWhat, 0, 0, msgObj);
     }
 
-    public AAVMessage(int msgWhat, int msgArg1, int msgArg2, Object msgObj) {
+    public AWMessage(int msgWhat, int msgArg1, int msgArg2, Object msgObj) {
         this.msgWhat = msgWhat;
         this.msgArg1 = msgArg1;
         this.msgArg2 = msgArg2;
@@ -30,7 +30,7 @@ public class AAVMessage {
     @Override
     public String toString() {
         StringBuilder strb = new StringBuilder();
-        strb.append("AAVMessage:: msgWhat = ").append(msgWhat)
+        strb.append("AWMessage:: msgWhat = ").append(msgWhat)
                 .append(", msgArg1 = ").append(msgArg1)
                 .append(", msgArg2 = ").append(msgArg2)
                 .append(", msgObj = ").append(msgObj);

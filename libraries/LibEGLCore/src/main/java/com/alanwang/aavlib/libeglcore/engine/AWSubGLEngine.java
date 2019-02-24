@@ -4,8 +4,8 @@ import android.opengl.EGLContext;
 import android.os.Process;
 import android.view.Surface;
 
-import com.alanwang.aavlib.libeglcore.common.AAVHandlerThread;
-import com.alanwang.aavlib.libeglcore.egl.AAVEGLCoreWrapper;
+import com.alanwang.aavlib.libeglcore.common.AWHandlerThread;
+import com.alanwang.aavlib.libeglcore.egl.AWEGLCoreWrapper;
 
 /**
  * Author: AlanWang4523.
@@ -13,15 +13,15 @@ import com.alanwang.aavlib.libeglcore.egl.AAVEGLCoreWrapper;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVSubGLEngine {
-    private static final String TAG = AAVMainGLEngine.class.getSimpleName();
+public class AWSubGLEngine {
+    private static final String TAG = AWMainGLEngine.class.getSimpleName();
 
-    private final AAVEGLCoreWrapper mEGLCoreWrapper;
-    private final AAVHandlerThread mHandlerThread;
+    private final AWEGLCoreWrapper mEGLCoreWrapper;
+    private final AWHandlerThread mHandlerThread;
 
-    public AAVSubGLEngine(EGLContext eglContext) {
-        mEGLCoreWrapper = new AAVEGLCoreWrapper(eglContext);
-        mHandlerThread = new AAVHandlerThread(TAG, Process.THREAD_PRIORITY_FOREGROUND);
+    public AWSubGLEngine(EGLContext eglContext) {
+        mEGLCoreWrapper = new AWEGLCoreWrapper(eglContext);
+        mHandlerThread = new AWHandlerThread(TAG, Process.THREAD_PRIORITY_FOREGROUND);
     }
 
     /**

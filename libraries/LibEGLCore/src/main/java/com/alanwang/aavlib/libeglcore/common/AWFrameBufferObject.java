@@ -5,22 +5,22 @@ import android.opengl.GLES20;
 import com.alanwang.aavlib.libeglcore.egl.GlUtil;
 
 /**
- * AAVFrameBufferObject 自带 texture 的 AAVFrameBuffer
+ * AWFrameBufferObject 自带 texture 的 AWFrameBuffer
  * Author: AlanWang4523.
  * Date: 19/1/22 00:58.
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVFrameBufferObject {
+public class AWFrameBufferObject {
 
-    private AAVFrameBuffer mFrameBuffer;
+    private AWFrameBuffer mFrameBuffer;
     private long mLastThreadID = 0;
     private int mOutputTextureId = -1;
     private int mWidth = 0;
     private int mHeight = 0;
 
-    public AAVFrameBufferObject() {
-        mFrameBuffer = new AAVFrameBuffer();
+    public AWFrameBufferObject() {
+        mFrameBuffer = new AWFrameBuffer();
     }
 
     public boolean checkInit(int width, int height) {

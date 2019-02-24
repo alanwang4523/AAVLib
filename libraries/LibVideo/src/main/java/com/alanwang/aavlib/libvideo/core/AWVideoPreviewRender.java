@@ -1,8 +1,8 @@
 package com.alanwang.aavlib.libvideo.core;
 
-import com.alanwang.aavlib.libeglcore.common.AAVFrameBufferObject;
-import com.alanwang.aavlib.libeglcore.render.AAVSurfaceRender;
-import com.alanwang.aavlib.libvideoeffect.effects.AAVGrayEffect;
+import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
+import com.alanwang.aavlib.libeglcore.render.AWSurfaceRender;
+import com.alanwang.aavlib.libvideoeffect.effects.AWGrayEffect;
 
 /**
  * Author: AlanWang4523.
@@ -11,17 +11,17 @@ import com.alanwang.aavlib.libvideoeffect.effects.AAVGrayEffect;
  */
 
 public class AWVideoPreviewRender {
-    private final AAVFrameBufferObject mEffectFrameBuffer;
-    private final AAVGrayEffect mTestEffect;
-    private final AAVSurfaceRender mVideoRender;
+    private final AWFrameBufferObject mEffectFrameBuffer;
+    private final AWGrayEffect mTestEffect;
+    private final AWSurfaceRender mVideoRender;
 
     private int mViewportWidth;
     private int mViewportHeight;
 
     public AWVideoPreviewRender() {
-        mEffectFrameBuffer = new AAVFrameBufferObject();
-        mTestEffect = new AAVGrayEffect();
-        mVideoRender = new AAVSurfaceRender();
+        mEffectFrameBuffer = new AWFrameBufferObject();
+        mTestEffect = new AWGrayEffect();
+        mVideoRender = new AWSurfaceRender();
     }
 
     /**

@@ -8,11 +8,11 @@ import android.opengl.GLES20;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVFrameBuffer {
+public class AWFrameBuffer {
     private int mFBO = -1;
     private long mLastThreadID = 0;
 
-    public AAVFrameBuffer() {
+    public AWFrameBuffer() {
 
     }
 

@@ -6,7 +6,7 @@ package com.alanwang.aavlib.libeglcore.common;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVCoordinateUtil {
+public class AWCoordinateUtil {
 
     public static final float DEFAULT_VERTEX_COORDS[] = {
             -1.0f, -1.0f,  // 0 bottom left

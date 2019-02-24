@@ -3,10 +3,10 @@ package com.alanwang.aavlib.libeglcore.render;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import com.alanwang.aavlib.libeglcore.common.AAVSurfaceTexture;
+import com.alanwang.aavlib.libeglcore.common.AWSurfaceTexture;
 
 /**
- * AAVOESTextureRender
+ * AWOESTextureRender
  * 用于 OES 纹理渲染，OES 纹理可来源于相机、player、编码器
  *
  * Author: AlanWang4523.
@@ -14,7 +14,7 @@ import com.alanwang.aavlib.libeglcore.common.AAVSurfaceTexture;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVOESTextureRender extends AAVBaseRender {
+public class AWOESTextureRender extends AWBaseRender {
 
     private static final String VERTEX_SHADER =
             "uniform mat4 uMVPMatrix;\n" +
@@ -41,7 +41,7 @@ public class AAVOESTextureRender extends AAVBaseRender {
     private int muMVPMatrixLoc;
     private int muTexMatrixLoc;
 
-    public AAVOESTextureRender() {
+    public AWOESTextureRender() {
         super(VERTEX_SHADER, FRAGMENT_SHADER, GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
         Matrix.setIdentityM(this.mMVPMatrix, 0);
         Matrix.setIdentityM(this.mTextureTransformMatrix, 0);
@@ -76,11 +76,11 @@ public class AAVOESTextureRender extends AAVBaseRender {
 
     /**
      * 渲染纹理
-     * @param aavSurfaceTexture
+     * @param AWSurfaceTexture
      */
-    public void drawFrame(AAVSurfaceTexture aavSurfaceTexture) {
-        aavSurfaceTexture.updateTexImage(mTextureTransformMatrix);
-        super.drawFrame(aavSurfaceTexture.getTextureId(), DEFAULT_VERTEX_COORDINATE_BUFFER, DEFAULT_TEXTURE_COORDINATE_BUFFER);
+    public void drawFrame(AWSurfaceTexture AWSurfaceTexture) {
+        AWSurfaceTexture.updateTexImage(mTextureTransformMatrix);
+        super.drawFrame(AWSurfaceTexture.getTextureId(), DEFAULT_VERTEX_COORDINATE_BUFFER, DEFAULT_TEXTURE_COORDINATE_BUFFER);
     }
 
     /**

@@ -6,10 +6,10 @@ package com.alanwang.aavlib.libeglcore.common;
  * Mail: alanwang4523@gmail.com
  */
 
-public interface AAVFrameAvailableListener {
+public interface AWFrameAvailableListener {
     /**
      * 通知新的一帧数据到来
      * @param surfaceTexture
      */
-    void onFrameAvailable(AAVSurfaceTexture surfaceTexture);
+    void onFrameAvailable(AWSurfaceTexture surfaceTexture);
 }

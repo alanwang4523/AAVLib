@@ -9,15 +9,15 @@ import android.util.Log;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVEGLCoreWrapper {
+public class AWEGLCoreWrapper {
 
-    private final String TAG = AAVEGLCoreWrapper.class.getSimpleName();
+    private final String TAG = AWEGLCoreWrapper.class.getSimpleName();
 
     protected EGLCore mEglCore;
-    protected AAVWindowSurface mWindowSurface;
+    protected AWWindowSurface mWindowSurface;
 
-    public AAVEGLCoreWrapper(EGLContext shareContext) {
-        mWindowSurface = new AAVWindowSurface();
+    public AWEGLCoreWrapper(EGLContext shareContext) {
+        mWindowSurface = new AWWindowSurface();
         mEglCore = new EGLCore(shareContext, EGLCore.FLAG_RECORDABLE);
     }
 

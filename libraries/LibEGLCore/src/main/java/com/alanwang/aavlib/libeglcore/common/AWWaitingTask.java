@@ -6,12 +6,12 @@ package com.alanwang.aavlib.libeglcore.common;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVWaitingTask implements Runnable {
+public class AWWaitingTask implements Runnable {
 
     private final Runnable runnable;
     private volatile boolean mIsNeedWait;
 
-    public AAVWaitingTask(Runnable runnable) {
+    public AWWaitingTask(Runnable runnable) {
         this.runnable = runnable;
         mIsNeedWait = true;
     }

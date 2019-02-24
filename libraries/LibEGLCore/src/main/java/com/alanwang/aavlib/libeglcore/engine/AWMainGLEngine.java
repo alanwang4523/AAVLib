@@ -5,9 +5,9 @@ import android.opengl.EGLContext;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.view.Surface;
-import com.alanwang.aavlib.libeglcore.common.AAVHandlerThread;
-import com.alanwang.aavlib.libeglcore.common.AAVMessage;
-import com.alanwang.aavlib.libeglcore.egl.AAVEGLCoreWrapper;
+import com.alanwang.aavlib.libeglcore.common.AWHandlerThread;
+import com.alanwang.aavlib.libeglcore.common.AWMessage;
+import com.alanwang.aavlib.libeglcore.egl.AWEGLCoreWrapper;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -17,20 +17,20 @@ import java.util.Deque;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AAVMainGLEngine {
-    private static final String TAG = AAVMainGLEngine.class.getSimpleName();
+public class AWMainGLEngine {
+    private static final String TAG = AWMainGLEngine.class.getSimpleName();
 
-    private final AAVEGLCoreWrapper mEGLCoreWrapper;
-    private final AAVHandlerThread mHandlerThread;
+    private final AWEGLCoreWrapper mEGLCoreWrapper;
+    private final AWHandlerThread mHandlerThread;
     private final ImageReader mImageReader;
-    private final Deque<AAVMessage> mRenderTaskDeque;
+    private final Deque<AWMessage> mRenderTaskDeque;
     private final RenderTask mRenderTask;
     private IGLEngineCallback mEngineCallback;
     private volatile boolean mIsEngineValid = false;
 
-    public AAVMainGLEngine(@NonNull IGLEngineCallback callback) {
-        mEGLCoreWrapper = new AAVEGLCoreWrapper(null);
-        mHandlerThread = new AAVHandlerThread(TAG, Process.THREAD_PRIORITY_FOREGROUND);
+    public AWMainGLEngine(@NonNull IGLEngineCallback callback) {
+        mEGLCoreWrapper = new AWEGLCoreWrapper(null);
+        mHandlerThread = new AWHandlerThread(TAG, Process.THREAD_PRIORITY_FOREGROUND);
         mImageReader = ImageReader.newInstance(1, 1, 1, 1);
         mRenderTaskDeque = new ArrayDeque<>();
         mRenderTask = new RenderTask(this);
@@ -82,7 +82,7 @@ public class AAVMainGLEngine {
      * 发送一个渲染消息
      * @param msg
      */
-    public void postRenderMessage(AAVMessage msg) {
+    public void postRenderMessage(AWMessage msg) {
         if (mIsEngineValid) {
             synchronized (mRenderTaskDeque) {
                 if (mRenderTaskDeque.size() > 100) {
@@ -98,7 +98,7 @@ public class AAVMainGLEngine {
      * 真正的处理渲染消息
      * @param msg
      */
-    private void handleRenderMsg(AAVMessage msg) {
+    private void handleRenderMsg(AWMessage msg) {
         if (mEGLCoreWrapper.isEGLContextValid()) {
             mEGLCoreWrapper.makeCurrent();
             mEngineCallback.onRender(msg);
@@ -140,15 +140,15 @@ public class AAVMainGLEngine {
      * 渲染任务
      */
     private static class RenderTask implements  Runnable {
-        private final AAVMainGLEngine mMainGLEngine;
+        private final AWMainGLEngine mMainGLEngine;
 
-        public RenderTask(AAVMainGLEngine mainGLEngine) {
+        public RenderTask(AWMainGLEngine mainGLEngine) {
             this.mMainGLEngine = mainGLEngine;
         }
 
         @Override
         public void run() {
-            AAVMessage msg;
+            AWMessage msg;
             synchronized (mMainGLEngine.mRenderTaskDeque) {
                 msg = mMainGLEngine.mRenderTaskDeque.poll();
             }
