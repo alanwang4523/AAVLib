@@ -19,9 +19,9 @@ import java.lang.ref.WeakReference;
 public class AWSurfaceTexture {
 
     private int mTextureId;
-    private final SurfaceTexture mSurfaceTexture;
+    private SurfaceTexture mSurfaceTexture;
     private Surface mSurface;
-    private final AWOESTextureRender mTextureRender;
+    private AWOESTextureRender mTextureRender;
     private AWFrameAvailableListener mFrameAvailableListener;
 
     public AWSurfaceTexture() {
@@ -128,8 +128,16 @@ public class AWSurfaceTexture {
             GLES20.glDeleteTextures(1, new int[]{mTextureId}, 0);
             mTextureId = -1;
         }
-        mSurfaceTexture.setOnFrameAvailableListener(null);
-        mSurfaceTexture.release();
+        if (mTextureRender != null) {
+            mTextureRender.release();
+            mTextureRender = null;
+        }
+        if (mSurfaceTexture != null) {
+            mSurfaceTexture.setOnFrameAvailableListener(null);
+            mSurfaceTexture.release();
+            mSurfaceTexture = null;
+        }
+
         if (mSurface != null) {
             mSurface.release();
             mSurface = null;

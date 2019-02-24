@@ -68,6 +68,7 @@ public class GlUtil {
         }
         int pixelShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSource);
         if (pixelShader == 0) {
+            GLES20.glDeleteShader(vertexShader);
             return 0;
         }
         int program = GLES20.glCreateProgram();
@@ -88,6 +89,8 @@ public class GlUtil {
             GLES20.glDeleteProgram(program);
             program = 0;
         }
+        GLES20.glDeleteShader(vertexShader);
+        GLES20.glDeleteShader(pixelShader);
         return program;
     }
 
