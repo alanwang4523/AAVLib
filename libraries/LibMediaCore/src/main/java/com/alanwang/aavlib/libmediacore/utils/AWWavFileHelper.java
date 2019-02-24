@@ -1,5 +1,11 @@
 package com.alanwang.aavlib.libmediacore.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
  * Wav File 工具类（注意：只支持文件头为 44 字节的 Wav 文件），支持：
  * 1. 生成 44 字节的 Wav 文件头
@@ -107,5 +113,132 @@ public class AWWavFileHelper {
         wavHeader[42] = (byte)((audioDataLen >> 16) & 0xff);
         wavHeader[43] = (byte)((audioDataLen >> 24) & 0xff);
         return wavHeader;
+    }
+
+    /**
+     * 更新 wav 文件头，主要是更新文件长度
+     */
+    public static void updateWavHeader(File wavFile) throws IOException {
+        updateWavHeader(wavFile, wavFile.length());
+    }
+
+    /**
+     * 更新 wav 文件头，主要是更新文件长度
+     * @param totalFileLenIncludeHeader 包含 44 字节 wav 头及所有 PCM 数据总和
+     */
+    public static void updateWavHeader(File wavFile, long totalFileLenIncludeHeader) throws IOException {
+        if (wavFile == null || !wavFile.exists()) {
+            throw new IllegalArgumentException("The wavFile is null or not exist!");
+        }
+        RandomAccessFile randomAccessFile = new RandomAccessFile(wavFile, "rw");
+        //更新wav文件头04H— 08H的数据长度：该长度 = 文件总长 - 8
+        randomAccessFile.seek(4);
+        randomAccessFile.write(int2ByteArray((int) (totalFileLenIncludeHeader - 8)));
+
+        //更新wav文件头28H— 2CH,实际PCM采样数据长度
+        randomAccessFile.seek(40);
+        randomAccessFile.write(int2ByteArray((int) (totalFileLenIncludeHeader - 44)));
+        randomAccessFile.close();
+    }
+
+    /**
+     * 获取wav文件头信息
+     * @param wavFile
+     * @return
+     */
+    public static WavHeaderInfo getWavHeaderInfo(File wavFile) throws IOException {
+        RandomAccessFile randomAccessFile = new RandomAccessFile(wavFile, "rw");
+
+        //读取channelCount，第22~23位
+        randomAccessFile.seek(22);
+        byte[] channelCountArray = new byte[2];
+        randomAccessFile.read(channelCountArray);
+        int channelCount = byteArray2Short(channelCountArray);
+
+        //读取sampleRate，第24~27位
+        randomAccessFile.seek(24);
+        byte[] sampleRateArray = new byte[4];
+        randomAccessFile.read(sampleRateArray);
+        int sampleRate = byteArray2Int(sampleRateArray);
+
+
+        //读取音频数据长度，第40~43位
+        randomAccessFile.seek(40);
+        byte[] audioDataLenArray = new byte[4];
+        randomAccessFile.read(audioDataLenArray);
+        int audioDataLen = byteArray2Int(audioDataLenArray);
+
+        randomAccessFile.close();
+
+        return new WavHeaderInfo(sampleRate, channelCount, audioDataLen);
+    }
+
+    /**
+     * 将整型转成byte数组
+     * @param data
+     * @return
+     */
+    private static byte[] int2ByteArray(int data) {
+        return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data).array();
+    }
+
+    /**
+     * 将short转成byte数组
+     * @param data
+     * @return
+     */
+    private static byte[] short2ByteArray(short data) {
+        return ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort(data).array();
+    }
+
+    /**
+     * 将byte数组转成short
+     * @param b
+     * @return
+     */
+    private static short byteArray2Short(byte[] b) {
+        return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getShort();
+    }
+
+    /**
+     * 将byte数组转成整型
+     * @param b
+     * @return
+     */
+    private static int byteArray2Int(byte[] b) {
+        return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    }
+
+    public static class WavHeaderInfo {
+        /**
+         * 采样率
+         */
+        public int sampleRate;
+
+        /**
+         * 通道数
+         */
+        public int channelCount;
+
+        /**
+         * 音频数据长度，单位：字节
+         */
+        public int audioDataLen;
+
+        public WavHeaderInfo(int sampleRate, int channelCount, int audioDataLen) {
+            this.sampleRate = sampleRate;
+            this.channelCount = channelCount;
+            this.audioDataLen = audioDataLen;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sttBuilder = new StringBuilder(WavHeaderInfo.class.getSimpleName());
+            sttBuilder.append("::")
+                    .append("sampleRate = ").append(sampleRate)
+                    .append(", channelCount = ").append(channelCount)
+                    .append(", audioDataLen = ").append(audioDataLen).append("\n");
+            return sttBuilder.toString();
+        }
     }
 }
