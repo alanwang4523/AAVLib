@@ -21,6 +21,7 @@ public abstract class AWBaseHWEncoder {
 
     private MediaCodec mEncoder;
     private MediaCodec.BufferInfo mBufferInfo;
+    private ByteBuffer[] mEncoderOutputBuffers;
     private int mEosSpinCount = 0;
 
     /**
@@ -72,33 +73,34 @@ public abstract class AWBaseHWEncoder {
      * @throws InterruptedException
      */
     private boolean retrySetupWhenFailed(Exception e) throws IOException, InterruptedException {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            try {
-                if (e instanceof MediaCodec.CodecException) {
-                    MediaCodec.CodecException codecException = (MediaCodec.CodecException) e;
-                    Log.e(TAG, "isRecoverable = " + codecException.isRecoverable() + ", isTransient = " + codecException.isTransient());
-                    if (codecException.isRecoverable()) {
-                        if (mEncoder != null) {
-                            mEncoder.stop();
-                            setupEncoder(mFormat);
-                            return true;
-                        }
-                    } else if (codecException.isTransient()) {
-                        Thread.sleep(500);
-                        mEncoder.start();
-                        return true;
-                    } else {
-                        if (mEncoder != null) {
-                            mEncoder.release();
-                        }
-                        mEncoder = MediaCodec.createEncoderByType(getMimeType());
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return false;
+        }
+        try {
+            if (e instanceof MediaCodec.CodecException) {
+                MediaCodec.CodecException codecException = (MediaCodec.CodecException) e;
+                Log.e(TAG, "isRecoverable = " + codecException.isRecoverable() + ", isTransient = " + codecException.isTransient());
+                if (codecException.isRecoverable()) {
+                    if (mEncoder != null) {
+                        mEncoder.stop();
                         setupEncoder(mFormat);
                         return true;
                     }
+                } else if (codecException.isTransient()) {
+                    Thread.sleep(500);
+                    mEncoder.start();
+                    return true;
+                } else {
+                    if (mEncoder != null) {
+                        mEncoder.release();
+                    }
+                    mEncoder = MediaCodec.createEncoderByType(getMimeType());
+                    setupEncoder(mFormat);
+                    return true;
                 }
-            } catch (Exception e1) {
-                throw e1;
             }
+        } catch (Exception e1) {
+            throw e1;
         }
         return false;
     }
@@ -123,14 +125,6 @@ public abstract class AWBaseHWEncoder {
             signalEndOfInputStream();
         }
 
-        ByteBuffer[] encoderOutputBuffers = null;
-        try {
-            encoderOutputBuffers = mEncoder.getOutputBuffers();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            return;//如果状态异常抛弃该次处理
-        }
-
         while (true) {
             // 硬件编码器，在队列中申请一个操作对象
             final int encoderStatus;
@@ -151,7 +145,7 @@ public abstract class AWBaseHWEncoder {
                     }
                 }
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                encoderOutputBuffers = mEncoder.getOutputBuffers();
+                mEncoderOutputBuffers = mEncoder.getOutputBuffers();
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat newFormat = mEncoder.getOutputFormat();
                 outputFormatChanged(newFormat);
@@ -163,13 +157,12 @@ public abstract class AWBaseHWEncoder {
                 if (Build.VERSION.SDK_INT >= 21) {
                     encodedData = mEncoder.getOutputBuffer(encoderStatus);
                 } else {
-                    encodedData = encoderOutputBuffers[encoderStatus];
+                    encodedData = mEncoderOutputBuffers[encoderStatus];
                 }
                 if (encodedData != null) {
                     if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                         mBufferInfo.size = 0;
                     }
-
                     if (mBufferInfo.size > 0) {
                         encodedData.position(mBufferInfo.offset);
                         encodedData.limit(mBufferInfo.offset + mBufferInfo.size);
@@ -194,6 +187,10 @@ public abstract class AWBaseHWEncoder {
         if (mEncoder != null) {
             try {
                 mEncoder.stop();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+            try {
                 mEncoder.release();
             } catch (IllegalStateException e) {
                 e.printStackTrace();
