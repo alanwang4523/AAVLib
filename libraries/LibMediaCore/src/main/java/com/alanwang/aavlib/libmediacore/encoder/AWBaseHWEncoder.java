@@ -76,28 +76,29 @@ public abstract class AWBaseHWEncoder {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             return false;
         }
+        if (!(e instanceof MediaCodec.CodecException)) {
+            return false;
+        }
         try {
-            if (e instanceof MediaCodec.CodecException) {
-                MediaCodec.CodecException codecException = (MediaCodec.CodecException) e;
-                Log.e(TAG, "isRecoverable = " + codecException.isRecoverable() + ", isTransient = " + codecException.isTransient());
-                if (codecException.isRecoverable()) {
-                    if (mEncoder != null) {
-                        mEncoder.stop();
-                        setupEncoder(mFormat);
-                        return true;
-                    }
-                } else if (codecException.isTransient()) {
-                    Thread.sleep(500);
-                    mEncoder.start();
-                    return true;
-                } else {
-                    if (mEncoder != null) {
-                        mEncoder.release();
-                    }
-                    mEncoder = MediaCodec.createEncoderByType(getMimeType());
+            MediaCodec.CodecException codecException = (MediaCodec.CodecException) e;
+            Log.e(TAG, "isRecoverable = " + codecException.isRecoverable() + ", isTransient = " + codecException.isTransient());
+            if (codecException.isRecoverable()) {
+                if (mEncoder != null) {
+                    mEncoder.stop();
                     setupEncoder(mFormat);
                     return true;
                 }
+            } else if (codecException.isTransient()) {
+                Thread.sleep(500);
+                mEncoder.start();
+                return true;
+            } else {
+                if (mEncoder != null) {
+                    mEncoder.release();
+                }
+                mEncoder = MediaCodec.createEncoderByType(getMimeType());
+                setupEncoder(mFormat);
+                return true;
             }
         } catch (Exception e1) {
             throw e1;
