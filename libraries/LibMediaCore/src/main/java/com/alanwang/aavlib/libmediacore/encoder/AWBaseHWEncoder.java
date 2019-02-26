@@ -118,6 +118,20 @@ public abstract class AWBaseHWEncoder {
     }
 
     /**
+     * 向 MediaCodec 放原始数据进行编码
+     * @param byteBuffer
+     * @param presentationTimeUs
+     * @param isEndOfStream
+     */
+    public void putRawDataToCodec(ByteBuffer byteBuffer, long presentationTimeUs, boolean isEndOfStream) {
+        // TODO put data to codec
+    }
+
+    public void takeEncodedDataFromCodec() {
+
+    }
+
+    /**
      * 处理编码数据
      * @param endOfStream
      */
