@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AWVideoRecordEncoder extends AWVideoEncodeCore {
+public class AWVideoRecordEncoder extends AWVideoHWEncoderCore {
 
     private MediaMuxer mMediaMuxer;
     private int mTrackIndex = -1;

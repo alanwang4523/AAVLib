@@ -7,6 +7,7 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -16,8 +17,8 @@ import java.nio.ByteBuffer;
  * Mail: alanwang4523@gmail.com
  */
 
-public abstract class AWVideoEncodeCore extends AWBaseHWEncoder {
-    private static final String TAG = AWVideoEncodeCore.class.getSimpleName();
+public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
+    private static final String TAG = AWVideoHWEncoderCore.class.getSimpleName();
 
     private static final String MIME_TYPE = "video/avc";
     protected static final int FRAME_RATE = 30;
@@ -30,12 +31,16 @@ public abstract class AWVideoEncodeCore extends AWBaseHWEncoder {
     private int mEosSpinCount = 0;
     private final int MAX_EOS_SPINS = 10;
 
-    public AWVideoEncodeCore(int width, int height, int bitRate, int frameRate, int iFrameInterval) {
-        mFormat = MediaFormat.createVideoFormat(MIME_TYPE, width, height);
+    public AWVideoHWEncoderCore() {
+    }
+
+    public void setup(int width, int height, int bitRate, int frameRate, int iFrameInterval) throws IOException, InterruptedException {
+        mFormat = MediaFormat.createVideoFormat(getMimeType(), width, height);
         mFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
         mFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
         mFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
         mFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
+        super.setup();
     }
 
     @Override
