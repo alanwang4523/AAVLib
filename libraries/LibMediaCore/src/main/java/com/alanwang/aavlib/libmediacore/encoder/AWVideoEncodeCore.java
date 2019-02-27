@@ -6,7 +6,7 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
-import java.io.IOException;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -16,20 +16,17 @@ import java.nio.ByteBuffer;
  * Mail: alanwang4523@gmail.com
  */
 
-public abstract class AWVideoEncodeCore {
+public abstract class AWVideoEncodeCore extends AWBaseHWEncoder {
     private static final String TAG = AWVideoEncodeCore.class.getSimpleName();
 
     private static final String MIME_TYPE = "video/avc";
     protected static final int FRAME_RATE = 30;
     protected static final int DEFAULT_I_FRAME_INTERVAL = 2;
-    protected static final int TIMEOUT_USEC = 0;
+    protected static final int CODEC_TIMEOUT_IN_US = 0;
 
-    protected MediaFormat mFormat;
 
     private Surface mInputSurface;
-    private MediaCodec mEncoder;
-    private MediaCodec.BufferInfo mBufferInfo;
-
+    protected ByteBuffer[] mEncoderOutputBuffers;
     private int mEosSpinCount = 0;
     private final int MAX_EOS_SPINS = 10;
 
@@ -41,76 +38,14 @@ public abstract class AWVideoEncodeCore {
         mFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
     }
 
-    /**
-     * 初始化
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public void setup() throws IOException, InterruptedException {
-        try {
-            mEncoder = MediaCodec.createEncoderByType(MIME_TYPE);
-            mBufferInfo = new MediaCodec.BufferInfo();
-        } catch (Exception e) {
-            throw e;
-        }
-        try {
-            setupEncoder(mFormat);
-        } catch (Exception e) {
-            Log.e(TAG, "" + e);
-            if (!retrySetupWhenFailed(e)) {
-                throw e;
-            }
-        }
+    @Override
+    protected String getMimeType() {
+        return MIME_TYPE;
     }
 
-    /**
-     * 初始化失败时进行重试
-     * @param e
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    private boolean retrySetupWhenFailed(Exception e) throws IOException, InterruptedException {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            try {
-                if (e instanceof MediaCodec.CodecException) {
-                    MediaCodec.CodecException codecException = (MediaCodec.CodecException) e;
-                    Log.e(TAG, "isRecoverable = " + codecException.isRecoverable() + ", isTransient = " + codecException.isTransient());
-                    if (codecException.isRecoverable()) {
-                        if (mEncoder != null) {
-                            mEncoder.stop();
-                            setupEncoder(mFormat);
-                            return true;
-                        }
-                    } else if (codecException.isTransient()) {
-                        Thread.sleep(500);
-                        mEncoder.start();
-                        return true;
-                    } else {
-                        if (mEncoder != null) {
-                            mEncoder.release();
-                        }
-                        mEncoder = MediaCodec.createEncoderByType(MIME_TYPE);
-                        setupEncoder(mFormat);
-                        return true;
-                    }
-                }
-            } catch (Exception e1) {
-                throw e1;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 初始化编码器
-     * @param format
-     * @throws IOException
-     */
-    private void setupEncoder(MediaFormat format) throws IOException {
-        mEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+    @Override
+    protected void onEncoderConfigured() {
         mInputSurface = mEncoder.createInputSurface();
-        mEncoder.start();
     }
 
     /**
@@ -128,19 +63,11 @@ public abstract class AWVideoEncodeCore {
     public void drainEncoder(boolean endOfStream) {
         signalEndOfInputStream(endOfStream);
 
-        ByteBuffer[] encoderOutputBuffers = null;
-        try {
-            encoderOutputBuffers = mEncoder.getOutputBuffers();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            return;//如果状态异常抛弃该次处理
-        }
-
         while (true) {
             // 硬件编码器，在队列中申请一个操作对象
             final int encoderStatus;
             try {
-                encoderStatus = mEncoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
+                encoderStatus = mEncoder.dequeueOutputBuffer(mBufferInfo, CODEC_TIMEOUT_IN_US);
             } catch (Exception e) {
                 Log.e(TAG, "dequeueOutputBuffer error", e);
                 break;//状态错误退出本次循环
@@ -156,10 +83,10 @@ public abstract class AWVideoEncodeCore {
                     }
                 }
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                encoderOutputBuffers = mEncoder.getOutputBuffers();
+                mEncoderOutputBuffers = mEncoder.getOutputBuffers();
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat newFormat = mEncoder.getOutputFormat();
-                outputFormatChanged(newFormat);
+                onOutputFormatChanged(newFormat);
             } else if (encoderStatus < 0) {
                 Log.w(TAG, "unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
             } else {
@@ -168,7 +95,7 @@ public abstract class AWVideoEncodeCore {
                 if (Build.VERSION.SDK_INT >= 21) {
                     encodedData = mEncoder.getOutputBuffer(encoderStatus);
                 } else {
-                    encodedData = encoderOutputBuffers[encoderStatus];
+                    encodedData = mEncoderOutputBuffers[encoderStatus];
                 }
                 if (encodedData != null) {
                     if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
@@ -193,34 +120,6 @@ public abstract class AWVideoEncodeCore {
             }
         }
     }
-
-    /**
-     * 释放资源
-     */
-    public void release() {
-        if (mEncoder != null) {
-            try {
-                mEncoder.stop();
-                mEncoder.release();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            }
-            mEncoder = null;
-        }
-    }
-
-    /**
-     * 编码器的 outputFormat 发生改变
-     * @param newFormat
-     */
-    protected abstract void outputFormatChanged(MediaFormat newFormat);
-
-    /**
-     * 处理编码好的数据
-     * @param encodedData
-     * @param bufferInfo
-     */
-    protected abstract void handleEncodedData(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo);
 
     /**
      * 发送编码结束信号

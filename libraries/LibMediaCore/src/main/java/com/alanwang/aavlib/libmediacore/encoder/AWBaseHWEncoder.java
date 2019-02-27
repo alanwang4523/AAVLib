@@ -15,20 +15,10 @@ import java.nio.ByteBuffer;
  */
 public abstract class AWBaseHWEncoder {
     private final static String TAG = AWBaseHWEncoder.class.getSimpleName();
-    protected static final int CODEC_TIMEOUT_IN_US = 0;
-    private static final int MAX_EOS_SPINS = 10;
+
     protected MediaFormat mFormat;
-
-    private MediaCodec mEncoder;
-    private MediaCodec.BufferInfo mBufferInfo;
-    private ByteBuffer[] mEncoderOutputBuffers;
-    private int mEosSpinCount = 0;
-
-    /**
-     * 创建
-     * @return
-     */
-    protected abstract MediaFormat createMediaFormat();
+    protected MediaCodec mEncoder;
+    protected MediaCodec.BufferInfo mBufferInfo;
 
     /**
      * 获取 MIME_TYPE,
@@ -44,13 +34,25 @@ public abstract class AWBaseHWEncoder {
     protected abstract void onEncoderConfigured();
 
     /**
+     * 编码器的 outputFormat 发生改变
+     * @param newFormat
+     */
+    protected abstract void onOutputFormatChanged(MediaFormat newFormat);
+
+    /**
+     * 处理编码好的数据
+     * @param encodedData
+     * @param bufferInfo
+     */
+    protected abstract void handleEncodedData(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo);
+
+    /**
      * 初始化
      * @throws IOException
      * @throws InterruptedException
      */
     protected void setup() throws IOException, InterruptedException {
         try {
-            mFormat = createMediaFormat();
             mEncoder = MediaCodec.createEncoderByType(getMimeType());
             mBufferInfo = new MediaCodec.BufferInfo();
         } catch (Exception e) {
@@ -118,86 +120,8 @@ public abstract class AWBaseHWEncoder {
     }
 
     /**
-     * 向 MediaCodec 放原始数据进行编码
-     * @param byteBuffer
-     * @param presentationTimeUs
-     * @param isEndOfStream
+     * 释放资源
      */
-    public void putRawDataToCodec(ByteBuffer byteBuffer, long presentationTimeUs, boolean isEndOfStream) {
-        // TODO put data to codec
-    }
-
-    public void takeEncodedDataFromCodec() {
-
-    }
-
-    /**
-     * 处理编码数据
-     * @param endOfStream
-     */
-    public void drainEncoder(boolean endOfStream) {
-        if (endOfStream) {
-            signalEndOfInputStream();
-        }
-
-        while (true) {
-            // 硬件编码器，在队列中申请一个操作对象
-            final int encoderStatus;
-            try {
-                encoderStatus = mEncoder.dequeueOutputBuffer(mBufferInfo, CODEC_TIMEOUT_IN_US);
-            } catch (Exception e) {
-                Log.e(TAG, "dequeueOutputBuffer error", e);
-                break;//状态错误退出本次循环
-            }
-            if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
-                // no output available yet
-                if (!endOfStream) {
-                    break;
-                } else {
-                    mEosSpinCount++;
-                    if (mEosSpinCount > MAX_EOS_SPINS) {
-                        break;
-                    }
-                }
-            } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                mEncoderOutputBuffers = mEncoder.getOutputBuffers();
-            } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                MediaFormat newFormat = mEncoder.getOutputFormat();
-                outputFormatChanged(newFormat);
-            } else if (encoderStatus < 0) {
-                Log.w(TAG, "unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
-            } else {
-                // encodedData为真正编码完成的数据
-                ByteBuffer encodedData;
-                if (Build.VERSION.SDK_INT >= 21) {
-                    encodedData = mEncoder.getOutputBuffer(encoderStatus);
-                } else {
-                    encodedData = mEncoderOutputBuffers[encoderStatus];
-                }
-                if (encodedData != null) {
-                    if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-                        mBufferInfo.size = 0;
-                    }
-                    if (mBufferInfo.size > 0) {
-                        encodedData.position(mBufferInfo.offset);
-                        encodedData.limit(mBufferInfo.offset + mBufferInfo.size);
-
-                        handleEncodedData(encodedData, mBufferInfo);
-                    }
-                }
-                mEncoder.releaseOutputBuffer(encoderStatus, false);
-
-                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                    if (!endOfStream) {
-                        Log.w(TAG, "reached end of stream unexpectedly");
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-
     public void release() {
         if (mEncoder != null) {
             try {
@@ -211,30 +135,6 @@ public abstract class AWBaseHWEncoder {
                 e.printStackTrace();
             }
             mEncoder = null;
-        }
-    }
-
-    /**
-     * 编码器的 outputFormat 发生改变
-     * @param newFormat
-     */
-    protected abstract void outputFormatChanged(MediaFormat newFormat);
-
-    /**
-     * 处理编码好的数据
-     * @param encodedData
-     * @param bufferInfo
-     */
-    protected abstract void handleEncodedData(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo);
-
-    /**
-     * 发送结束编码的信号
-     */
-    private void signalEndOfInputStream() {
-        try {
-            mEncoder.signalEndOfInputStream();
-        } catch (IllegalStateException e) {
-            Log.e(TAG, "signalEndOfInputStream error", e);
         }
     }
 }

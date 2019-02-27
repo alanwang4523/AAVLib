@@ -53,7 +53,7 @@ public class AWVideoRecordEncoder extends AWVideoEncodeCore {
     }
 
     @Override
-    protected void outputFormatChanged(MediaFormat newFormat) {
+    protected void onOutputFormatChanged(MediaFormat newFormat) {
         mTrackIndex = mMediaMuxer.addTrack(newFormat);
         mMediaMuxer.start();
     }
