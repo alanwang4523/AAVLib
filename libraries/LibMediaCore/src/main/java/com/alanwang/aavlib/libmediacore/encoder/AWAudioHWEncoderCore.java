@@ -3,6 +3,7 @@ package com.alanwang.aavlib.libmediacore.encoder;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.os.Build;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -16,6 +17,10 @@ import java.nio.ByteBuffer;
 public abstract class AWAudioHWEncoderCore extends AWBaseHWEncoder {
 
     private static final String MIME_TYPE = "audio/mp4a-latm";
+    protected static final int CODEC_TIMEOUT_IN_US = 0;
+
+    private ByteBuffer[] mEncoderInputBuffers;
+    protected ByteBuffer[] mEncoderOutputBuffers;
 
     public AWAudioHWEncoderCore() {
     }
@@ -38,11 +43,57 @@ public abstract class AWAudioHWEncoderCore extends AWBaseHWEncoder {
     /**
      * 向 MediaCodec 放原始数据进行编码
      * @param byteBuffer
+     * @param dataSize
      * @param presentationTimeUs
      * @param isEndOfStream
+     * @return 是否有可填充数据的 buffer
      */
-    protected void putRawDataToCodec(ByteBuffer byteBuffer, long presentationTimeUs, boolean isEndOfStream) {
+    protected boolean putRawDataToCodec(ByteBuffer byteBuffer, int dataSize, long presentationTimeUs, boolean isEndOfStream) {
+        int inputBufIndex = mMediaEncoder.dequeueInputBuffer(CODEC_TIMEOUT_IN_US);
+        if (inputBufIndex == -1) {
+            return false;
+        }
 
+        ByteBuffer inputBuffer = mEncoderInputBuffers[inputBufIndex];
+        inputBuffer.clear();
+        inputBuffer.put(byteBuffer.array(), byteBuffer.position(), dataSize);
+
+        int flags = isEndOfStream ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0;
+        mMediaEncoder.queueInputBuffer(inputBufIndex, 0, dataSize, presentationTimeUs, flags);
+
+        return true;
+    }
+
+    /**
+     * 处理编码好的数据
+     * @return 是否可以继续处理
+     */
+    protected boolean handleEncodedData() {
+        int outputBufIndex = mMediaEncoder.dequeueOutputBuffer(mBufferInfo, CODEC_TIMEOUT_IN_US);
+        if (outputBufIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
+            return false;
+        }
+        if (outputBufIndex >= 0) {
+            ByteBuffer encodedData;
+            if (Build.VERSION.SDK_INT >= 21) {
+                encodedData = mMediaEncoder.getOutputBuffer(outputBufIndex);
+            } else {
+                encodedData = mEncoderOutputBuffers[outputBufIndex];
+            }
+            encodedData.position(mBufferInfo.offset);
+            encodedData.limit(mBufferInfo.offset + mBufferInfo.size);
+            if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0 && mBufferInfo.size != 0) {
+                mMediaEncoder.releaseOutputBuffer(outputBufIndex, false);
+            } else {
+                handleEncodedData(encodedData, mBufferInfo);
+                mMediaEncoder.releaseOutputBuffer(outputBufIndex, false);
+            }
+        } else if (outputBufIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+            onOutputFormatChanged(mMediaEncoder.getOutputFormat());
+        } else if (outputBufIndex == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+            mEncoderOutputBuffers = mMediaEncoder.getOutputBuffers();
+        }
+        return true;
     }
 
     @Override
@@ -51,17 +102,9 @@ public abstract class AWAudioHWEncoderCore extends AWBaseHWEncoder {
     }
 
     @Override
-    protected void onEncoderConfigured() {
-        // do nothing
-    }
-
-    @Override
-    protected void onOutputFormatChanged(MediaFormat newFormat) {
-
-    }
-
-    @Override
-    protected void handleEncodedData(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo) {
-
+    protected void onEncoderStarted() {
+        super.onEncoderStarted();
+        mEncoderInputBuffers = mMediaEncoder.getInputBuffers();
+        mEncoderOutputBuffers = mMediaEncoder.getOutputBuffers();
     }
 }

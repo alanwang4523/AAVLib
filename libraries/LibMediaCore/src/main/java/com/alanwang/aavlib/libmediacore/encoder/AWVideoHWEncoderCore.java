@@ -50,6 +50,7 @@ public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
 
     @Override
     protected void onEncoderConfigured() {
+        super.onEncoderConfigured();
         mInputSurface = mMediaEncoder.createInputSurface();
     }
 

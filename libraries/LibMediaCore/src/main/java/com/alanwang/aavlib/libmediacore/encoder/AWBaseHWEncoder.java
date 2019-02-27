@@ -31,7 +31,12 @@ public abstract class AWBaseHWEncoder {
     /**
      * 初始化完成
      */
-    protected abstract void onEncoderConfigured();
+    protected void onEncoderConfigured(){}
+
+    /**
+     * 编码器已开始
+     */
+    protected void onEncoderStarted(){}
 
     /**
      * 编码器的 outputFormat 发生改变
@@ -54,7 +59,6 @@ public abstract class AWBaseHWEncoder {
     protected void setup() throws IOException, InterruptedException {
         try {
             mMediaEncoder = MediaCodec.createEncoderByType(getMimeType());
-            mBufferInfo = new MediaCodec.BufferInfo();
         } catch (Exception e) {
             throw e;
         }
@@ -115,8 +119,10 @@ public abstract class AWBaseHWEncoder {
      */
     private void setupEncoder(MediaFormat format) throws IOException {
         mMediaEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+        mBufferInfo = new MediaCodec.BufferInfo();
         onEncoderConfigured();
         mMediaEncoder.start();
+        onEncoderStarted();
     }
 
     /**
