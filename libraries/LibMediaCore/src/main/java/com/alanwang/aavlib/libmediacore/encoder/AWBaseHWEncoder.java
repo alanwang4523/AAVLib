@@ -16,8 +16,8 @@ import java.nio.ByteBuffer;
 public abstract class AWBaseHWEncoder {
     private final static String TAG = AWBaseHWEncoder.class.getSimpleName();
 
-    protected MediaFormat mFormat;
-    protected MediaCodec mEncoder;
+    protected MediaFormat mMediaFormat;
+    protected MediaCodec mMediaEncoder;
     protected MediaCodec.BufferInfo mBufferInfo;
 
     /**
@@ -53,13 +53,13 @@ public abstract class AWBaseHWEncoder {
      */
     protected void setup() throws IOException, InterruptedException {
         try {
-            mEncoder = MediaCodec.createEncoderByType(getMimeType());
+            mMediaEncoder = MediaCodec.createEncoderByType(getMimeType());
             mBufferInfo = new MediaCodec.BufferInfo();
         } catch (Exception e) {
             throw e;
         }
         try {
-            setupEncoder(mFormat);
+            setupEncoder(mMediaFormat);
         } catch (Exception e) {
             if (!retrySetupWhenFailed(e)) {
                 throw e;
@@ -85,21 +85,21 @@ public abstract class AWBaseHWEncoder {
             MediaCodec.CodecException codecException = (MediaCodec.CodecException) e;
             Log.e(TAG, "isRecoverable = " + codecException.isRecoverable() + ", isTransient = " + codecException.isTransient());
             if (codecException.isRecoverable()) {
-                if (mEncoder != null) {
-                    mEncoder.stop();
-                    setupEncoder(mFormat);
+                if (mMediaEncoder != null) {
+                    mMediaEncoder.stop();
+                    setupEncoder(mMediaFormat);
                     return true;
                 }
             } else if (codecException.isTransient()) {
                 Thread.sleep(500);
-                mEncoder.start();
+                mMediaEncoder.start();
                 return true;
             } else {
-                if (mEncoder != null) {
-                    mEncoder.release();
+                if (mMediaEncoder != null) {
+                    mMediaEncoder.release();
                 }
-                mEncoder = MediaCodec.createEncoderByType(getMimeType());
-                setupEncoder(mFormat);
+                mMediaEncoder = MediaCodec.createEncoderByType(getMimeType());
+                setupEncoder(mMediaFormat);
                 return true;
             }
         } catch (Exception e1) {
@@ -114,27 +114,27 @@ public abstract class AWBaseHWEncoder {
      * @throws IOException
      */
     private void setupEncoder(MediaFormat format) throws IOException {
-        mEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+        mMediaEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         onEncoderConfigured();
-        mEncoder.start();
+        mMediaEncoder.start();
     }
 
     /**
      * 释放资源
      */
     public void release() {
-        if (mEncoder != null) {
+        if (mMediaEncoder != null) {
             try {
-                mEncoder.stop();
+                mMediaEncoder.stop();
             } catch (IllegalStateException e) {
                 e.printStackTrace();
             }
             try {
-                mEncoder.release();
+                mMediaEncoder.release();
             } catch (IllegalStateException e) {
                 e.printStackTrace();
             }
-            mEncoder = null;
+            mMediaEncoder = null;
         }
     }
 }

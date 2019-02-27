@@ -35,11 +35,11 @@ public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
     }
 
     public void setup(int width, int height, int bitRate, int frameRate, int iFrameInterval) throws IOException, InterruptedException {
-        mFormat = MediaFormat.createVideoFormat(getMimeType(), width, height);
-        mFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-        mFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
-        mFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
-        mFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
+        mMediaFormat = MediaFormat.createVideoFormat(getMimeType(), width, height);
+        mMediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
+        mMediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
+        mMediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
+        mMediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
         super.setup();
     }
 
@@ -50,7 +50,7 @@ public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
 
     @Override
     protected void onEncoderConfigured() {
-        mInputSurface = mEncoder.createInputSurface();
+        mInputSurface = mMediaEncoder.createInputSurface();
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
             // 硬件编码器，在队列中申请一个操作对象
             final int encoderStatus;
             try {
-                encoderStatus = mEncoder.dequeueOutputBuffer(mBufferInfo, CODEC_TIMEOUT_IN_US);
+                encoderStatus = mMediaEncoder.dequeueOutputBuffer(mBufferInfo, CODEC_TIMEOUT_IN_US);
             } catch (Exception e) {
                 Log.e(TAG, "dequeueOutputBuffer error", e);
                 break;//状态错误退出本次循环
@@ -88,9 +88,9 @@ public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
                     }
                 }
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                mEncoderOutputBuffers = mEncoder.getOutputBuffers();
+                mEncoderOutputBuffers = mMediaEncoder.getOutputBuffers();
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                MediaFormat newFormat = mEncoder.getOutputFormat();
+                MediaFormat newFormat = mMediaEncoder.getOutputFormat();
                 onOutputFormatChanged(newFormat);
             } else if (encoderStatus < 0) {
                 Log.w(TAG, "unexpected result from encoder.dequeueOutputBuffer: " + encoderStatus);
@@ -98,7 +98,7 @@ public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
                 // encodedData为真正编码完成的数据
                 ByteBuffer encodedData;
                 if (Build.VERSION.SDK_INT >= 21) {
-                    encodedData = mEncoder.getOutputBuffer(encoderStatus);
+                    encodedData = mMediaEncoder.getOutputBuffer(encoderStatus);
                 } else {
                     encodedData = mEncoderOutputBuffers[encoderStatus];
                 }
@@ -114,7 +114,7 @@ public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
                         handleEncodedData(encodedData, mBufferInfo);
                     }
                 }
-                mEncoder.releaseOutputBuffer(encoderStatus, false);
+                mMediaEncoder.releaseOutputBuffer(encoderStatus, false);
 
                 if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     if (!endOfStream) {
@@ -133,7 +133,7 @@ public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
     private void signalEndOfInputStream(boolean endOfStream) {
         if (endOfStream) {
             try {
-                mEncoder.signalEndOfInputStream();
+                mMediaEncoder.signalEndOfInputStream();
             } catch (IllegalStateException e) {
                 Log.e(TAG, "signalEndOfInputStream error", e);
             }

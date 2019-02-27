@@ -29,9 +29,9 @@ public abstract class AWAudioHWEncoderCore extends AWBaseHWEncoder {
      * @throws InterruptedException
      */
     public void setup(int sampleRate, int channelCount, int bitRate) throws IOException, InterruptedException {
-        mFormat = MediaFormat.createAudioFormat(getMimeType(), sampleRate, channelCount);
-        mFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-        mFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
+        mMediaFormat = MediaFormat.createAudioFormat(getMimeType(), sampleRate, channelCount);
+        mMediaFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
+        mMediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
         super.setup();
     }
 
