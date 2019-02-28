@@ -33,7 +33,7 @@ public abstract class AWAudioHWEncoderCore extends AWBaseHWEncoder {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void setup(int sampleRate, int channelCount, int bitRate) throws IOException, InterruptedException {
+    protected void setup(int sampleRate, int channelCount, int bitRate) throws IOException, InterruptedException {
         mMediaFormat = MediaFormat.createAudioFormat(getMimeType(), sampleRate, channelCount);
         mMediaFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
         mMediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
