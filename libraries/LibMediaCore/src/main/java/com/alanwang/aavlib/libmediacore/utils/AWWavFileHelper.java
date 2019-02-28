@@ -161,6 +161,11 @@ public class AWWavFileHelper {
         randomAccessFile.read(sampleRateArray);
         int sampleRate = byteArray2Int(sampleRateArray);
 
+        //读取BitsPerSample，第34~35位
+        randomAccessFile.seek(34);
+        byte[] bitsPerSampleArray = new byte[2];
+        randomAccessFile.read(bitsPerSampleArray);
+        int bytePerSample = byteArray2Short(bitsPerSampleArray) / 8;
 
         //读取音频数据长度，第40~43位
         randomAccessFile.seek(40);
@@ -170,7 +175,7 @@ public class AWWavFileHelper {
 
         randomAccessFile.close();
 
-        return new WavHeaderInfo(sampleRate, channelCount, audioDataLen);
+        return new WavHeaderInfo(sampleRate, channelCount, audioDataLen, bytePerSample);
     }
 
     /**
@@ -221,13 +226,22 @@ public class AWWavFileHelper {
         public int channelCount;
 
         /**
+         * 每个采样点的大小，
+         * 如：short 型 PCM 是 2 字节
+         * 如：float 型 PCM 是 4 字节
+         * 单位：字节
+         */
+        public int bytePerSample;
+
+        /**
          * 音频数据长度，单位：字节
          */
         public int audioDataLen;
 
-        public WavHeaderInfo(int sampleRate, int channelCount, int audioDataLen) {
+        public WavHeaderInfo(int sampleRate, int channelCount, int bytePerSample, int audioDataLen) {
             this.sampleRate = sampleRate;
             this.channelCount = channelCount;
+            this.bytePerSample = bytePerSample;
             this.audioDataLen = audioDataLen;
         }
 
@@ -237,6 +251,7 @@ public class AWWavFileHelper {
             sttBuilder.append("::")
                     .append("sampleRate = ").append(sampleRate)
                     .append(", channelCount = ").append(channelCount)
+                    .append(", bytePerSample = ").append(bytePerSample)
                     .append(", audioDataLen = ").append(audioDataLen).append("\n");
             return sttBuilder.toString();
         }
