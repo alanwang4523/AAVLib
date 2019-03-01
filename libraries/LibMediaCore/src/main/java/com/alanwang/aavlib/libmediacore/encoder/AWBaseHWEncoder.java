@@ -49,7 +49,7 @@ public abstract class AWBaseHWEncoder {
      * @param encodedData
      * @param bufferInfo
      */
-    protected abstract void handleEncodedData(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo);
+    protected abstract void onEncodedDataAvailable(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo);
 
     /**
      * 初始化

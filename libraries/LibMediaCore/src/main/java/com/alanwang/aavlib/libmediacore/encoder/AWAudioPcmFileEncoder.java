@@ -19,7 +19,7 @@ public class AWAudioPcmFileEncoder extends AWAudioHWEncoderCore {
     }
 
     @Override
-    protected void handleEncodedData(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo) {
+    protected void onEncodedDataAvailable(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo) {
 
     }
 }

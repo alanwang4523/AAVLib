@@ -59,7 +59,7 @@ public class AWVideoRecordEncoder extends AWVideoHWEncoderCore {
     }
 
     @Override
-    protected void handleEncodedData(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo) {
+    protected void onEncodedDataAvailable(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo) {
         if (mMediaMuxer != null) {
             mMediaMuxer.writeSampleData(mTrackIndex, encodedData, bufferInfo);
         }

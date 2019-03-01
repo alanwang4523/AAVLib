@@ -112,7 +112,7 @@ public abstract class AWVideoHWEncoderCore extends AWBaseHWEncoder {
                         encodedData.position(mBufferInfo.offset);
                         encodedData.limit(mBufferInfo.offset + mBufferInfo.size);
 
-                        handleEncodedData(encodedData, mBufferInfo);
+                        onEncodedDataAvailable(encodedData, mBufferInfo);
                     }
                 }
                 mMediaEncoder.releaseOutputBuffer(encoderStatus, false);

@@ -25,8 +25,10 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
     private int mSampleRate;
     private int mChannelCount;
     private int mBytePerSample;
+
     private long mNeedEncodeLen;
-    private long mNeedSkipLen;
+    private long mPresentationTimeUs;
+    private long mTotalLenReaded = 0;
     private boolean mIsReady = false;
     private volatile boolean mIsRunning = false;
 
@@ -61,11 +63,12 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
      * @param startTimeMs
      * @param endTimeMs
      */
-    public void setEncodeTime(long startTimeMs, long endTimeMs) {
+    public void setEncodeTime(long startTimeMs, long endTimeMs) throws IOException {
         checkIsReady();
-        mNeedSkipLen = getLenByTime(mSampleRate, mChannelCount, mBytePerSample, startTimeMs);
+        long needSkipLen = getLenByTime(mSampleRate, mChannelCount, mBytePerSample, startTimeMs);
         long needEncodeLen = getLenByTime(mSampleRate, mChannelCount, mBytePerSample, (endTimeMs - startTimeMs));
         mNeedEncodeLen = Math.min(needEncodeLen, mNeedEncodeLen);
+        mWavInputStream.skip(needSkipLen);
     }
 
     /**
@@ -109,7 +112,9 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
         mIsRunning = false;
     }
 
-    private void releaseMuxer() {
+    @Override
+    public void release() {
+        super.release();
         if (mMediaMuxer != null) {
             try {
                 mMediaMuxer.stop();
@@ -127,9 +132,67 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
     private final Runnable workRunnable = new Runnable() {
         @Override
         public void run() {
+            boolean isSuccess;
+            do {
+                isSuccess = fillingRawData();
+                if (!isSuccess) {
+                    break;
+                }
 
+                do {
+                    isSuccess = extractEncodedData();
+                } while (mIsRunning && isSuccess);
+                if (mBufferInfo.flags == MediaCodec.BUFFER_FLAG_END_OF_STREAM) {
+                    break;
+                }
+            } while (mIsRunning);
+
+            release();
         }
     };
+
+    /**
+     * 向编码器中填充裸数据
+     * @return
+     */
+    private boolean fillingRawData() {
+        int inputBufIndex = 0;
+        int bytesRead = 0;
+        while (mIsRunning) {
+            inputBufIndex = mMediaEncoder.dequeueInputBuffer(CODEC_TIMEOUT_IN_US);
+            if (inputBufIndex < 0) {
+                break;
+            }
+            ByteBuffer inputBuffer = mEncoderInputBuffers[inputBufIndex];
+            inputBuffer.clear();
+
+            try {
+                bytesRead = mWavInputStream.read(inputBuffer.array(), 0, inputBuffer.limit());
+            } catch (IOException e) {
+                return false;
+            }
+
+            if (bytesRead == -1) {//读到文件尾，这里应该走不到才对
+                mMediaEncoder.queueInputBuffer(inputBufIndex, 0, 0,
+                        mPresentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                break;
+            } else {
+                int flags = 0;
+                if (mNeedEncodeLen - mTotalLenReaded < bytesRead) {
+                    bytesRead = (int)(mNeedEncodeLen - mTotalLenReaded);
+                    flags = MediaCodec.BUFFER_FLAG_END_OF_STREAM;
+                }
+                mTotalLenReaded += bytesRead;
+                inputBuffer.limit(bytesRead);
+                mMediaEncoder.queueInputBuffer(inputBufIndex, 0, bytesRead, mPresentationTimeUs, flags);
+                mPresentationTimeUs = (1.0 * mTotalLenReaded / mBytePerSample / mSampleRate / mChannelCount * 1000 * 1000l;
+                if (MediaCodec.BUFFER_FLAG_END_OF_STREAM == flags) {
+                    break;
+                }
+            }
+        }
+        return true;
+    }
 
     @Override
     protected void onOutputFormatChanged(MediaFormat newFormat) {
@@ -138,7 +201,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
     }
 
     @Override
-    protected void handleEncodedData(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo) {
+    protected void onEncodedDataAvailable(ByteBuffer encodedData, MediaCodec.BufferInfo bufferInfo) {
         mMediaMuxer.writeSampleData(mAudioTrackIdx, encodedData, bufferInfo);
     }
 

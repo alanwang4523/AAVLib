@@ -19,7 +19,7 @@ public abstract class AWAudioHWEncoderCore extends AWBaseHWEncoder {
     private static final String MIME_TYPE = "audio/mp4a-latm";
     protected static final int CODEC_TIMEOUT_IN_US = 0;
 
-    private ByteBuffer[] mEncoderInputBuffers;
+    protected ByteBuffer[] mEncoderInputBuffers;
     protected ByteBuffer[] mEncoderOutputBuffers;
 
     public AWAudioHWEncoderCore() {
@@ -65,10 +65,10 @@ public abstract class AWAudioHWEncoderCore extends AWBaseHWEncoder {
     }
 
     /**
-     * 处理编码好的数据
+     * 抽取编码好的数据
      * @return 是否可以继续处理
      */
-    protected boolean handleEncodedData() {
+    protected boolean extractEncodedData() {
         int outputBufIndex = mMediaEncoder.dequeueOutputBuffer(mBufferInfo, CODEC_TIMEOUT_IN_US);
         if (outputBufIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
             return false;
@@ -85,7 +85,7 @@ public abstract class AWAudioHWEncoderCore extends AWBaseHWEncoder {
             if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0 && mBufferInfo.size != 0) {
                 mMediaEncoder.releaseOutputBuffer(outputBufIndex, false);
             } else {
-                handleEncodedData(encodedData, mBufferInfo);
+                onEncodedDataAvailable(encodedData, mBufferInfo);
                 mMediaEncoder.releaseOutputBuffer(outputBufIndex, false);
             }
         } else if (outputBufIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
