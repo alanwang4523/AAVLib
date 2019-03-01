@@ -179,6 +179,10 @@ public class AWAVAndroidMuxer {
         if (mIsStart) {
             try {
                 mMediaMuxer.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
                 mMediaMuxer.release();
             } catch (Exception e) {
                 e.printStackTrace();

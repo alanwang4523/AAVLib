@@ -17,9 +17,8 @@ import java.nio.ByteBuffer;
  * Mail: alanwang4523@gmail.com
  */
 public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
-
+    private static final String TAG = AWAudioWavFileEncoder.class.getSimpleName();
     private FileInputStream mWavInputStream = null;
-    private boolean mIsReady = false;
     private AWProcessListener mProcessListener;
     private MediaMuxer mMediaMuxer;
     private int mAudioTrackIdx = 0;
@@ -28,6 +27,8 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
     private int mBytePerSample;
     private long mNeedEncodeLen;
     private long mNeedSkipLen;
+    private boolean mIsReady = false;
+    private volatile boolean mIsRunning = false;
 
     /**
      * 设置资源文件
@@ -91,15 +92,44 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
      */
     public void start() {
         checkIsReady();
-        // TODO 开现线程开始处理
+        if (!mIsRunning) {
+            StringBuilder strBuilder = new StringBuilder(TAG);
+            strBuilder.append("-").append(System.currentTimeMillis());
+
+            Thread thread = new Thread(null, workRunnable, strBuilder.toString());
+            thread.start();
+            mIsRunning = true;
+        }
     }
 
     /**
      * 停止/取消裁剪
      */
     public void cancel() {
-
+        mIsRunning = false;
     }
+
+    private void releaseMuxer() {
+        if (mMediaMuxer != null) {
+            try {
+                mMediaMuxer.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                mMediaMuxer.release();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private final Runnable workRunnable = new Runnable() {
+        @Override
+        public void run() {
+
+        }
+    };
 
     @Override
     protected void onOutputFormatChanged(MediaFormat newFormat) {
