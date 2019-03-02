@@ -148,6 +148,9 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
             } while (mIsRunning);
 
             release();
+            if (mProcessListener != null) {
+                mProcessListener.onFinish();
+            }
         }
     };
 
@@ -156,8 +159,8 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
      * @return
      */
     private boolean fillingRawData() {
-        int inputBufIndex = 0;
-        int bytesRead = 0;
+        int inputBufIndex;
+        int bytesRead;
         while (mIsRunning) {
             inputBufIndex = mMediaEncoder.dequeueInputBuffer(CODEC_TIMEOUT_IN_US);
             if (inputBufIndex < 0) {
@@ -169,6 +172,9 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
             try {
                 bytesRead = mWavInputStream.read(inputBuffer.array(), 0, inputBuffer.limit());
             } catch (IOException e) {
+                if (mProcessListener != null) {
+                    mProcessListener.onError("Read file error!");
+                }
                 return false;
             }
 
@@ -185,7 +191,13 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
                 mTotalLenReaded += bytesRead;
                 inputBuffer.limit(bytesRead);
                 mMediaEncoder.queueInputBuffer(inputBufIndex, 0, bytesRead, mPresentationTimeUs, flags);
-                mPresentationTimeUs = (1.0 * mTotalLenReaded / mBytePerSample / mSampleRate / mChannelCount * 1000 * 1000l;
+                mPresentationTimeUs = (long) (1.0 * mTotalLenReaded / mBytePerSample / mSampleRate / mChannelCount * 1000 * 1000);
+
+                if (mProcessListener != null) {
+                    int percent = (int) (1.0f * mTotalLenReaded / mNeedEncodeLen);
+                    mProcessListener.onProgress(percent);;
+                }
+
                 if (MediaCodec.BUFFER_FLAG_END_OF_STREAM == flags) {
                     break;
                 }
