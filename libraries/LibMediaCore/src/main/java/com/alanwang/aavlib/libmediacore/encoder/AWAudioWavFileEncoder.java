@@ -132,24 +132,31 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
     private final Runnable workRunnable = new Runnable() {
         @Override
         public void run() {
-            boolean isSuccess;
+            boolean isSuccess = false;
+            boolean isContinue;
             do {
-                isSuccess = fillingRawData();
-                if (!isSuccess) {
+                isContinue = fillingRawData();
+                if (!isContinue) {
                     break;
                 }
 
                 do {
-                    isSuccess = extractEncodedData();
-                } while (mIsRunning && isSuccess);
+                    isContinue = extractEncodedData();
+                } while (mIsRunning && isContinue);
+
                 if (mBufferInfo.flags == MediaCodec.BUFFER_FLAG_END_OF_STREAM) {
+                    isSuccess = true;
                     break;
                 }
             } while (mIsRunning);
 
             release();
-            if (mProcessListener != null) {
-                mProcessListener.onFinish();
+            if (isSuccess) {
+
+                if (mProcessListener != null) {
+                    mProcessListener.onProgress(100);
+                    mProcessListener.onFinish();
+                }
             }
         }
     };
