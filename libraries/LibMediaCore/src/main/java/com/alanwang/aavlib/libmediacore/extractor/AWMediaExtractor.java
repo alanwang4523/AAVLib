@@ -120,8 +120,8 @@ public abstract class AWMediaExtractor {
             strBuilder.append("-").append(System.currentTimeMillis());
 
             Thread thread = new Thread(null, workRunnable, strBuilder.toString());
-            thread.start();
             mIsRunning = true;
+            thread.start();
         }
     }
 

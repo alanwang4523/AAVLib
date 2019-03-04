@@ -9,8 +9,10 @@ import com.alanwang.aavlib.libmediacore.clipper.AWAVClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWAudioClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWVideoClipper;
 import com.alanwang.aavlib.libmediacore.encoder.AWAudioWavFileEncoder;
+import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
 import com.alanwang.aavlib.libmediacore.muxer.AWAVAndroidMuxer;
+import com.alanwang.aavlib.libmediacore.utils.AWWavFileHelper;
 import com.alanwang.aavlib.libutils.ALog;
 import java.io.File;
 import java.io.IOException;
@@ -193,12 +195,11 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         try {
             wavFileEncoder.setDataSource(srcWavFile, outputPath);
             wavFileEncoder.setup(64 * 1024);
+            wavFileEncoder.setEncodeTime(30 * 1000, -1);
             wavFileEncoder.setProcessListener(new CommonProgressListener(
                     "AWAudioWavFileEncoder", outputPath));
             wavFileEncoder.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (AWAudioException e) {
             e.printStackTrace();
         }
     }

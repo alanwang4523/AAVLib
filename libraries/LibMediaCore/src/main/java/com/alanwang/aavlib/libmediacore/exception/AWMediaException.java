@@ -10,16 +10,26 @@ package com.alanwang.aavlib.libmediacore.exception;
  * Mail: alanwang4523@gmail.com
  */
 public class AWMediaException extends Exception {
+    protected static final int DEFAULT_ERROR_CODE = -1;
+    protected static final String DEFAULT_ERROR_MSG = "error";
 
     protected int errorCode;
     protected String errorMsg;
 
     public AWMediaException(int errorCode) {
-        this(errorCode, "");
+        this(errorCode, DEFAULT_ERROR_MSG);
+    }
+
+    public AWMediaException(String errorMsg) {
+        this(DEFAULT_ERROR_CODE, errorMsg);
     }
 
     public AWMediaException(int errorCode, String errorMsg) {
         this(errorCode, errorMsg, null);
+    }
+
+    public AWMediaException(String errorMsg, Throwable cause) {
+        this(DEFAULT_ERROR_CODE, errorMsg, cause);
     }
 
     public AWMediaException(int errorCode, String errorMsg, Throwable cause) {

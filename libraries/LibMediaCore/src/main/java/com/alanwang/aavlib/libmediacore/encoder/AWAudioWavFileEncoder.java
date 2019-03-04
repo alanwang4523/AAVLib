@@ -3,6 +3,7 @@ package com.alanwang.aavlib.libmediacore.encoder;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
 import com.alanwang.aavlib.libmediacore.utils.AWWavFileHelper;
 import java.io.File;
@@ -39,22 +40,37 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
      * @param outputFilePath
      * @throws IOException
      */
-    public void setDataSource(String wavFilePath, String outputFilePath) throws IOException {
+    public void setDataSource(String wavFilePath, String outputFilePath) throws AWAudioException {
         File wavFile = new File(wavFilePath);
         if (!wavFile.exists()) {
-            throw new FileNotFoundException("Wav file is not found!");
+            throw new AWAudioException("Wav file is not found!");
         }
 
         // 获取音频信息
-        AWWavFileHelper.WavHeaderInfo headerInfo = AWWavFileHelper.getWavHeaderInfo(wavFile);
+        AWWavFileHelper.WavHeaderInfo headerInfo = null;
+        try {
+            headerInfo = AWWavFileHelper.getWavHeaderInfo(wavFile);
+        } catch (IOException e) {
+            throw new AWAudioException("Get wav header info failed!", e);
+        }
         mSampleRate = headerInfo.sampleRate;
         mChannelCount = headerInfo.channelCount;
         mBytePerSample = headerInfo.bytePerSample;
         mTotalNeedProcessLen = headerInfo.audioDataLen;
 
-        mMediaMuxer = new MediaMuxer(outputFilePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-        mWavInputStream = new FileInputStream(wavFile);
-        mWavInputStream.skip(44);//跳过wav文件头，从00H~2BH
+        try {
+            mMediaMuxer = new MediaMuxer(outputFilePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+        } catch (IOException e) {
+            throw new AWAudioException("Create MediaMuxer failed!", e);
+        }
+        try {
+            mWavInputStream = new FileInputStream(wavFile);
+            mWavInputStream.skip(44);//跳过wav文件头，从00H~2BH
+        } catch (FileNotFoundException e) {
+            throw new AWAudioException("The wav file not found!", e);
+        } catch (IOException e) {
+            throw new AWAudioException("Input stream skip failed!", e);
+        }
         mTempBuffer = new byte[10 * 1024];
 
         mIsReady = true;
@@ -63,14 +79,23 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
     /**
      * 设置要编码的区间, 须在 {@link #setDataSource} 之后调
      * @param startTimeMs
-     * @param endTimeMs
+     * @param endTimeMs 为 -1 时表示编码到文件尾
      */
-    public void setEncodeTime(long startTimeMs, long endTimeMs) throws IOException {
+    public void setEncodeTime(long startTimeMs, long endTimeMs) throws AWAudioException {
         checkIsReady();
+        if (endTimeMs != -1 && startTimeMs >= endTimeMs) {
+            throw new AWAudioException("Illegal Arguments: start time could not be larger than end time!");
+        }
         long needSkipLen = getLenByTime(mSampleRate, mChannelCount, mBytePerSample, startTimeMs);
-        long needEncodeLen = getLenByTime(mSampleRate, mChannelCount, mBytePerSample, (endTimeMs - startTimeMs));
-        mTotalNeedProcessLen = Math.min(needEncodeLen, mTotalNeedProcessLen);
-        mWavInputStream.skip(needSkipLen);
+        if (endTimeMs != -1) {
+            long needEncodeLen = getLenByTime(mSampleRate, mChannelCount, mBytePerSample, (endTimeMs - startTimeMs));
+            mTotalNeedProcessLen = Math.min(needEncodeLen, mTotalNeedProcessLen);
+        }
+        try {
+            mWavInputStream.skip(needSkipLen);
+        } catch (IOException e) {
+            throw new AWAudioException("skip failed!", e);
+        }
     }
 
     /**
@@ -79,9 +104,15 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void setup(int bitRate) throws IOException, InterruptedException {
+    public void setup(int bitRate) throws AWAudioException {
         checkIsReady();
-        super.setup(mSampleRate, mChannelCount, bitRate);
+        try {
+            super.setup(mSampleRate, mChannelCount, bitRate);
+        } catch (IOException e) {
+            throw new AWAudioException("Set up failed!", e);
+        } catch (InterruptedException e) {
+            throw new AWAudioException("Set up failed!", e);
+        }
     }
 
     /**
