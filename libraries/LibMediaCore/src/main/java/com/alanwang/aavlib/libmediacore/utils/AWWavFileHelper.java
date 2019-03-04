@@ -175,7 +175,7 @@ public class AWWavFileHelper {
 
         randomAccessFile.close();
 
-        return new WavHeaderInfo(sampleRate, channelCount, audioDataLen, bytePerSample);
+        return new WavHeaderInfo(sampleRate, channelCount, bytePerSample, audioDataLen);
     }
 
     /**

@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.alanwang.aavlib.libmediacore.clipper.AWAVClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWAudioClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWVideoClipper;
+import com.alanwang.aavlib.libmediacore.encoder.AWAudioWavFileEncoder;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
 import com.alanwang.aavlib.libmediacore.muxer.AWAVAndroidMuxer;
 import com.alanwang.aavlib.libutils.ALog;
@@ -173,8 +174,33 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         }
     }
 
+    /**
+     * 测试 wav 文件编码
+     */
     private void testWavEncoder() {
+        final String outputPath = "/sdcard/Alan/video/audio_test.m4a";
+        File outputFile = new File(outputPath);
+        if (outputFile.exists()) {
+            outputFile.delete();
+        }
 
+        String srcWavFile = "/sdcard/Alan/video/audio_test.wav";
+        if (!checkIfFileExist(srcWavFile)) {
+            return;
+        }
+
+        AWAudioWavFileEncoder wavFileEncoder = new AWAudioWavFileEncoder();
+        try {
+            wavFileEncoder.setDataSource(srcWavFile, outputPath);
+            wavFileEncoder.setup(64 * 1024);
+            wavFileEncoder.setProcessListener(new CommonProgressListener(
+                    "AWAudioWavFileEncoder", outputPath));
+            wavFileEncoder.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

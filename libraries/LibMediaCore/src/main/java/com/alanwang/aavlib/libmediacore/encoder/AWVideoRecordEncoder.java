@@ -18,8 +18,8 @@ public class AWVideoRecordEncoder extends AWVideoHWEncoderCore {
     private MediaMuxer mMediaMuxer;
     private int mTrackIndex = -1;
 
-    public AWVideoRecordEncoder(int width, int height, int bitRate) {
-        super(width, height, bitRate, FRAME_RATE, DEFAULT_I_FRAME_INTERVAL);
+    public void setup(int width, int height, int bitRate) throws IOException, InterruptedException {
+        super.setup(width, height, bitRate, FRAME_RATE, DEFAULT_I_FRAME_INTERVAL);
     }
 
     /**
