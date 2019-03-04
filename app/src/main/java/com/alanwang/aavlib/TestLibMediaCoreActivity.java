@@ -37,6 +37,9 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
 
         TextView btn_test_muxer = findViewById(R.id.btn_libmediacore_test_muxer);
         btn_test_muxer.setOnClickListener(this);
+
+        TextView btn_test_wav_encoder = findViewById(R.id.btn_libmediacore_test_wav_encoder);
+        btn_test_wav_encoder.setOnClickListener(this);
     }
 
     @Override
@@ -53,6 +56,9 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
                 break;
             case R.id.btn_libmediacore_test_muxer:
                 testMuxer();
+                break;
+            case R.id.btn_libmediacore_test_wav_encoder:
+                testWavEncoder();
                 break;
             default:
         }
@@ -165,6 +171,10 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void testWavEncoder() {
+
     }
 
     /**

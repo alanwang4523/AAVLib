@@ -67,6 +67,18 @@
                 android:layout_centerInParent="true"
                 android:background="@color/colorPrimaryDark"
                 android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/btn_libmediacore_test_wav_encoder"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/margin_normal_45"
+                android:layout_marginTop="@dimen/margin_normal_20"
+                android:text="@string/lib_media_core_test_wav_encoder"
+                android:textSize="@dimen/text_size_16"
+                android:textColor="@color/white"
+                android:layout_centerInParent="true"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="center"/>
         </LinearLayout>
     </ScrollView>
 

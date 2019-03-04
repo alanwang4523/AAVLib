@@ -8,4 +8,5 @@
     <string name="lib_media_core_test_extract_video">Test Extract Video</string>
     <string name="lib_media_core_test_clipper">Test AV Clipper</string>
     <string name="lib_media_core_test_muxer">Test AV Muxer</string>
+    <string name="lib_media_core_test_wav_encoder">Test Encode Wav</string>
 </resources>
