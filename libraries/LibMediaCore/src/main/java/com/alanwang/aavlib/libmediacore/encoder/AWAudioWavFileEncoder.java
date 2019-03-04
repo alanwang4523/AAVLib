@@ -21,6 +21,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
     private FileInputStream mWavInputStream = null;
     private AWProcessListener mProcessListener;
     private MediaMuxer mMediaMuxer;
+    private byte[] mTempBuffer;
     private int mAudioTrackIdx = 0;
     private int mSampleRate;
     private int mChannelCount;
@@ -54,6 +55,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
         mMediaMuxer = new MediaMuxer(outputFilePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
         mWavInputStream = new FileInputStream(wavFile);
         mWavInputStream.skip(44);//跳过wav文件头，从00H~2BH
+        mTempBuffer = new byte[10 * 1024];
 
         mIsReady = true;
     }
@@ -100,8 +102,8 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
             strBuilder.append("-").append(System.currentTimeMillis());
 
             Thread thread = new Thread(null, workRunnable, strBuilder.toString());
-            thread.start();
             mIsRunning = true;
+            thread.start();
         }
     }
 
@@ -178,7 +180,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
             inputBuffer.clear();
 
             try {
-                bytesRead = mWavInputStream.read(inputBuffer.array(), 0, inputBuffer.limit());
+                bytesRead = mWavInputStream.read(mTempBuffer, 0, inputBuffer.limit());
             } catch (IOException e) {
                 if (mProcessListener != null) {
                     mProcessListener.onError("Read file error!");
@@ -197,13 +199,13 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
                     flags = MediaCodec.BUFFER_FLAG_END_OF_STREAM;
                 }
                 mTotalHaveReadLen += bytesRead;
-                inputBuffer.limit(bytesRead);
+                inputBuffer.put(mTempBuffer, 0, bytesRead);
                 mMediaEncoder.queueInputBuffer(inputBufIndex, 0, bytesRead, mPresentationTimeUs, flags);
                 mPresentationTimeUs = (long) (1.0 * mTotalHaveReadLen / mBytePerSample / mSampleRate / mChannelCount * 1000 * 1000);
 
                 if (mProcessListener != null) {
-                    int percent = (int) (1.0f * mTotalHaveReadLen / mTotalNeedProcessLen);
-                    mProcessListener.onProgress(percent);;
+                    int percent = (int) (100.0f * mTotalHaveReadLen / mTotalNeedProcessLen);
+                    mProcessListener.onProgress(percent);
                 }
 
                 if (MediaCodec.BUFFER_FLAG_END_OF_STREAM == flags) {
@@ -223,7 +225,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
         do {
             isContinue = extractEncodedData();
         } while (mIsRunning && isContinue);
-        return isContinue;
+        return true;
     }
 
 
