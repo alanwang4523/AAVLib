@@ -193,9 +193,15 @@ public abstract class AWMediaExtractor {
         mIsExtractorReady = false;
     }
 
+    /**
+     * 在 run 之前回调，用于子类做准备工作
+     */
+    protected void onRunPre() {}
+
     private final Runnable workRunnable = new Runnable() {
         @Override
         public void run() {
+            onRunPre();
             boolean isSuccess = false;
             int readCount;
             while (mIsRunning) {
