@@ -12,7 +12,6 @@ import com.alanwang.aavlib.libmediacore.encoder.AWAudioWavFileEncoder;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
 import com.alanwang.aavlib.libmediacore.muxer.AWAVAndroidMuxer;
-import com.alanwang.aavlib.libmediacore.utils.AWWavFileHelper;
 import com.alanwang.aavlib.libutils.ALog;
 import java.io.File;
 import java.io.IOException;

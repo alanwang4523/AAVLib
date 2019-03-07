@@ -67,6 +67,9 @@ public abstract class AWBaseRender {
             // 放在这里初始化是为了保证初始化在 GL 线程调用，否则 init 里 load shader 创建 program 会失败
             mIsInit = init(mVertexShader, mFragmentShader);
         }
+        if (mProgramHandle == -1) {
+            return;
+        }
         GLES20.glUseProgram(mProgramHandle);
         bindTexture(textureId);
         GlUtil.checkGlError("drawFrame()--->>>glBindTexture");
