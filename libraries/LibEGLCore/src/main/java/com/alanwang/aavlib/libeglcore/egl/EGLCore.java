@@ -154,7 +154,7 @@ public class EGLCore {
             EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
                     EGL14.EGL_NO_CONTEXT);
             EGL14.eglDestroyContext(mEGLDisplay, mEGLContext);
-            EGL14.eglReleaseThread();
+//            EGL14.eglReleaseThread();// SM-N9005、SAMSUNG-SGH-I537 执行这句会崩溃
             EGL14.eglTerminate(mEGLDisplay);
         }
 
