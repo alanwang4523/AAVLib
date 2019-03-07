@@ -20,22 +20,38 @@ public class AWWavFileHelper {
 
     /**
      * 生成 Wav 文件头
+     * @param wavHeaderInfo
+     * @return
+     */
+    public static byte[] generateWavHeader(WavHeaderInfo wavHeaderInfo) {
+        return generateWavHeader(wavHeaderInfo.sampleRate, wavHeaderInfo.channelCount,
+                wavHeaderInfo.bytePerSample, wavHeaderInfo.audioDataLen);
+    }
+
+    /**
+     *
+     * 生成 Wav 文件头
      * @param sampleRate 采样率，如44100
      * @param channels 通道数，如立体声为2
      * @param bitsPerSample 采样精度，即每个采样所占数据位数，如16，表示每个采样16bit数据，即2个字节
+     * @param audioDataLenInBytes
      * @return wavHeader
      */
-    public static byte[] generateWavHeader(int sampleRate, int channels, int bitsPerSample) {
+    public static byte[] generateWavHeader(int sampleRate, int channels, int bitsPerSample, long audioDataLenInBytes) {
         if (bitsPerSample != 16 || bitsPerSample != 32) {
             throw new IllegalArgumentException("The bitsPerSample is not 16 or 32!");
+        }
+        if (audioDataLenInBytes < 0) {
+            throw new IllegalArgumentException("Audio data len could not be negative!");
         }
         byte[] wavHeader = new byte[44];
 
         // 这个长度不包括"RIFF"标志(4字节)和文件长度本身所占字节(4字节),即该长度等于整个 Wav文件长度(包含44字节头) - 8
-        long ckTotalSize = 36;
+        // 也等于纯音频数据的长度 + 36
+        long ckTotalSize = 36 + audioDataLenInBytes;
 
         // 生成文件头默认纯音频数据长度为 0
-        long audioDataLen = 0;
+        long audioDataLen = audioDataLenInBytes;
 
         // 音频数据传送速率, 单位是字节。其值为采样率×每次采样大小。播放软件利用此值可以估计缓冲区的大小。
         // bytePerSecond = sampleRate * (bitsPerSample / 8) * channels
@@ -112,6 +128,7 @@ public class AWWavFileHelper {
         wavHeader[41] = (byte)((audioDataLen >> 8) & 0xff);
         wavHeader[42] = (byte)((audioDataLen >> 16) & 0xff);
         wavHeader[43] = (byte)((audioDataLen >> 24) & 0xff);
+
         return wavHeader;
     }
 
