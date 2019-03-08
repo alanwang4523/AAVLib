@@ -198,6 +198,11 @@ public abstract class AWMediaExtractor {
      */
     protected void onRunPre() {}
 
+    /**
+     * 在 run 结束后回调，用于子类释放资源
+     */
+    protected void onRunPost() {}
+
     private final Runnable workRunnable = new Runnable() {
         @Override
         public void run() {
@@ -246,6 +251,7 @@ public abstract class AWMediaExtractor {
                 }
             }
             release();
+            onRunPost();
             if (isSuccess) {
                 if (mProcessListener != null) {
                     mProcessListener.onProgress(100);

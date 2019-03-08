@@ -15,11 +15,13 @@ import java.nio.ByteBuffer;
  */
 public class AWAudioHWDecoder {
 
+    private static final int DECODER_TIMEOUT_IN_MS = 500;
     private MediaCodec mMediaDecoder;
     private ByteBuffer[] mInputBuffers, mOutputBuffers;
     private MediaCodec.BufferInfo mDecodeBufferInfo;
     private AWProcessListener mProcessListener;
     private volatile boolean mIsRunning = false;
+    private long mPresentationTimeUs;
 
     /**
      * 设置资源文件
@@ -67,7 +69,16 @@ public class AWAudioHWDecoder {
 
         @Override
         protected void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo) {
+            int inputBufIndex = mMediaDecoder.dequeueInputBuffer(DECODER_TIMEOUT_IN_MS);
+            if (inputBufIndex > 0) {
+                ByteBuffer inputBuffer = mInputBuffers[inputBufIndex];
+                inputBuffer.clear();
 
+                inputBuffer.put(extractBuffer);
+
+                mMediaDecoder.queueInputBuffer(inputBufIndex, 0, bufferInfo.size, (long) mPresentationTimeUs, 0);
+                mPresentationTimeUs = bufferInfo.presentationTimeUs;
+            }
         }
 
         @Override
@@ -76,6 +87,19 @@ public class AWAudioHWDecoder {
             //创建解码器
             mMediaDecoder = MediaCodec.createDecoderByType(mediaFormat.getString(MediaFormat.KEY_MIME));
             mMediaDecoder.configure(mediaFormat, null, null, 0);
+        }
+
+        @Override
+        protected void onRunPost() {
+            super.onRunPost();
+            int inputBufIndex = mMediaDecoder.dequeueInputBuffer(DECODER_TIMEOUT_IN_MS);
+            if (inputBufIndex > 0) {
+                // 当结束时需要明确发个END_OF_STREAM的标识
+                mMediaDecoder.queueInputBuffer(inputBufIndex, 0, 0,
+                        (long) mPresentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+            }
+            mMediaDecoder.stop();
+            mMediaDecoder.release();
         }
     };
 }
