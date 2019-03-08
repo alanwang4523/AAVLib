@@ -2,6 +2,7 @@ package com.alanwang.aavlib.libmediacore.decoder;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
+import android.os.Build;
 import android.text.TextUtils;
 import com.alanwang.aavlib.libmediacore.extractor.AWMediaExtractor;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
@@ -13,7 +14,7 @@ import java.nio.ByteBuffer;
  * Date: 19/3/8 00:31.
  * Mail: alanwang4523@gmail.com
  */
-public class AWAudioHWDecoder {
+public abstract class AWAudioHWDecoder {
 
     private static final int DECODER_TIMEOUT_IN_MS = 500;
     private MediaCodec mMediaDecoder;
@@ -49,6 +50,13 @@ public class AWAudioHWDecoder {
         this.mProcessListener = extractorListener;
     }
 
+    /**
+     * 解码好的数据到来
+     * @param extractBuffer
+     * @param bufferInfo
+     */
+    protected abstract void onDecodedAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo);
+
     protected AWMediaExtractor mMediaExtractor = new AWMediaExtractor() {
         @Override
         protected boolean isTheInterestedTrack(String keyMimeString) {
@@ -69,6 +77,8 @@ public class AWAudioHWDecoder {
 
         @Override
         protected void onDataAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo) {
+
+            // 编码数据
             int inputBufIndex = mMediaDecoder.dequeueInputBuffer(DECODER_TIMEOUT_IN_MS);
             if (inputBufIndex > 0) {
                 ByteBuffer inputBuffer = mInputBuffers[inputBufIndex];
@@ -79,6 +89,9 @@ public class AWAudioHWDecoder {
                 mMediaDecoder.queueInputBuffer(inputBufIndex, 0, bufferInfo.size, (long) mPresentationTimeUs, 0);
                 mPresentationTimeUs = bufferInfo.presentationTimeUs;
             }
+
+            // 处理编码好的数据
+            handleDecodedData();
         }
 
         @Override
@@ -100,6 +113,34 @@ public class AWAudioHWDecoder {
             }
             mMediaDecoder.stop();
             mMediaDecoder.release();
+        }
+
+        private void handleDecodedData() {
+            int outputBufIndex = 0;
+            long dataLen;
+            while (outputBufIndex != MediaCodec.INFO_TRY_AGAIN_LATER) {
+
+                outputBufIndex = mMediaDecoder.dequeueOutputBuffer(mDecodeBufferInfo, DECODER_TIMEOUT_IN_MS);
+                if (outputBufIndex >= 0) {
+                    ByteBuffer decodedBuffer;
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        decodedBuffer = mMediaDecoder.getOutputBuffer(outputBufIndex);
+                    } else {
+                        decodedBuffer = mOutputBuffers[outputBufIndex];
+                    }
+
+                    decodedBuffer.position(mDecodeBufferInfo.offset);
+                    decodedBuffer.limit(mDecodeBufferInfo.offset + mDecodeBufferInfo.size);
+
+                    if ((mDecodeBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0
+                            && mDecodeBufferInfo.size != 0) {
+                        mMediaDecoder.releaseOutputBuffer(outputBufIndex, false);
+                    } else {
+                        onDecodedAvailable(decodedBuffer, mDecodeBufferInfo);
+                        mMediaDecoder.releaseOutputBuffer(outputBufIndex, false);
+                    }
+                }
+            }
         }
     };
 }
