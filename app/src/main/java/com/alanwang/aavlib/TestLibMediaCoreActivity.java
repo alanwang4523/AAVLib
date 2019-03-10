@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.alanwang.aavlib.libmediacore.clipper.AWAVClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWAudioClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWVideoClipper;
+import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderForPCM;
 import com.alanwang.aavlib.libmediacore.encoder.AWAudioWavFileEncoder;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
@@ -213,7 +214,27 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
      * 测试 m4a 解码
      */
     private void testM4aDecode() {
+        final String srcMa4Path = "/sdcard/Alan/video/audio_test.m4a";
+        if (!checkIfFileExist(srcMa4Path)) {
+            return;
+        }
 
+        String outputFilePath = "/sdcard/Alan/video/audio_test.pcm";
+        File outputFile = new File(outputFilePath);
+        if (outputFile.exists()) {
+            outputFile.delete();
+        }
+
+        AWAudioHWDecoderForPCM audioHWDecoderForPCM = new AWAudioHWDecoderForPCM();
+        try {
+            audioHWDecoderForPCM.setDataSource(srcMa4Path);
+            audioHWDecoderForPCM.setOutputFile(outputFilePath);
+            audioHWDecoderForPCM.setProcessListener(new CommonProgressListener(
+                    "AWAudioHWDecoderForPCM", outputFilePath));
+            audioHWDecoderForPCM.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

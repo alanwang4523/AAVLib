@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 public class AWAudioHWDecoderForPCM extends AWAudioHWDecoder {
 
     private FileOutputStream mOutPutFile;
+    private byte[] dataArr = new byte[10 * 1024];
 
     public void setOutputFile(String filePath) throws FileNotFoundException {
         mOutPutFile = new FileOutputStream(new File(filePath));
@@ -25,7 +26,8 @@ public class AWAudioHWDecoderForPCM extends AWAudioHWDecoder {
     @Override
     protected void onDecodedAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo) {
         try {
-            mOutPutFile.write(extractBuffer.array(), 0, bufferInfo.size);
+            extractBuffer.get(dataArr, 0, bufferInfo.size);
+            mOutPutFile.write(dataArr, 0, bufferInfo.size);
         } catch (IOException e) {
             e.printStackTrace();
         }
