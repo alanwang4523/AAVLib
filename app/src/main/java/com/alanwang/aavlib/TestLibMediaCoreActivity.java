@@ -42,6 +42,9 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
 
         TextView btn_test_wav_encoder = findViewById(R.id.btn_libmediacore_test_wav_encoder);
         btn_test_wav_encoder.setOnClickListener(this);
+
+        TextView btn_test_m4a_decoder = findViewById(R.id.btn_libmediacore_test_wav_decoder);
+        btn_test_m4a_decoder.setOnClickListener(this);
     }
 
     @Override
@@ -61,6 +64,9 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
                 break;
             case R.id.btn_libmediacore_test_wav_encoder:
                 testWavEncoder();
+                break;
+            case R.id.btn_libmediacore_test_wav_decoder:
+                testM4aDecode();
                 break;
             default:
         }
@@ -201,6 +207,13 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         } catch (AWAudioException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 测试 m4a 解码
+     */
+    private void testM4aDecode() {
+
     }
 
     /**
