@@ -21,7 +21,6 @@ public abstract class AWAudioHWDecoder {
     private ByteBuffer[] mInputBuffers, mOutputBuffers;
     private MediaCodec.BufferInfo mDecodeBufferInfo;
     private AWProcessListener mProcessListener;
-    private volatile boolean mIsRunning = false;
     private long mPresentationTimeUs;
 
     /**
@@ -48,6 +47,21 @@ public abstract class AWAudioHWDecoder {
      */
     public void setProcessListener(AWProcessListener extractorListener) {
         this.mProcessListener = extractorListener;
+        mMediaExtractor.setProcessListener(mProcessListener);
+    }
+
+    /**
+     * 开始抽取数据
+     */
+    public void start() {
+        mMediaExtractor.start();
+    }
+
+    /**
+     * 停止抽取数据
+     */
+    public void cancel() {
+        mMediaExtractor.cancel();
     }
 
     /**
@@ -56,6 +70,11 @@ public abstract class AWAudioHWDecoder {
      * @param bufferInfo
      */
     protected abstract void onDecodedAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo);
+
+    protected void onRelease() {
+        mMediaDecoder.stop();
+        mMediaDecoder.release();
+    }
 
     protected AWMediaExtractor mMediaExtractor = new AWMediaExtractor() {
         @Override
@@ -111,8 +130,7 @@ public abstract class AWAudioHWDecoder {
                 mMediaDecoder.queueInputBuffer(inputBufIndex, 0, 0,
                         (long) mPresentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
             }
-            mMediaDecoder.stop();
-            mMediaDecoder.release();
+            onRelease();
         }
 
         private void handleDecodedData() {
