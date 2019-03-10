@@ -22,6 +22,7 @@ public abstract class AWAudioHWDecoder {
     private MediaCodec.BufferInfo mDecodeBufferInfo;
     private AWProcessListener mProcessListener;
     private long mPresentationTimeUs;
+    private byte[] dataArr = new byte[10 * 1024];
 
     /**
      * 设置资源文件
@@ -66,10 +67,11 @@ public abstract class AWAudioHWDecoder {
 
     /**
      * 解码好的数据到来
-     * @param extractBuffer
-     * @param bufferInfo
+     * @param data
+     * @param offset
+     * @param len
      */
-    protected abstract void onDecodedAvailable(ByteBuffer extractBuffer, MediaCodec.BufferInfo bufferInfo);
+    protected abstract void onDecodedAvailable(byte[] data, int offset, int len);
 
     protected void onRelease() {
         mMediaDecoder.stop();
@@ -135,7 +137,6 @@ public abstract class AWAudioHWDecoder {
 
         private void handleDecodedData() {
             int outputBufIndex = 0;
-            long dataLen;
             while (outputBufIndex != MediaCodec.INFO_TRY_AGAIN_LATER) {
 
                 outputBufIndex = mMediaDecoder.dequeueOutputBuffer(mDecodeBufferInfo, DECODER_TIMEOUT_IN_MS);
@@ -154,7 +155,8 @@ public abstract class AWAudioHWDecoder {
                             && mDecodeBufferInfo.size != 0) {
                         mMediaDecoder.releaseOutputBuffer(outputBufIndex, false);
                     } else {
-                        onDecodedAvailable(decodedBuffer, mDecodeBufferInfo);
+                        decodedBuffer.get(dataArr, 0, mDecodeBufferInfo.size);
+                        onDecodedAvailable(dataArr, 0, mDecodeBufferInfo.size);
                         mMediaDecoder.releaseOutputBuffer(outputBufIndex, false);
                     }
                 }

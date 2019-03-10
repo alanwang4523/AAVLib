@@ -8,7 +8,7 @@ import android.widget.Toast;
 import com.alanwang.aavlib.libmediacore.clipper.AWAVClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWAudioClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWVideoClipper;
-import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderForPCM;
+import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderToPCM;
 import com.alanwang.aavlib.libmediacore.encoder.AWAudioWavFileEncoder;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
@@ -225,12 +225,12 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
             outputFile.delete();
         }
 
-        AWAudioHWDecoderForPCM audioHWDecoderForPCM = new AWAudioHWDecoderForPCM();
+        AWAudioHWDecoderToPCM audioHWDecoderForPCM = new AWAudioHWDecoderToPCM();
         try {
             audioHWDecoderForPCM.setDataSource(srcMa4Path);
             audioHWDecoderForPCM.setOutputFile(outputFilePath);
             audioHWDecoderForPCM.setProcessListener(new CommonProgressListener(
-                    "AWAudioHWDecoderForPCM", outputFilePath));
+                    "AWAudioHWDecoderToPCM", outputFilePath));
             audioHWDecoderForPCM.start();
         } catch (IOException e) {
             e.printStackTrace();
