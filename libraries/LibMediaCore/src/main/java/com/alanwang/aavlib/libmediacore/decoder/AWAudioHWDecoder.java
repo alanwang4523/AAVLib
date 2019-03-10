@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
+ * 支持解码的格式同 MediaCodec
  * Author: AlanWang4523.
  * Date: 19/3/8 00:31.
  * Mail: alanwang4523@gmail.com
@@ -73,6 +74,12 @@ public abstract class AWAudioHWDecoder {
      */
     protected abstract void onDecodedAvailable(byte[] data, int offset, int len);
 
+    /**
+     * mediaFormat 已确认
+     * @param mediaFormat
+     */
+    protected void onMediaFormatConfirmed(MediaFormat mediaFormat) {}
+
     protected void onRelease() {
         mMediaDecoder.stop();
         mMediaDecoder.release();
@@ -121,6 +128,7 @@ public abstract class AWAudioHWDecoder {
             //创建解码器
             mMediaDecoder = MediaCodec.createDecoderByType(mediaFormat.getString(MediaFormat.KEY_MIME));
             mMediaDecoder.configure(mediaFormat, null, null, 0);
+            AWAudioHWDecoder.this.onMediaFormatConfirmed(mediaFormat);
         }
 
         @Override
