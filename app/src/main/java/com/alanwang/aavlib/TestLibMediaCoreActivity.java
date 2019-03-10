@@ -9,6 +9,7 @@ import com.alanwang.aavlib.libmediacore.clipper.AWAVClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWAudioClipper;
 import com.alanwang.aavlib.libmediacore.clipper.AWVideoClipper;
 import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderToPCM;
+import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderToWav;
 import com.alanwang.aavlib.libmediacore.encoder.AWAudioWavFileEncoder;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
 import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
@@ -44,8 +45,11 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         TextView btn_test_wav_encoder = findViewById(R.id.btn_libmediacore_test_wav_encoder);
         btn_test_wav_encoder.setOnClickListener(this);
 
-        TextView btn_test_m4a_decoder = findViewById(R.id.btn_libmediacore_test_wav_decoder);
-        btn_test_m4a_decoder.setOnClickListener(this);
+        TextView btn_test_decoder_to_pcm = findViewById(R.id.btn_libmediacore_test_audio_decoder_to_pcm);
+        btn_test_decoder_to_pcm.setOnClickListener(this);
+
+        TextView btn_test_decoder_to_wav = findViewById(R.id.btn_libmediacore_test_audio_decoder_to_wav);
+        btn_test_decoder_to_wav.setOnClickListener(this);
     }
 
     @Override
@@ -66,8 +70,11 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
             case R.id.btn_libmediacore_test_wav_encoder:
                 testWavEncoder();
                 break;
-            case R.id.btn_libmediacore_test_wav_decoder:
-                testM4aDecode();
+            case R.id.btn_libmediacore_test_audio_decoder_to_pcm:
+                testM4aDecodeToPCM();
+                break;
+            case R.id.btn_libmediacore_test_audio_decoder_to_wav:
+                testM4aDecodeToWAV();
                 break;
             default:
         }
@@ -213,7 +220,7 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
     /**
      * 测试 m4a 解码
      */
-    private void testM4aDecode() {
+    private void testM4aDecodeToPCM() {
         final String srcMa4Path = "/sdcard/Alan/video/audio_test.m4a";
         if (!checkIfFileExist(srcMa4Path)) {
             return;
@@ -232,6 +239,33 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
             audioHWDecoderForPCM.setProcessListener(new CommonProgressListener(
                     "AWAudioHWDecoderToPCM", outputFilePath));
             audioHWDecoderForPCM.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 测试 m4a 解码到 wav
+     */
+    private void testM4aDecodeToWAV() {
+        final String srcMa4Path = "/sdcard/Alan/video/audio_test.m4a";
+        if (!checkIfFileExist(srcMa4Path)) {
+            return;
+        }
+
+        String outputFilePath = "/sdcard/Alan/video/audio_test.wav";
+        File outputFile = new File(outputFilePath);
+        if (outputFile.exists()) {
+            outputFile.delete();
+        }
+
+        AWAudioHWDecoderToWav audioHWDecoderToWav = new AWAudioHWDecoderToWav();
+        try {
+            audioHWDecoderToWav.setDataSource(srcMa4Path);
+            audioHWDecoderToWav.setOutputFile(outputFilePath);
+            audioHWDecoderToWav.setProcessListener(new CommonProgressListener(
+                    "AWAudioHWDecoderToWav", outputFilePath));
+            audioHWDecoderToWav.start();
         } catch (IOException e) {
             e.printStackTrace();
         }

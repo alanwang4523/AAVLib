@@ -38,7 +38,7 @@ public class AWWavFileHelper {
      * @return wavHeader
      */
     public static byte[] generateWavHeader(int sampleRate, int channels, int bitsPerSample, long audioDataLenInBytes) {
-        if (bitsPerSample != 16 || bitsPerSample != 32) {
+        if (bitsPerSample != 16 && bitsPerSample != 32) {
             throw new IllegalArgumentException("The bitsPerSample is not 16 or 32!");
         }
         if (audioDataLenInBytes < 0) {
