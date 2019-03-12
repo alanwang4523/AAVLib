@@ -11,4 +11,7 @@
     <string name="lib_media_core_test_wav_encoder">Test Encode Wav</string>
     <string name="lib_media_core_test_decoder_to_pcm">Test Decode Audio to PCM</string>
     <string name="lib_media_core_test_decoder_to_wav">Test Decode Audio to WAV</string>
+
+    <!-- LibAudio tests-->
+    <string name="lib_audio_test_record_to_wav">Test Record Audio to WAV</string>
 </resources>
