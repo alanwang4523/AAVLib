@@ -25,6 +25,11 @@ public class AWAudioDefaultRecorder {
          * @param errMsg
          */
         void onError(String errMsg);
+
+        /**
+         * 录制结束
+         */
+        void onFinish();
     }
 
     private AudioRecord mAudioRecorder;
@@ -93,6 +98,9 @@ public class AWAudioDefaultRecorder {
             }
             mAudioRecorder.stop();
             mAudioRecorder.release();
+            if (mAudioListener != null) {
+                mAudioListener.onFinish();
+            }
         }
     };
 }
