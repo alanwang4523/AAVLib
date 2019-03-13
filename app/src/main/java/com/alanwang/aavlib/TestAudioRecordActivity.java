@@ -57,6 +57,7 @@ public class TestAudioRecordActivity extends AppCompatActivity implements View.O
             public void onDataAvailable(byte[] data, int len) {
                 try {
                     ALog.e("onDataAvailable()-->>" + len);
+                    // 可在此处做音效处理
                     wavFile.writeData(data, len);
                 } catch (IOException e) {
                     e.printStackTrace();
