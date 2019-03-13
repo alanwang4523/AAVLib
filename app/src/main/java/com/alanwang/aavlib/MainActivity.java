@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_goto_video_editor.setOnClickListener(this);
         TextView btn_goto_test_libmediacore = findViewById(R.id.btn_goto_test_libmediacore);
         btn_goto_test_libmediacore.setOnClickListener(this);
+        TextView btn_goto_test_libaudio = findViewById(R.id.btn_goto_test_libaudio);
+        btn_goto_test_libaudio.setOnClickListener(this);
     }
 
     @Override
@@ -38,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_goto_test_libmediacore:
                 startActivity(new Intent(MainActivity.this, TestLibMediaCoreActivity.class));
+                break;
+            case R.id.btn_goto_test_libaudio:
+                startActivity(new Intent(MainActivity.this, TestLibAudioActivity.class));
                 break;
             default:
         }

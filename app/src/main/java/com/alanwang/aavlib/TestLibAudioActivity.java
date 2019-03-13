@@ -15,7 +15,7 @@ public class TestLibAudioActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test_libmediacore);
+        setContentView(R.layout.activity_test_libaudio);
 
         TextView btn_test_record_to_wav = findViewById(R.id.btn_libaudio_record_to_wav);
         btn_test_record_to_wav.setOnClickListener(this);
@@ -24,7 +24,7 @@ public class TestLibAudioActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_libmediacore_test_extract_audio:
+            case R.id.btn_libaudio_record_to_wav:
                 testRecordAudioToWav();
                 break;
             default:
@@ -35,6 +35,5 @@ public class TestLibAudioActivity extends AppCompatActivity implements View.OnCl
      * 测试录制音频到 wav
      */
     private void testRecordAudioToWav() {
-
     }
 }

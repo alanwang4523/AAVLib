@@ -42,6 +42,18 @@
                 android:layout_centerInParent="true"
                 android:background="@color/colorPrimaryDark"
                 android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/btn_goto_test_libaudio"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/margin_normal_45"
+                android:layout_marginTop="@dimen/margin_normal_20"
+                android:text="@string/test_lib_audio"
+                android:textSize="@dimen/text_size_16"
+                android:textColor="@color/white"
+                android:layout_centerInParent="true"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="center"/>
         </LinearLayout>
     </ScrollView>
 

@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">AAVLib</string>
     <string name="test_module_video_editor">Test ALVideoEditor</string>
-    <string name="test_lib_media_core">Test LibMediaCore</string>
 
     <!-- LibMediaCore tests-->
+    <string name="test_lib_media_core">Test LibMediaCore</string>
     <string name="lib_media_core_test_extract_audio">Test Extract Audio</string>
     <string name="lib_media_core_test_extract_video">Test Extract Video</string>
     <string name="lib_media_core_test_clipper">Test AV Clipper</string>
@@ -13,5 +13,6 @@
     <string name="lib_media_core_test_decoder_to_wav">Test Decode Audio to WAV</string>
 
     <!-- LibAudio tests-->
+    <string name="test_lib_audio">Test LibAudio</string>
     <string name="lib_audio_test_record_to_wav">Test Record Audio to WAV</string>
 </resources>
