@@ -44,6 +44,12 @@
             android:resizeableActivity="false"
             android:screenOrientation="portrait">
         </activity>
+
+        <activity
+            android:name=".TestAudioRecordActivity"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

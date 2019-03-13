@@ -15,4 +15,9 @@
     <!-- LibAudio tests-->
     <string name="test_lib_audio">Test LibAudio</string>
     <string name="lib_audio_test_record_to_wav">Test Record Audio to WAV</string>
+
+    <string name="lib_audio_audio_record_start">Start</string>
+    <string name="lib_audio_audio_record_stop">Stop</string>
+
+    <!-- LibAudio tests audio record-->
 </resources>
