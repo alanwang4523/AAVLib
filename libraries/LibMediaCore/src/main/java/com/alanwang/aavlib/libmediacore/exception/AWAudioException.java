@@ -5,7 +5,7 @@ package com.alanwang.aavlib.libmediacore.exception;
  * Date: 19/3/5 00:37.
  * Mail: alanwang4523@gmail.com
  */
-public class AWAudioException extends AWMediaException {
+public class AWAudioException extends AWException {
 
     public AWAudioException(int errorCode) {
         super(errorCode);
