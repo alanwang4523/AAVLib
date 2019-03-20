@@ -5,7 +5,7 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.text.TextUtils;
 import com.alanwang.aavlib.libmediacore.extractor.AWMediaExtractor;
-import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
+import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -21,7 +21,7 @@ public abstract class AWAudioHWDecoder {
     private MediaCodec mMediaDecoder;
     private ByteBuffer[] mInputBuffers, mOutputBuffers;
     private MediaCodec.BufferInfo mDecodeBufferInfo;
-    private AWProcessListener mProcessListener;
+    private AWMediaListener mProcessListener;
     private long mPresentationTimeUs;
     private byte[] dataArr = new byte[10 * 1024];
 
@@ -47,7 +47,7 @@ public abstract class AWAudioHWDecoder {
      * 设置监听器
      * @param extractorListener
      */
-    public void setProcessListener(AWProcessListener extractorListener) {
+    public void setProcessListener(AWMediaListener extractorListener) {
         this.mProcessListener = extractorListener;
         mMediaExtractor.setProcessListener(mProcessListener);
     }

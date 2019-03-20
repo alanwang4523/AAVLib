@@ -4,7 +4,7 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
-import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
+import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
 import com.alanwang.aavlib.libmediacore.utils.AWWavFileHelper;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
 public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
     private static final String TAG = AWAudioWavFileEncoder.class.getSimpleName();
     private FileInputStream mWavInputStream = null;
-    private AWProcessListener mProcessListener;
+    private AWMediaListener mProcessListener;
     private MediaMuxer mMediaMuxer;
     private byte[] mTempBuffer;
     private int mAudioTrackIdx = 0;
@@ -119,7 +119,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
      * 设置监听器
      * @param extractorListener
      */
-    public void setProcessListener(AWProcessListener extractorListener) {
+    public void setProcessListener(AWMediaListener extractorListener) {
         this.mProcessListener = extractorListener;
     }
 

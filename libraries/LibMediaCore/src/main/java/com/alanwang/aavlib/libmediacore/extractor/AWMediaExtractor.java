@@ -6,7 +6,7 @@ import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.text.TextUtils;
 
-import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
+import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -24,7 +24,7 @@ public abstract class AWMediaExtractor {
     private int mTrackIndex = -1;
     private ByteBuffer mByteBuffer;
     private MediaCodec.BufferInfo mBufferInfo;
-    private AWProcessListener mProcessListener;
+    private AWMediaListener mProcessListener;
     private long mStartPosTimeUs = 0; // 需要抽取的起始时间，单位微秒
     private long mEndPosTimeUs = 0; // 需要抽取的截止时间，单位微秒
     private boolean mIsExtractorReady = false;
@@ -88,7 +88,7 @@ public abstract class AWMediaExtractor {
      * 设置监听器
      * @param extractorListener
      */
-    public void setProcessListener(AWProcessListener extractorListener) {
+    public void setProcessListener(AWMediaListener extractorListener) {
         this.mProcessListener = extractorListener;
     }
 

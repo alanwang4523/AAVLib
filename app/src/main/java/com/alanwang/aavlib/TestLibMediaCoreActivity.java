@@ -12,7 +12,7 @@ import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderToPCM;
 import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderToWav;
 import com.alanwang.aavlib.libmediacore.encoder.AWAudioWavFileEncoder;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
-import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
+import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
 import com.alanwang.aavlib.libmediacore.muxer.AWAVAndroidMuxer;
 import com.alanwang.aavlib.libutils.ALog;
 import java.io.File;
@@ -300,7 +300,7 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         });
     }
 
-    private class CommonProgressListener implements AWProcessListener {
+    private class CommonProgressListener implements AWMediaListener {
         private String Tag;
         private String outPath;
         private int lastProgress = 0;

@@ -5,7 +5,7 @@ import android.media.MediaMuxer;
 import com.alanwang.aavlib.libmediacore.extractor.AWAudioExtractor;
 import com.alanwang.aavlib.libmediacore.extractor.AWVideoExtractor;
 import com.alanwang.aavlib.libmediacore.listener.AWExtractorListener;
-import com.alanwang.aavlib.libmediacore.listener.AWProcessListener;
+import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -19,7 +19,7 @@ public class AWAVAndroidMuxer {
     private AWAudioExtractor mAudioExtractor;
     private AWVideoExtractor mVideoExtractor;
     private MediaMuxer mMediaMuxer;
-    private AWProcessListener mProcessListener;
+    private AWMediaListener mProcessListener;
 
     private boolean mIsHaveAudio = false;
     private boolean mIsHaveVideo = false;
@@ -104,7 +104,7 @@ public class AWAVAndroidMuxer {
      * 设置监听器
      * @param extractorListener
      */
-    public void setProcessListener(AWProcessListener extractorListener) {
+    public void setProcessListener(AWMediaListener extractorListener) {
         this.mProcessListener = extractorListener;
     }
 
@@ -190,7 +190,7 @@ public class AWAVAndroidMuxer {
         }
     }
 
-    private class AVProcessListener implements AWProcessListener {
+    private class AVProcessListener implements AWMediaListener {
         static final int TYPE_AUDIO = 0x01;
         static final int TYPE_VIDEO = 0x02;
 
