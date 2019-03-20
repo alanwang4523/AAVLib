@@ -1,5 +1,6 @@
 package com.alanwang.aavlib.libaudio.recorder;
 
+import com.alanwang.aavlib.libmediacore.exception.AWException;
 import com.alanwang.aavlib.libmediacore.utils.AWWavFile;
 import com.alanwang.aavlib.libutils.ALog;
 import java.io.IOException;
@@ -54,18 +55,18 @@ public class AWWavRecorder {
         }
 
         @Override
-        public void onError(String errMsg) {
-            ALog.e("onError()-->>" + errMsg);
-        }
-
-        @Override
-        public void onFinish() {
+        public void onSuccess(Void result) {
             ALog.e("onFinish()-->>");
             try {
                 wavFile.release();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        @Override
+        public void onError(AWException e) {
+            ALog.e("onError()-->>" + e);
         }
     };
 }

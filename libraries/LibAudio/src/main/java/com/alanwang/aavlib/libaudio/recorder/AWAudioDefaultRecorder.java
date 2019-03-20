@@ -3,6 +3,8 @@ package com.alanwang.aavlib.libaudio.recorder;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
+import com.alanwang.aavlib.libmediacore.listener.AWResultCallback;
 
 /**
  * Author: AlanWang4523.
@@ -12,24 +14,13 @@ import android.media.MediaRecorder;
 public class AWAudioDefaultRecorder {
     private final static String TAG = AWAudioDefaultRecorder.class.getSimpleName();
 
-    public interface AudioListener {
+    public interface AudioListener extends AWResultCallback<Void> {
         /**
          * 有数据到来
          * @param data
          * @param len
          */
         void onDataAvailable(byte[] data, int len);
-
-        /**
-         * 出错
-         * @param errMsg
-         */
-        void onError(String errMsg);
-
-        /**
-         * 录制结束
-         */
-        void onFinish();
     }
 
     private AudioRecord mAudioRecorder;
@@ -42,7 +33,7 @@ public class AWAudioDefaultRecorder {
     public AWAudioDefaultRecorder(int sampleRate, int channelCount) {
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;// 默认采样 short 型格式
         int channelConfig = channelCount == 2 ? AudioFormat.CHANNEL_IN_STEREO : AudioFormat.CHANNEL_IN_MONO;
-        mBufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat) * 2;
+        mBufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
         mDataBuffer = new byte[mBufferSize];
         mAudioRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 sampleRate, channelConfig, audioFormat, mBufferSize);
@@ -91,7 +82,7 @@ public class AWAudioDefaultRecorder {
                     }
                 } else {
                     if (mAudioListener != null) {
-                        mAudioListener.onError("Record error : " + length);
+                        mAudioListener.onError(new AWAudioException("Record error : " + length));
                     }
                     break;
                 }
@@ -99,7 +90,7 @@ public class AWAudioDefaultRecorder {
             mAudioRecorder.stop();
             mAudioRecorder.release();
             if (mAudioListener != null) {
-                mAudioListener.onFinish();
+                mAudioListener.onSuccess(null);
             }
         }
     };
