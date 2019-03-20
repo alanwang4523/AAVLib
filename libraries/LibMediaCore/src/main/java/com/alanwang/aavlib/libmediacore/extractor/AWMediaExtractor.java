@@ -6,6 +6,7 @@ import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.text.TextUtils;
 
+import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
 import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ public abstract class AWMediaExtractor {
     private int mTrackIndex = -1;
     private ByteBuffer mByteBuffer;
     private MediaCodec.BufferInfo mBufferInfo;
-    private AWMediaListener mProcessListener;
+    private AWMediaListener<Void> mProcessListener;
     private long mStartPosTimeUs = 0; // 需要抽取的起始时间，单位微秒
     private long mEndPosTimeUs = 0; // 需要抽取的截止时间，单位微秒
     private boolean mIsExtractorReady = false;
@@ -88,7 +89,7 @@ public abstract class AWMediaExtractor {
      * 设置监听器
      * @param extractorListener
      */
-    public void setProcessListener(AWMediaListener extractorListener) {
+    public void setProcessListener(AWMediaListener<Void> extractorListener) {
         this.mProcessListener = extractorListener;
     }
 
@@ -212,7 +213,7 @@ public abstract class AWMediaExtractor {
             while (mIsRunning) {
                 ByteBuffer byteBuffer = getBufferForOutputData();
                 if (byteBuffer == null && mProcessListener != null) {
-                    mProcessListener.onError("Buffer cannot be null！");
+                    mProcessListener.onError(new AWAudioException("Buffer cannot be null！"));
                     break;
                 }
                 byteBuffer.clear();
@@ -221,7 +222,7 @@ public abstract class AWMediaExtractor {
                     readCount = mExtractor.readSampleData(byteBuffer, 0);
                 } catch (IllegalArgumentException e) {
                     if (mProcessListener != null) {
-                        mProcessListener.onError("Buffer not enough！");
+                        mProcessListener.onError(new AWAudioException("Buffer not enough！"));
                     }
                     break;
                 }
@@ -255,7 +256,7 @@ public abstract class AWMediaExtractor {
             if (isSuccess) {
                 if (mProcessListener != null) {
                     mProcessListener.onProgress(100);
-                    mProcessListener.onFinish();
+                    mProcessListener.onSuccess(null);
                 }
             }
         }

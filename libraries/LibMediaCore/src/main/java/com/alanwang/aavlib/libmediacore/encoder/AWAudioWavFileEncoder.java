@@ -189,7 +189,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
 
                 if (mProcessListener != null) {
                     mProcessListener.onProgress(100);
-                    mProcessListener.onFinish();
+                    mProcessListener.onSuccess(null);
                 }
             }
         }
@@ -214,7 +214,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
                 bytesRead = mWavInputStream.read(mTempBuffer, 0, inputBuffer.limit());
             } catch (IOException e) {
                 if (mProcessListener != null) {
-                    mProcessListener.onError("Read file error!");
+                    mProcessListener.onError(new AWAudioException("Read file error!"));
                 }
                 return false;
             }

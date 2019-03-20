@@ -12,6 +12,7 @@ import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderToPCM;
 import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderToWav;
 import com.alanwang.aavlib.libmediacore.encoder.AWAudioWavFileEncoder;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
+import com.alanwang.aavlib.libmediacore.exception.AWException;
 import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
 import com.alanwang.aavlib.libmediacore.muxer.AWAVAndroidMuxer;
 import com.alanwang.aavlib.libutils.ALog;
@@ -300,7 +301,7 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         });
     }
 
-    private class CommonProgressListener implements AWMediaListener {
+    private class CommonProgressListener implements AWMediaListener<Void> {
         private String Tag;
         private String outPath;
         private int lastProgress = 0;
@@ -319,15 +320,15 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
         }
 
         @Override
-        public void onFinish() {
+        public void onSuccess(Void result) {
             ALog.d(Tag + "::onFinish()-->" + outPath);
             toastInUiThread(Tag + " success!", true);
         }
 
         @Override
-        public void onError(String error) {
-            ALog.d(Tag + "::onError()-->" + error);
-            toastInUiThread(Tag + " error!-->" + error, true);
+        public void onError(AWException e) {
+            ALog.d(Tag + "::onError()-->" + e);
+            toastInUiThread(Tag + " error!-->" + e.getErrorMsg(), true);
         }
     }
 

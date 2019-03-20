@@ -2,6 +2,7 @@ package com.alanwang.aavlib.libmediacore.muxer;
 
 import android.media.MediaCodec;
 import android.media.MediaMuxer;
+import com.alanwang.aavlib.libmediacore.exception.AWException;
 import com.alanwang.aavlib.libmediacore.extractor.AWAudioExtractor;
 import com.alanwang.aavlib.libmediacore.extractor.AWVideoExtractor;
 import com.alanwang.aavlib.libmediacore.listener.AWExtractorListener;
@@ -190,7 +191,7 @@ public class AWAVAndroidMuxer {
         }
     }
 
-    private class AVProcessListener implements AWMediaListener {
+    private class AVProcessListener implements AWMediaListener<Void> {
         static final int TYPE_AUDIO = 0x01;
         static final int TYPE_VIDEO = 0x02;
 
@@ -211,7 +212,7 @@ public class AWAVAndroidMuxer {
         }
 
         @Override
-        public void onFinish() {
+        public void onSuccess(Void result) {
             if (mediaType == TYPE_AUDIO) {
                 mIsAudioProcessFinish = true;
             } else if (mediaType == TYPE_VIDEO) {
@@ -220,13 +221,13 @@ public class AWAVAndroidMuxer {
             if (isAllFinish()) {
                 release();
                 if (mProcessListener != null) {
-                    mProcessListener.onFinish();
+                    mProcessListener.onSuccess(result);
                 }
             }
         }
 
         @Override
-        public void onError(String error) {
+        public void onError(AWException e) {
             if (mediaType == TYPE_AUDIO && mIsHaveVideo) {
                 // 当音频出错时，将视频停止
                 mVideoExtractor.cancel();
@@ -236,7 +237,7 @@ public class AWAVAndroidMuxer {
             }
             release();
             if (mProcessListener != null) {
-                mProcessListener.onError(error);
+                mProcessListener.onError(e);
             }
         }
 
