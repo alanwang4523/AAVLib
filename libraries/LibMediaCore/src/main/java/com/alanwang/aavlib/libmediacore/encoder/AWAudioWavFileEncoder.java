@@ -4,7 +4,6 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
-import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
 import com.alanwang.aavlib.libmediacore.listener.AWVoidResultListener;
 import com.alanwang.aavlib.libmediacore.utils.AWWavFileHelper;
 import java.io.File;

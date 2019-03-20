@@ -5,5 +5,5 @@ package com.alanwang.aavlib.libmediacore.listener;
  * Date: 19/3/20 23:53.
  * Mail: alanwang4523@gmail.com
  */
-public interface AWStringResultListener extends AWMediaListener<String> {
+public interface AWStringResultListener extends AWProgressResultListener<String> {
 }

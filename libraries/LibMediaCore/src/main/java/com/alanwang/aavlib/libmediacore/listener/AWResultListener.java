@@ -7,7 +7,7 @@ import com.alanwang.aavlib.libmediacore.exception.AWException;
  * Date: 19/3/15 13:18.
  * Mail: alanwang4523@gmail.com
  */
-public interface AWResultCallback <T> {
+public interface AWResultListener<T> {
     /**
      * 成功的回调
      * @param result

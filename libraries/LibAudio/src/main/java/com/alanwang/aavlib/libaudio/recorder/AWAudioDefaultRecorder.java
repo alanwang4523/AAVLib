@@ -4,7 +4,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
-import com.alanwang.aavlib.libmediacore.listener.AWResultCallback;
+import com.alanwang.aavlib.libmediacore.listener.AWResultListener;
 
 /**
  * Author: AlanWang4523.
@@ -14,7 +14,7 @@ import com.alanwang.aavlib.libmediacore.listener.AWResultCallback;
 public class AWAudioDefaultRecorder {
     private final static String TAG = AWAudioDefaultRecorder.class.getSimpleName();
 
-    public interface AudioListener extends AWResultCallback<Void> {
+    public interface AudioListener extends AWResultListener<Void> {
         /**
          * 有数据到来
          * @param data

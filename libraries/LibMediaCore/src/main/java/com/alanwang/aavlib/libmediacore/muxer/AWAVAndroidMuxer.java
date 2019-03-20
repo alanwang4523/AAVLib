@@ -6,7 +6,6 @@ import com.alanwang.aavlib.libmediacore.exception.AWException;
 import com.alanwang.aavlib.libmediacore.extractor.AWAudioExtractor;
 import com.alanwang.aavlib.libmediacore.extractor.AWVideoExtractor;
 import com.alanwang.aavlib.libmediacore.listener.AWExtractorListener;
-import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
 import com.alanwang.aavlib.libmediacore.listener.AWVoidResultListener;
 import java.io.IOException;
 import java.nio.ByteBuffer;
