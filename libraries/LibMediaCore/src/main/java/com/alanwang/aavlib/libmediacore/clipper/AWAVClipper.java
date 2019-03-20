@@ -1,6 +1,6 @@
 package com.alanwang.aavlib.libmediacore.clipper;
 
-import com.alanwang.aavlib.libmediacore.listener.AWMediaListener;
+import com.alanwang.aavlib.libmediacore.listener.AWVoidResultListener;
 import com.alanwang.aavlib.libmediacore.muxer.AWAVAndroidMuxer;
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class AWAVClipper {
      * 设置监听器
      * @param extractorListener
      */
-    public void setProcessListener(AWMediaListener extractorListener) {
+    public void setProcessListener(AWVoidResultListener extractorListener) {
         mAVAndroidMuxer.setProcessListener(extractorListener);
     }
 
