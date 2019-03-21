@@ -12,7 +12,7 @@
     <color name="colorTextSelect">#F54E3F</color>
 
     <color name="lib_general_white_alpha_ff">#FFEEEEEE</color>
-    <color name="lib_general_white_fa_30">#4CFAFAFA</color>
-    <color name="lib_general_white_25">#40FFFFFF</color>
+    <color name="lib_general_white_fa_4c">#4CFAFAFA</color>
+    <color name="lib_general_white_ff_55">#55FFFFFF</color>
 
 </resources>

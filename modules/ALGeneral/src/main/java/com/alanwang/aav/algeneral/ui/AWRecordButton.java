@@ -81,10 +81,10 @@ public class AWRecordButton extends View {
     private float scRingLineWidth = 0f;
 
     private int tpButtonColor = getColor(R.color.lib_general_white_alpha_ff);
-    private int tpRingColor = getColor(R.color.lib_general_white_fa_30);
+    private int tpRingColor = getColor(R.color.lib_general_white_ff_55);
     private int scButtonColor = getColor(R.color.lib_general_white_alpha_ff);// 中间按钮颜色
     private int scRingColorStatic = getColor(R.color.lib_general_white_alpha_ff);
-    private int scRingColorBreath = getColor(R.color.lib_general_white_25);
+    private int scRingColorBreath = getColor(R.color.lib_general_white_ff_55);
 
     private Paint scButtonPaint = new Paint();
     private Paint scRingPaint = new Paint();
