@@ -2,9 +2,8 @@ package com.alanwang.aavlib;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
+import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aavlib.libaudio.recorder.AWWavRecorder;
 import java.io.IOException;
 
@@ -13,53 +12,66 @@ import java.io.IOException;
  * Date: 19/3/14 01:33.
  * Mail: alanwang4523@gmail.com
  */
-public class TestAudioRecordActivity extends AppCompatActivity implements View.OnClickListener {
+public class TestAudioRecordActivity extends AppCompatActivity {
 
-    private TextView btn_audio_record;
+    private AWRecordButton btnRecord;
     private AWWavRecorder audioRecorder;
-    private boolean isRecording = false;
     private String wavFilePath = "/sdcard/Alan/video/audio_recorder.wav";
+    private boolean mIsRecording = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_audio_record);
 
-        btn_audio_record = findViewById(R.id.btn_audio_record);
-        btn_audio_record.setOnClickListener(this);
+        btnRecord = findViewById(R.id.btn_audio_record_to_wav);
+        btnRecord.setMode(AWRecordButton.Mode.MODE_SINGLE_CLICK);
+        btnRecord.setListener(new AWRecordButton.onRecordBtnTouchListener() {
+            @Override
+            public void onInit() {
+                Toast.makeText(TestAudioRecordActivity.this, "onInit", Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void onClick() {
+                mIsRecording = !mIsRecording;
+                if (mIsRecording) {
+                    btnRecord.setRecordStatus(AWRecordButton.Status.STATUS_RECORDING);
+                    if (audioRecorder == null) {
+                        audioRecorder = createARecorder();
+                    }
+                    if (audioRecorder != null) {
+                        audioRecorder.start();
+                    }
+                } else {
+                    btnRecord.setRecordStatus(AWRecordButton.Status.STATUS_READY);
+                    if (audioRecorder != null) {
+                        audioRecorder.stop();
+                        audioRecorder = null;
+                    }
+                    Toast.makeText(TestAudioRecordActivity.this, wavFilePath, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onStartLongClick() {
+                Toast.makeText(TestAudioRecordActivity.this, "onStartLongClick", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onEndLongClick() {
+                Toast.makeText(TestAudioRecordActivity.this, "onEndLongClick", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private AWWavRecorder createARecorder() {
+        AWWavRecorder audioRecorder = null;
         try {
             audioRecorder = new AWWavRecorder(wavFilePath, 44100, 1, 16);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_audio_record:
-                testRecordAudioToWav();
-                break;
-            default:
-        }
-    }
-
-    /**
-     * 测试录制音频到 wav
-     */
-    private void testRecordAudioToWav() {
-        if (!isRecording && audioRecorder != null) {
-            audioRecorder.start();
-        } else {
-            if (audioRecorder != null) {
-                audioRecorder.stop();
-            }
-            Toast.makeText(this, wavFilePath, Toast.LENGTH_LONG).show();
-        }
-        isRecording = !isRecording;
-        btn_audio_record.setText(isRecording ?
-                this.getResources().getString(R.string.lib_audio_audio_record_stop) :
-                this.getResources().getString(R.string.lib_audio_audio_record_start));
+        return audioRecorder;
     }
 }
