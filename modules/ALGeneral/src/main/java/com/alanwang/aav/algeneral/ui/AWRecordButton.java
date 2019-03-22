@@ -26,31 +26,25 @@ import java.lang.annotation.RetentionPolicy;
 public class AWRecordButton extends View {
     private final static String TAG = AWRecordButton.class.getSimpleName();
 
-    public interface onRecordBtnTouchListener {
-        void onInit();
+    public interface OnClickListener {
         void onClick();
-        void onStartLongClick();
-        void onEndLongClick();
     }
 
     @IntDef({
-            Mode.MODE_HOLD,
             Mode.MODE_SINGLE_CLICK,
             Mode.MODE_TAKE_PHOTO
     })
 
     @Retention(RetentionPolicy.SOURCE)
     public @interface Mode {
-        int MODE_HOLD = 0;
-        int MODE_SINGLE_CLICK = 1;
-        int MODE_TAKE_PHOTO = 2;
+        int MODE_SINGLE_CLICK = 0;
+        int MODE_TAKE_PHOTO = 1;
     }
 
     @IntDef({
             Status.STATUS_INIT,
             Status.STATUS_READY,
             Status.STATUS_RECORDING,
-            Status.STATUS_PAUSE,
             Status.STATUS_CHANGING_MODE
     })
 
@@ -59,7 +53,6 @@ public class AWRecordButton extends View {
         int STATUS_INIT = 0;
         int STATUS_READY = 1;
         int STATUS_RECORDING = 2;
-        int STATUS_PAUSE = 3;
         int STATUS_CHANGING_MODE = 4;
     }
 
@@ -82,7 +75,7 @@ public class AWRecordButton extends View {
 
     private int tpButtonColor = getColor(R.color.lib_general_white_alpha_ff);
     private int tpRingColor = getColor(R.color.lib_general_white_ff_55);
-    private int scButtonColor = getColor(R.color.lib_general_white_alpha_ff);// 中间按钮颜色
+    private int scButtonColor = getColor(R.color.lib_general_white_alpha_ff);// 中间方形按钮颜色
     private int scRingColorStatic = getColor(R.color.lib_general_white_alpha_ff);
     private int scRingColorBreath = getColor(R.color.lib_general_white_ff_55);
 
@@ -100,15 +93,10 @@ public class AWRecordButton extends View {
     private RectF scRingRectF = new RectF();
     private RectF scButtonRectF = new RectF();
 
-    private float xDown = 0f;
-    private float yDown = 0f;
-    private LongPressRunnable longPressRunnable = new LongPressRunnable();
-    private boolean isLongClick = false;
-
     private EnableSingleClickRunnable enableSingleClickRunnable = new EnableSingleClickRunnable();
     private boolean enableSingleClick = true;
 
-    private onRecordBtnTouchListener listener = null;
+    private OnClickListener listener = null;
 
     private @Mode int btnMode = Mode.MODE_SINGLE_CLICK;
     private @Status int status = Status.STATUS_INIT;
@@ -179,7 +167,7 @@ public class AWRecordButton extends View {
 
     private void drawSCRing(Canvas canvas) {
         scRingPaint.setStrokeWidth(scRingLineWidth);
-        if (status == Status.STATUS_READY || status == Status.STATUS_PAUSE) {
+        if (status == Status.STATUS_READY) {
             if (scRingLineWidth == scRingLineWidthRecordingMinPercent * getWidth()) {
                 scRingPaint.setColor(scRingColorStatic);
             } else {
@@ -203,10 +191,6 @@ public class AWRecordButton extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "OnTouchEvent--->Down");
-                xDown = event.getX();
-                yDown = event.getY();
-
-                postDelayed(longPressRunnable, 300);
                 break;
             case MotionEvent.ACTION_MOVE:
                 Log.d(TAG, "OnTouchEvent--->Move");
@@ -228,22 +212,13 @@ public class AWRecordButton extends View {
         if (status == Status.STATUS_CHANGING_MODE) {
             return;
         }
-        removeCallbacks(longPressRunnable);
-        //根据当前状态处理
-        if (isLongClick) {
+        if (enableSingleClick) {
             if (listener != null) {
-                listener.onEndLongClick();
+                listener.onClick();
             }
-        } else {
-            if (enableSingleClick) {
-                if (listener != null) {
-                    listener.onClick();
-                }
-                enableSingleClick = false;
-                postDelayed(enableSingleClickRunnable, 500L);
-            }
+            enableSingleClick = false;
+            postDelayed(enableSingleClickRunnable, 500L);
         }
-        isLongClick = false;
     }
 
     /**
@@ -257,7 +232,7 @@ public class AWRecordButton extends View {
         setRecordStatus(Status.STATUS_READY, true);
     }
 
-    public void setListener(onRecordBtnTouchListener listener) {
+    public void setListener(OnClickListener listener) {
         this.listener = listener;
     }
 
@@ -308,8 +283,7 @@ public class AWRecordButton extends View {
         float nowRingLineWidth = scRingLineWidth;
         float minRingLineWidth = 0f;
         switch (status) {
-            case Status.STATUS_READY:
-            case Status.STATUS_PAUSE: {
+            case Status.STATUS_READY: {
                 targetButtonWidth = scButtonWidthMaxPercent * getEffectiveRadius() * 2.0f;
                 targetButtonRadius = targetButtonWidth / 2.0f;
                 targetRingWidthRadius = scRingWidthRecordingMinPercent * getEffectiveRadius() - targetButtonWidth / 2.0f;
@@ -460,12 +434,12 @@ public class AWRecordButton extends View {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    setRecordStatus(Status.STATUS_READY, false);
+                    setRecordStatus(Status.STATUS_READY);
                 }
 
                 @Override
                 public void onAnimationCancel(Animator animation) {
-                    setRecordStatus(Status.STATUS_READY, false);
+                    setRecordStatus(Status.STATUS_READY);
                 }
 
                 @Override
@@ -494,10 +468,7 @@ public class AWRecordButton extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        if (listener != null) {
-            listener.onInit();
-        }
-        setRecordStatus(Status.STATUS_READY, false);
+        setRecordStatus(Status.STATUS_READY);
     }
 
     @Override
@@ -512,23 +483,12 @@ public class AWRecordButton extends View {
         if (scRingAnimation != null) {
             scRingAnimation.cancel();
         }
-        removeCallbacks(longPressRunnable);
         removeCallbacks(enableSingleClickRunnable);
         enableSingleClick = true;
     }
 
     private int getColor(@ColorRes int resId) {
         return this.getContext().getResources().getColor(resId);
-    }
-
-    private class LongPressRunnable implements Runnable {
-        @Override
-        public void run() {
-            isLongClick = true;
-            if (listener != null) {
-                listener.onStartLongClick();
-            }
-        }
     }
 
     private class EnableSingleClickRunnable implements Runnable {

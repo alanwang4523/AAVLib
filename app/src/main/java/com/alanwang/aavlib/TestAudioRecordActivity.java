@@ -26,12 +26,7 @@ public class TestAudioRecordActivity extends AppCompatActivity {
 
         btnRecord = findViewById(R.id.btn_audio_record_to_wav);
         btnRecord.setMode(AWRecordButton.Mode.MODE_SINGLE_CLICK);
-        btnRecord.setListener(new AWRecordButton.onRecordBtnTouchListener() {
-            @Override
-            public void onInit() {
-                Toast.makeText(TestAudioRecordActivity.this, "onInit", Toast.LENGTH_SHORT).show();
-            }
-
+        btnRecord.setListener(new AWRecordButton.OnClickListener() {
             @Override
             public void onClick() {
                 mIsRecording = !mIsRecording;
@@ -51,16 +46,6 @@ public class TestAudioRecordActivity extends AppCompatActivity {
                     }
                     Toast.makeText(TestAudioRecordActivity.this, wavFilePath, Toast.LENGTH_LONG).show();
                 }
-            }
-
-            @Override
-            public void onStartLongClick() {
-                Toast.makeText(TestAudioRecordActivity.this, "onStartLongClick", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onEndLongClick() {
-                Toast.makeText(TestAudioRecordActivity.this, "onEndLongClick", Toast.LENGTH_SHORT).show();
             }
         });
     }
