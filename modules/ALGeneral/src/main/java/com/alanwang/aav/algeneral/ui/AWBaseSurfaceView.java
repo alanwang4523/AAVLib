@@ -2,7 +2,6 @@ package com.alanwang.aav.algeneral.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -19,15 +18,17 @@ public abstract class AWBaseSurfaceView extends SurfaceView implements SurfaceHo
     protected boolean isRun = true;
     protected SurfaceHolder surfaceHolder;
     protected Canvas canvas;
-    protected Paint defaultPaint;
 
     public AWBaseSurfaceView(Context context) {
-        super(context);
-        initView(null);
+        this(context, null);
     }
 
     public AWBaseSurfaceView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
+    }
+
+    public AWBaseSurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         initView(attrs);
     }
 
@@ -37,8 +38,6 @@ public abstract class AWBaseSurfaceView extends SurfaceView implements SurfaceHo
         setFocusableInTouchMode(true);
         surfaceHolder = this.getHolder();
         surfaceHolder.addCallback(this);
-        defaultPaint = new Paint();
-        defaultPaint.setAntiAlias(true);
     }
 
     @Override

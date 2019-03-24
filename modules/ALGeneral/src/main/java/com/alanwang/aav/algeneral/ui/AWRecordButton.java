@@ -34,15 +34,15 @@ public class AWRecordButton extends View {
         void onTakePicture();
     }
 
-    @IntDef({Mode.RECORD, Mode.TAKE_PHOTO})
     @Retention(RetentionPolicy.SOURCE)
+    @IntDef({Mode.RECORD, Mode.TAKE_PHOTO})
     public @interface Mode {
         int RECORD = 0;
         int TAKE_PHOTO = 1;
     }
 
-    @IntDef({Status.INIT, Status.IDLE, Status.RECORDING})
     @Retention(RetentionPolicy.SOURCE)
+    @IntDef({Status.INIT, Status.IDLE, Status.RECORDING})
     public @interface Status {
         int INIT = 0;
         int IDLE = 1;
