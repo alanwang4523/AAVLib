@@ -17,7 +17,6 @@ public class TestAudioRecordActivity extends AppCompatActivity {
     private AWRecordButton btnRecord;
     private AWWavRecorder audioRecorder;
     private String wavFilePath = "/sdcard/Alan/video/audio_recorder.wav";
-    private boolean mIsRecording = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,29 +24,51 @@ public class TestAudioRecordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test_audio_record);
 
         btnRecord = findViewById(R.id.btn_audio_record_to_wav);
-        btnRecord.setMode(AWRecordButton.Mode.MODE_SINGLE_CLICK);
-        btnRecord.setListener(new AWRecordButton.OnClickListener() {
+        btnRecord.setMode(AWRecordButton.Mode.RECORD);
+        btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
             @Override
-            public void onClick() {
-                mIsRecording = !mIsRecording;
-                if (mIsRecording) {
-                    btnRecord.setRecordStatus(AWRecordButton.Status.STATUS_RECORDING);
-                    if (audioRecorder == null) {
-                        audioRecorder = createARecorder();
-                    }
-                    if (audioRecorder != null) {
-                        audioRecorder.start();
-                    }
-                } else {
-                    btnRecord.setRecordStatus(AWRecordButton.Status.STATUS_READY);
-                    if (audioRecorder != null) {
-                        audioRecorder.stop();
-                        audioRecorder = null;
-                    }
-                    Toast.makeText(TestAudioRecordActivity.this, wavFilePath, Toast.LENGTH_LONG).show();
+            public void onRecordStart() {
+                if (audioRecorder == null) {
+                    audioRecorder = createARecorder();
+                }
+                if (audioRecorder != null) {
+                    audioRecorder.start();
                 }
             }
+
+            @Override
+            public void onRecordStop() {
+                if (audioRecorder != null) {
+                    audioRecorder.stop();
+                    audioRecorder = null;
+                }
+                Toast.makeText(TestAudioRecordActivity.this, wavFilePath, Toast.LENGTH_LONG).show();
+            }
         });
+
+
+//        btnRecord.setMode(AWRecordButton.Mode.TAKE_PHOTO);
+//        btnRecord.setTakePictureListener(new AWRecordButton.OnTakePictureListener() {
+//            @Override
+//            public void onTakePicture() {
+//                Toast.makeText(TestAudioRecordActivity.this, "Take a photo!", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+
+//        btnRecord.setMode(AWRecordButton.Mode.RECORD);
+//        btnRecord.setOnRecordListener(new AWRecordButton.OnRecordListener() {
+//            @Override
+//            public void onRecordStart() {
+//                mIsRecording = true;
+//                Toast.makeText(TestAudioRecordActivity.this, "start record!", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onRecordStop() {
+//                mIsRecording = false;
+//                Toast.makeText(TestAudioRecordActivity.this, "stop record!", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
     private AWWavRecorder createARecorder() {

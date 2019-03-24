@@ -13,9 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
 import com.alanwang.aav.algeneral.R;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -27,38 +25,45 @@ import java.lang.annotation.RetentionPolicy;
 public class AWRecordButton extends View {
     private final static String TAG = AWRecordButton.class.getSimpleName();
 
-    public interface OnClickListener {
-        void onClick();
+    public interface OnRecordListener {
+        void onRecordStart();
+        void onRecordStop();
+    }
+
+    public interface OnTakePictureListener {
+        void onTakePicture();
     }
 
     @IntDef({
-            Mode.MODE_SINGLE_CLICK,
-            Mode.MODE_TAKE_PHOTO
+            Mode.RECORD,
+            Mode.TAKE_PHOTO
     })
 
     @Retention(RetentionPolicy.SOURCE)
     public @interface Mode {
-        int MODE_SINGLE_CLICK = 0;
-        int MODE_TAKE_PHOTO = 1;
+        int RECORD = 0;
+        int TAKE_PHOTO = 1;
     }
 
     @IntDef({
-            Status.STATUS_INIT,
-            Status.STATUS_READY,
-            Status.STATUS_RECORDING
+            Status.INIT,
+            Status.IDLE,
+            Status.RECORDING
     })
 
     @Retention(RetentionPolicy.SOURCE)
     public @interface Status {
-        int STATUS_INIT = 0;
-        int STATUS_READY = 1;
-        int STATUS_RECORDING = 2;
+        int INIT = 0;
+        int IDLE = 1;
+        int RECORDING = 2;
     }
 
     // 拍照按钮相关参数
     private final static long TP_ANIMATION_DURATION = 300L;
     private final static float TP_BTN_MIN_SIZE_PERCENTAGE = 0.56f;
     private final static float TP_BTN_MAX_SIZE_PERCENTAGE = 0.78f;
+    private final static float TP_RING_THICKNESS_PERCENTAGE = 0.12f;
+    private final static float TP_CENTER_AND_RING_MAGIN_PERCENTAGE = 0.10f;
 
     private final int TP_CENTER_COLOR = getColor(R.color.lib_general_white_alpha_ff);
     private final int TP_RING_COLOR = getColor(R.color.lib_general_white_ff_55);
@@ -97,17 +102,19 @@ public class AWRecordButton extends View {
     private RectF rcRingRectF = new RectF();
     private ValueAnimator rcRingAnimation = null;
 
+    private float wholeBtnEffectiveRadius = 0.0f;
+
     private boolean isHandlingClickEvent = false;
-    private OnClickListener listener = null;
-    private @Mode int btnMode = Mode.MODE_SINGLE_CLICK;
-    private @Status int status = Status.STATUS_INIT;
+    private @Mode int curBtnMode = Mode.RECORD;
+    private @Status int curBtnStatus = Status.INIT;
+    private OnRecordListener onRecordListener;
+    private OnTakePictureListener onTakePictureListener;
 
 
     public AWRecordButton(Context context) {
         super(context);
         init();
     }
-
 
     public AWRecordButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -137,12 +144,12 @@ public class AWRecordButton extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        switch (btnMode) {
-            case Mode.MODE_SINGLE_CLICK:
-                drawRecordCenter(canvas);
-                drawRecordRing(canvas);
+        switch (curBtnMode) {
+            case Mode.RECORD:
+                drawRCCenter(canvas);
+                drawRCRing(canvas);
                 break;
-            case Mode.MODE_TAKE_PHOTO:
+            case Mode.TAKE_PHOTO:
                 drawTPCenter(canvas);
                 drawTPRing(canvas);
                 break;
@@ -165,7 +172,7 @@ public class AWRecordButton extends View {
      * @param canvas
      */
     private void drawTPRing(Canvas canvas) {
-        rcRingPaint.setStrokeWidth(tpRingRadiusWidth - 0.08f * getEffectiveRadius());
+        rcRingPaint.setStrokeWidth(TP_RING_THICKNESS_PERCENTAGE * getEffectiveRadius());
         rcRingPaint.setColor(TP_RING_COLOR);
         canvas.drawArc(tpRingRectF, -90f, 360f, false, rcRingPaint);
     }
@@ -174,7 +181,7 @@ public class AWRecordButton extends View {
      * 绘制录制模式下的中心区域
      * @param canvas
      */
-    private void drawRecordCenter(Canvas canvas) {
+    private void drawRCCenter(Canvas canvas) {
         rcCenterPaint.setColor(RC_CENTER_AREA_COLOR);
         canvas.drawRoundRect(rcCenterRectF, rcCenterAreaRadius, rcCenterAreaRadius, rcCenterPaint);
     }
@@ -183,15 +190,15 @@ public class AWRecordButton extends View {
      * 绘制录制模式下的环形
      * @param canvas
      */
-    private void drawRecordRing(Canvas canvas) {
+    private void drawRCRing(Canvas canvas) {
         rcRingPaint.setStrokeWidth(rcRingLineWidth);
-        if (status == Status.STATUS_READY) {
+        if (curBtnStatus == Status.IDLE) {
             if (rcRingLineWidth == RC_RING_MIN_THICKNESS_PERCENTAGE * getWidth()) {
                 rcRingPaint.setColor(RC_RING_STATIC_COLOR);
             } else {
                 rcRingPaint.setColor(RC_RING_BREATHE_COLOR);
             }
-        } else if (status == Status.STATUS_RECORDING) {
+        } else if (curBtnStatus == Status.RECORDING) {
             rcRingPaint.setColor(RC_RING_BREATHE_COLOR);
         }
         canvas.drawArc(rcRingRectF, -90f, 360f, false, rcRingPaint);
@@ -201,7 +208,7 @@ public class AWRecordButton extends View {
      * 获取有效的最大半径
      */
     private float getEffectiveRadius() {
-        return (getWidth() - getPaddingStart() - getPaddingEnd()) / 2.0f;
+        return wholeBtnEffectiveRadius;
     }
 
     @Override
@@ -225,11 +232,21 @@ public class AWRecordButton extends View {
     //当手指松开按钮时候处理的逻辑
     private void handlerEventActionUpByState() {
         if (!isHandlingClickEvent) {
-            if (listener != null) {
-                listener.onClick();
+            if (curBtnMode == Mode.RECORD && onRecordListener != null) {
+                if (curBtnStatus == Status.IDLE) {
+                    onRecordListener.onRecordStart();
+                    setRecordStatus(Status.RECORDING);
+                } else if (curBtnStatus == Status.RECORDING) {
+                    onRecordListener.onRecordStop();
+                    setRecordStatus(Status.IDLE);
+                }
+            } else if (curBtnMode == Mode.TAKE_PHOTO && onTakePictureListener != null) {
+                onTakePictureListener.onTakePicture();
+                setRecordStatus(Status.RECORDING);
             }
+
             isHandlingClickEvent = true;
-            postDelayed(enableSingleClickRunnable, 500L);
+            postDelayed(resetHandlingEventStatusRunnable, 500L);
         }
     }
 
@@ -237,18 +254,22 @@ public class AWRecordButton extends View {
      * 设置当前模式
      */
     public void setMode(@Mode int mode) {
-        if (this.btnMode == mode) {
+        if (this.curBtnMode == mode) {
             return;
         }
-        this.btnMode = mode;
-        setRecordStatus(Status.STATUS_READY, true);
+        this.curBtnMode = mode;
+        setRecordStatus(Status.IDLE, true);
     }
 
-    public void setListener(OnClickListener listener) {
-        this.listener = listener;
+    public void setRecordListener(OnRecordListener onRecordListener) {
+        this.onRecordListener = onRecordListener;
     }
 
-    public void setRecordStatus(@Status int status) {
+    public void setTakePictureListener(OnTakePictureListener onTakePictureListener) {
+        this.onTakePictureListener = onTakePictureListener;
+    }
+
+    private void setRecordStatus(@Status int status) {
         setRecordStatus(status, false);
     }
 
@@ -256,15 +277,15 @@ public class AWRecordButton extends View {
      * 设置当前状态
      */
     private void setRecordStatus(@Status int status, boolean isForce) {
-        if (this.status == status && !isForce) {
+        if (this.curBtnStatus == status && !isForce) {
             return;
         }
-        if (btnMode == Mode.MODE_SINGLE_CLICK) {
+        if (curBtnMode == Mode.RECORD) {
             initRecordModeParams(status);
-        } else if (btnMode == Mode.MODE_TAKE_PHOTO) {
+        } else if (curBtnMode == Mode.TAKE_PHOTO) {
             initTPParams(status);
         }
-        this.status = status;
+        this.curBtnStatus = status;
     }
 
     /**
@@ -290,14 +311,14 @@ public class AWRecordButton extends View {
         float nowRingLineWidth = rcRingLineWidth;
         float minRingLineWidth = 0f;
         switch (status) {
-            case Status.STATUS_READY: {
+            case Status.IDLE: {
                 targetButtonWidth = RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE * getEffectiveRadius() * 2.0f;
                 targetButtonRadius = targetButtonWidth / 2.0f;
                 targetRingWidthRadius = RC_RING_MIN_BREATHE_DIAMETER_PERCENTAGE * getEffectiveRadius() - targetButtonWidth / 2.0f;
                 minRingWidthRadius = targetRingWidthRadius;
                 targetRingLineWidth = RC_RING_MIN_THICKNESS_PERCENTAGE * getEffectiveRadius() * 2.0f;
                 minRingLineWidth = targetRingLineWidth;
-                if (this.status == Status.STATUS_INIT) {
+                if (this.curBtnStatus == Status.INIT) {
                     rcCenterAreaWidth = targetButtonWidth;
                     rcCenterAreaRadius = targetButtonRadius;
                     rcRingRadiusWidth = targetRingWidthRadius;
@@ -309,7 +330,7 @@ public class AWRecordButton extends View {
                 }
             }
             break;
-            case Status.STATUS_RECORDING : {
+            case Status.RECORDING: {
                 targetButtonWidth = RC_CENTER_AREA_MIN_WIDTH_PERCENTAGE * getEffectiveRadius() * 2.0f;
                 targetButtonRadius = RC_CENTER_AREA_MIN_CORNER_RADIUS_PERCENTAGE * getEffectiveRadius() * 2.0f;
                 targetRingWidthRadius = RC_RING_MAX_BREATHE_DIAMETER_PERCENTAGE * getEffectiveRadius() - RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE * getEffectiveRadius();
@@ -353,7 +374,7 @@ public class AWRecordButton extends View {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (status == Status.STATUS_RECORDING) {
+                if (status == Status.RECORDING) {
                     //如果是录制状态，需要在变换动画结束后开始呼吸动画
                     PropertyValuesHolder repeatRingWidthRadiusValuesHolder = PropertyValuesHolder.ofFloat("repeatRingWidthRadius", tempMinRingWidthRadius, tempTargetRingWidthRadius);
                     PropertyValuesHolder repeatRingLineWidthValuesHolder = PropertyValuesHolder.ofFloat("repeatRingLineWidth", tempMinRingLineWidth, tempTargetRingLineWidth);
@@ -408,7 +429,7 @@ public class AWRecordButton extends View {
      * 初始化 TakePhoto 模式下的参数
      */
     private void initTPParams(@Status int status) {
-        if (status == Status.STATUS_RECORDING) {
+        if (status == Status.RECORDING) {
             //拍照状态下的recording其实就是闪一下然后就需要把状态变为ready
             if (tpRecordAnimation != null) {
                 tpRecordAnimation.cancel();
@@ -418,8 +439,8 @@ public class AWRecordButton extends View {
             float maxButtonRadius = TP_BTN_MAX_SIZE_PERCENTAGE * getEffectiveRadius();
             float minButtonRadius = TP_BTN_MIN_SIZE_PERCENTAGE * getEffectiveRadius();
 
-            float maxRingRadiusWidth = (TP_BTN_MAX_SIZE_PERCENTAGE + 0.22f) * getEffectiveRadius() - maxButtonRadius;
-            float minRingRadiusWidth = (TP_BTN_MIN_SIZE_PERCENTAGE + 0.22f) * getEffectiveRadius() - minButtonRadius;
+            float maxRingRadiusWidth = (TP_CENTER_AND_RING_MAGIN_PERCENTAGE + TP_RING_THICKNESS_PERCENTAGE) * getEffectiveRadius();
+            float minRingRadiusWidth = maxRingRadiusWidth;
             PropertyValuesHolder btnRadiusValuesHolder = PropertyValuesHolder.ofFloat("buttonRadius", minButtonRadius, maxButtonRadius, minButtonRadius);
             PropertyValuesHolder ringRadiusWidthValuesHolder = PropertyValuesHolder.ofFloat("ringRadiusWidth", minRingRadiusWidth, maxRingRadiusWidth, minRingRadiusWidth);
             tpRecordAnimation = ValueAnimator.ofPropertyValuesHolder(btnRadiusValuesHolder, ringRadiusWidthValuesHolder)
@@ -441,12 +462,12 @@ public class AWRecordButton extends View {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    setRecordStatus(Status.STATUS_READY);
+                    setRecordStatus(Status.IDLE);
                 }
 
                 @Override
                 public void onAnimationCancel(Animator animation) {
-                    setRecordStatus(Status.STATUS_READY);
+                    setRecordStatus(Status.IDLE);
                 }
 
                 @Override
@@ -459,7 +480,7 @@ public class AWRecordButton extends View {
         } else {
             //除了recording状态，其它状态对于photo都是一样的
             tpCenterCircleRadius = TP_BTN_MIN_SIZE_PERCENTAGE * getEffectiveRadius();
-            tpRingRadiusWidth = (TP_BTN_MIN_SIZE_PERCENTAGE + 0.22f) * getEffectiveRadius() - tpCenterCircleRadius;
+            tpRingRadiusWidth = (TP_CENTER_AND_RING_MAGIN_PERCENTAGE + TP_RING_THICKNESS_PERCENTAGE) * getEffectiveRadius();
             resetTPRingRect();
             invalidate();
         }
@@ -475,7 +496,8 @@ public class AWRecordButton extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        setRecordStatus(Status.STATUS_READY);
+        wholeBtnEffectiveRadius = (getWidth() - getPaddingStart() - getPaddingEnd()) / 2.0f;
+        setRecordStatus(Status.IDLE, true);
     }
 
     @Override
@@ -493,7 +515,7 @@ public class AWRecordButton extends View {
             rcRingAnimation.cancel();
             rcRingAnimation = null;
         }
-        removeCallbacks(enableSingleClickRunnable);
+        removeCallbacks(resetHandlingEventStatusRunnable);
         isHandlingClickEvent = false;
     }
 
@@ -501,7 +523,7 @@ public class AWRecordButton extends View {
         return this.getContext().getResources().getColor(resId);
     }
 
-    private Runnable enableSingleClickRunnable = new Runnable() {
+    private Runnable resetHandlingEventStatusRunnable = new Runnable() {
         @Override
         public void run() {
             isHandlingClickEvent = false;
