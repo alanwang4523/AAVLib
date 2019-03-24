@@ -34,23 +34,14 @@ public class AWRecordButton extends View {
         void onTakePicture();
     }
 
-    @IntDef({
-            Mode.RECORD,
-            Mode.TAKE_PHOTO
-    })
-
+    @IntDef({Mode.RECORD, Mode.TAKE_PHOTO})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Mode {
         int RECORD = 0;
         int TAKE_PHOTO = 1;
     }
 
-    @IntDef({
-            Status.INIT,
-            Status.IDLE,
-            Status.RECORDING
-    })
-
+    @IntDef({Status.INIT, Status.IDLE, Status.RECORDING})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Status {
         int INIT = 0;
@@ -63,7 +54,7 @@ public class AWRecordButton extends View {
     private final static float TP_BTN_MIN_SIZE_PERCENTAGE = 0.56f;
     private final static float TP_BTN_MAX_SIZE_PERCENTAGE = 0.78f;
     private final static float TP_RING_THICKNESS_PERCENTAGE = 0.12f;
-    private final static float TP_CENTER_AND_RING_MAGIN_PERCENTAGE = 0.10f;
+    private final static float TP_CENTER_AND_RING_MARGIN_PERCENTAGE = 0.10f;
 
     private final int TP_CENTER_COLOR = getColor(R.color.lib_general_white_alpha_ff);
     private final int TP_RING_COLOR = getColor(R.color.lib_general_white_ff_55);
@@ -72,14 +63,14 @@ public class AWRecordButton extends View {
     private final static long RC_CENTER_AREA_ANIMATION_DURATION = 500L;// 中间方形的动画时长
     private final static long RC_RING_REPEAT_ANIMATION_DURATION = 1000L;// 环形呼吸动画时长
     // 中间方形参数
-    private final static float RC_CENTER_AREA_MIN_CORNER_RADIUS_PERCENTAGE = 0.04f;// 中间方形圆角的最小百分比
+    private final static float RC_CENTER_AREA_MIN_CORNER_RADIUS_PERCENTAGE = 0.08f;// 中间方形圆角的最小百分比
     private final static float RC_CENTER_AREA_MIN_WIDTH_PERCENTAGE = 0.28f;// 中间矩形的最小宽度百分比
     private final static float RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE = 0.56f;// 中间矩形的最大宽度百分比
     // 外围环形参数
-    private final static float RC_RING_MIN_BREATHE_DIAMETER_PERCENTAGE = 0.7f;// 环形最小呼吸闪动直径百分比
-    private final static float RC_RING_MAX_BREATHE_DIAMETER_PERCENTAGE = 0.9f;// 环形最大呼吸闪动直径百分比
-    private final static float RC_RING_MIN_THICKNESS_PERCENTAGE = 0.03f;// 环形最小厚度百分比
-    private final static float RC_RING_MAX_THICKNESS_PERCENTAGE = 0.068f;// 环形最大厚度百分比（即内外半径差）
+    private final static float RC_RING_MIN_BREATHE_RADIUS_PERCENTAGE = 0.7f;// 环形最小呼吸闪动直径百分比
+    private final static float RC_RING_MAX_BREATHE_RADIUS_PERCENTAGE = 0.9f;// 环形最大呼吸闪动直径百分比
+    private final static float RC_RING_MIN_THICKNESS_PERCENTAGE = 0.06f;// 环形最小厚度百分比
+    private final static float RC_RING_MAX_THICKNESS_PERCENTAGE = 0.136f;// 环形最大厚度百分比（即内外半径差）
 
     private final int RC_CENTER_AREA_COLOR = getColor(R.color.lib_general_white_alpha_ff);// 中间方形按钮颜色
     private final int RC_RING_STATIC_COLOR = getColor(R.color.lib_general_white_alpha_ff);// 环形静止时的颜色
@@ -90,14 +81,15 @@ public class AWRecordButton extends View {
     private ValueAnimator tpRecordAnimation = null;
     private RectF tpRingRectF = new RectF();
 
-    private float rcCenterAreaWidth = 0f;
     private float rcCenterAreaRadius = 0f;
+    private float rcCenterAreaCornerRadius = 0f;
     private Paint rcCenterPaint = new Paint();
     private RectF rcCenterRectF = new RectF();
     private ValueAnimator rcCenterAnimation = null;
 
-    private float rcRingRadiusWidth = 0f;
-    private float rcRingLineWidth = 0f;
+    // 环的包含中间空隙的宽度（即环宽度 + 空隙宽度，也即环最外圆半径 - 中心圆半径）
+    private float rcRingThicknessWithMarginToCenter = 0f;
+    private float rcRingThickness = 0f;// 环的厚度，不包括空隙
     private Paint rcRingPaint = new Paint();
     private RectF rcRingRectF = new RectF();
     private ValueAnimator rcRingAnimation = null;
@@ -183,7 +175,7 @@ public class AWRecordButton extends View {
      */
     private void drawRCCenter(Canvas canvas) {
         rcCenterPaint.setColor(RC_CENTER_AREA_COLOR);
-        canvas.drawRoundRect(rcCenterRectF, rcCenterAreaRadius, rcCenterAreaRadius, rcCenterPaint);
+        canvas.drawRoundRect(rcCenterRectF, rcCenterAreaCornerRadius, rcCenterAreaCornerRadius, rcCenterPaint);
     }
 
     /**
@@ -191,9 +183,9 @@ public class AWRecordButton extends View {
      * @param canvas
      */
     private void drawRCRing(Canvas canvas) {
-        rcRingPaint.setStrokeWidth(rcRingLineWidth);
+        rcRingPaint.setStrokeWidth(rcRingThickness);
         if (curBtnStatus == Status.IDLE) {
-            if (rcRingLineWidth == RC_RING_MIN_THICKNESS_PERCENTAGE * getWidth()) {
+            if (rcRingThickness == RC_RING_MIN_THICKNESS_PERCENTAGE * getWidth() / 2.0f) {
                 rcRingPaint.setColor(RC_RING_STATIC_COLOR);
             } else {
                 rcRingPaint.setColor(RC_RING_BREATHE_COLOR);
@@ -213,18 +205,8 @@ public class AWRecordButton extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                //do nothing
-                break;
-            case MotionEvent.ACTION_MOVE:
-                //do nothing
-                break;
-            case MotionEvent.ACTION_UP:
-                handlerEventActionUpByState();
-                break;
-            default:
-                break;
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            handlerEventActionUpByState();
         }
         return true;
     }
@@ -281,90 +263,62 @@ public class AWRecordButton extends View {
             return;
         }
         if (curBtnMode == Mode.RECORD) {
-            initRecordModeParams(status);
+            resetRecordModeParams(status);
         } else if (curBtnMode == Mode.TAKE_PHOTO) {
-            initTPParams(status);
+            resetTPParams(status);
         }
         this.curBtnStatus = status;
     }
 
-    /**
-     * 初始化录制模式参数
-     */
-    private void initRecordModeParams(@Status final int status) {
-        if (rcCenterAnimation != null) {
-            rcCenterAnimation.cancel();
-            rcCenterAnimation = null;
-        }
-        if (rcRingAnimation != null) {
-            rcRingAnimation.cancel();
-            rcRingAnimation = null;
-        }
-        float targetButtonWidth = 0f;
-        float nowButtonWidth = rcCenterAreaWidth;
-        float targetButtonRadius = 0f;
-        float nowButtonRadius = rcCenterAreaRadius;
-        float targetRingWidthRadius = 0f;
-        float nowRingWidthRadius = rcRingRadiusWidth;
-        float minRingWidthRadius = 0f;
-        float targetRingLineWidth = 0f;
-        float nowRingLineWidth = rcRingLineWidth;
-        float minRingLineWidth = 0f;
-        switch (status) {
-            case Status.IDLE: {
-                targetButtonWidth = RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE * getEffectiveRadius() * 2.0f;
-                targetButtonRadius = targetButtonWidth / 2.0f;
-                targetRingWidthRadius = RC_RING_MIN_BREATHE_DIAMETER_PERCENTAGE * getEffectiveRadius() - targetButtonWidth / 2.0f;
-                minRingWidthRadius = targetRingWidthRadius;
-                targetRingLineWidth = RC_RING_MIN_THICKNESS_PERCENTAGE * getEffectiveRadius() * 2.0f;
-                minRingLineWidth = targetRingLineWidth;
-                if (this.curBtnStatus == Status.INIT) {
-                    rcCenterAreaWidth = targetButtonWidth;
-                    rcCenterAreaRadius = targetButtonRadius;
-                    rcRingRadiusWidth = targetRingWidthRadius;
-                    rcRingLineWidth = targetRingLineWidth;
-                    resetRCRingRect();
-                    resetRCCenterRect();
-                    invalidate();
-                    return;
-                }
-            }
-            break;
-            case Status.RECORDING: {
-                targetButtonWidth = RC_CENTER_AREA_MIN_WIDTH_PERCENTAGE * getEffectiveRadius() * 2.0f;
-                targetButtonRadius = RC_CENTER_AREA_MIN_CORNER_RADIUS_PERCENTAGE * getEffectiveRadius() * 2.0f;
-                targetRingWidthRadius = RC_RING_MAX_BREATHE_DIAMETER_PERCENTAGE * getEffectiveRadius() - RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE * getEffectiveRadius();
-                minRingWidthRadius = RC_RING_MIN_BREATHE_DIAMETER_PERCENTAGE * getEffectiveRadius() - RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE * getEffectiveRadius();
-                targetRingLineWidth = RC_RING_MAX_THICKNESS_PERCENTAGE * getEffectiveRadius() * 2.0f;
-                minRingLineWidth = RC_RING_MIN_THICKNESS_PERCENTAGE * getEffectiveRadius() * 2.0f;
-            }
-            break;
-        }
-        PropertyValuesHolder btnWidthValuesHolder = PropertyValuesHolder.ofFloat("buttonWidth", nowButtonWidth, targetButtonWidth);
-        PropertyValuesHolder btnRadiusValuesHolder = PropertyValuesHolder.ofFloat("buttonRadius", nowButtonRadius, targetButtonRadius);
-        PropertyValuesHolder ringWidthRadiusValuesHolder = PropertyValuesHolder.ofFloat("ringWidthRadius", nowRingWidthRadius, minRingWidthRadius);
-        PropertyValuesHolder ringLineWidthValuesHolder = PropertyValuesHolder.ofFloat("ringLineWidth", nowRingLineWidth, minRingLineWidth);
+    private void resetRecordModeParamsWhenStatusIdle() {
+        cancelAllAnimations();
+        rcCenterAreaRadius = RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE * getEffectiveRadius();
+        rcCenterAreaCornerRadius = rcCenterAreaRadius;
+        rcRingThicknessWithMarginToCenter = RC_RING_MIN_BREATHE_RADIUS_PERCENTAGE * getEffectiveRadius() - rcCenterAreaRadius;
+        rcRingThickness = RC_RING_MIN_THICKNESS_PERCENTAGE * getEffectiveRadius();
+        resetRCRingRect();
+        resetRCCenterRect();
+        invalidate();
+    }
+
+    private void resetRecordModeParamsWhenStatusRecording() {
+        cancelAllAnimations();
+        float targetCenterAreaRadius = RC_CENTER_AREA_MIN_WIDTH_PERCENTAGE * getEffectiveRadius();
+        float curCenterAreaRadius = rcCenterAreaRadius;
+        float targetCenterAreaCornerRadius = RC_CENTER_AREA_MIN_CORNER_RADIUS_PERCENTAGE * getEffectiveRadius();
+        float curCenterAreaCornerRadius = rcCenterAreaCornerRadius;
+
+        float curRingThicknessWithMarginToCenter = rcRingThicknessWithMarginToCenter;
+        float minRingThicknessWithMarginToCenter = (RC_RING_MIN_BREATHE_RADIUS_PERCENTAGE - RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE) * getEffectiveRadius();
+
+        float curRingThickness = rcRingThickness;
+        float minRingThickness = RC_RING_MIN_THICKNESS_PERCENTAGE * getEffectiveRadius();
+
+        PropertyValuesHolder centerAreaRadiusValuesHolder = PropertyValuesHolder.ofFloat("centerAreaRadius", curCenterAreaRadius, targetCenterAreaRadius);
+        PropertyValuesHolder centerAreaCornerRadiusValuesHolder = PropertyValuesHolder.ofFloat("centerAreaCornerRadius", curCenterAreaCornerRadius, targetCenterAreaCornerRadius);
+        PropertyValuesHolder ringThicknessWithMarginToCenterValuesHolder = PropertyValuesHolder.ofFloat("ringThicknessWithMarginToCenter", curRingThicknessWithMarginToCenter, minRingThicknessWithMarginToCenter);
+        PropertyValuesHolder ringThicknessValuesHolder = PropertyValuesHolder.ofFloat("ringThickness", curRingThickness, minRingThickness);
         rcCenterAnimation = ValueAnimator.ofPropertyValuesHolder(
-                btnWidthValuesHolder, btnRadiusValuesHolder,
-                ringWidthRadiusValuesHolder, ringLineWidthValuesHolder)
+                centerAreaRadiusValuesHolder, centerAreaCornerRadiusValuesHolder,
+                ringThicknessWithMarginToCenterValuesHolder, ringThicknessValuesHolder)
                 .setDuration(RC_CENTER_AREA_ANIMATION_DURATION);
         rcCenterAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                rcCenterAreaWidth = (Float) animation.getAnimatedValue("buttonWidth");
-                rcCenterAreaRadius = (Float) animation.getAnimatedValue("buttonRadius");
-                rcRingRadiusWidth = (Float) animation.getAnimatedValue("ringWidthRadius");
-                rcRingLineWidth = (Float) animation.getAnimatedValue("ringLineWidth");
+                rcCenterAreaRadius = (Float) animation.getAnimatedValue("centerAreaRadius");
+                rcCenterAreaCornerRadius = (Float) animation.getAnimatedValue("centerAreaCornerRadius");
+                rcRingThicknessWithMarginToCenter = (Float) animation.getAnimatedValue("ringThicknessWithMarginToCenter");
+                rcRingThickness = (Float) animation.getAnimatedValue("ringThickness");
                 resetRCRingRect();
                 resetRCCenterRect();
                 invalidate();
             }
         });
 
-        final float tempMinRingWidthRadius = minRingWidthRadius;
-        final float tempTargetRingWidthRadius = targetRingWidthRadius;
-        final float tempMinRingLineWidth = minRingLineWidth;
-        final float tempTargetRingLineWidth = targetRingLineWidth;
+        final float tempMinRingThicknessWithMarginToCenter = minRingThicknessWithMarginToCenter;
+        final float tempTargetRingThicknessWithMarginToCenter = (RC_RING_MAX_BREATHE_RADIUS_PERCENTAGE - RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE) * getEffectiveRadius();
+        final float tempMinRingThickness = minRingThickness;
+        final float tempTargetRingThickness = RC_RING_MAX_THICKNESS_PERCENTAGE * getEffectiveRadius();
 
         rcCenterAnimation.addListener(new Animator.AnimatorListener() {
             @Override
@@ -374,25 +328,23 @@ public class AWRecordButton extends View {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (status == Status.RECORDING) {
-                    //如果是录制状态，需要在变换动画结束后开始呼吸动画
-                    PropertyValuesHolder repeatRingWidthRadiusValuesHolder = PropertyValuesHolder.ofFloat("repeatRingWidthRadius", tempMinRingWidthRadius, tempTargetRingWidthRadius);
-                    PropertyValuesHolder repeatRingLineWidthValuesHolder = PropertyValuesHolder.ofFloat("repeatRingLineWidth", tempMinRingLineWidth, tempTargetRingLineWidth);
-                    rcRingAnimation = ValueAnimator.ofPropertyValuesHolder(repeatRingWidthRadiusValuesHolder, repeatRingLineWidthValuesHolder)
-                            .setDuration(RC_RING_REPEAT_ANIMATION_DURATION);
-                    rcRingAnimation.setRepeatCount(ValueAnimator.INFINITE);
-                    rcRingAnimation.setRepeatMode(ValueAnimator.REVERSE);
-                    rcRingAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            rcRingRadiusWidth = (Float) animation.getAnimatedValue("repeatRingWidthRadius");
-                            rcRingLineWidth = (Float) animation.getAnimatedValue("repeatRingLineWidth");
-                            resetRCRingRect();
-                            invalidate();
-                        }
-                    });
-                    rcRingAnimation.start();
-                }
+                //如果是录制状态，需要在变换动画结束后开始呼吸动画
+                PropertyValuesHolder repeatRingThicknessWithMarginToCenterValuesHolder = PropertyValuesHolder.ofFloat("repeatRingThicknessWithMarginToCenter", tempMinRingThicknessWithMarginToCenter, tempTargetRingThicknessWithMarginToCenter);
+                PropertyValuesHolder repeatRingThicknessValuesHolder = PropertyValuesHolder.ofFloat("repeatRingThickness", tempMinRingThickness, tempTargetRingThickness);
+                rcRingAnimation = ValueAnimator.ofPropertyValuesHolder(repeatRingThicknessWithMarginToCenterValuesHolder, repeatRingThicknessValuesHolder)
+                        .setDuration(RC_RING_REPEAT_ANIMATION_DURATION);
+                rcRingAnimation.setRepeatCount(ValueAnimator.INFINITE);
+                rcRingAnimation.setRepeatMode(ValueAnimator.REVERSE);
+                rcRingAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        rcRingThicknessWithMarginToCenter = (Float) animation.getAnimatedValue("repeatRingThicknessWithMarginToCenter");
+                        rcRingThickness = (Float) animation.getAnimatedValue("repeatRingThickness");
+                        resetRCRingRect();
+                        invalidate();
+                    }
+                });
+                rcRingAnimation.start();
             }
 
             @Override
@@ -409,26 +361,37 @@ public class AWRecordButton extends View {
         rcCenterAnimation.start();
     }
 
+    /**
+     * 初始化录制模式参数
+     */
+    private void resetRecordModeParams(@Status final int status) {
+        if (status == Status.IDLE) {
+            resetRecordModeParamsWhenStatusIdle();
+        } else if (status == Status.RECORDING) {
+            resetRecordModeParamsWhenStatusRecording();
+        }
+    }
+
     private void resetRCRingRect() {
         rcRingRectF.set(getPaddingStart() + getWidth() / 2 - getEffectiveRadius() * RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE
-                - rcRingRadiusWidth + rcRingLineWidth / 2, getPaddingTop() + getHeight() / 2
-                - getEffectiveRadius() * RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE - rcRingRadiusWidth + rcRingLineWidth / 2,
-                getWidth() / 2 - getPaddingEnd() + getEffectiveRadius() * RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE + rcRingRadiusWidth - rcRingLineWidth / 2,
-                getHeight() / 2 - getPaddingBottom() + getEffectiveRadius() * RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE + rcRingRadiusWidth - rcRingLineWidth / 2);
+                - rcRingThicknessWithMarginToCenter + rcRingThickness, getPaddingTop() + getHeight() / 2
+                - getEffectiveRadius() * RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE - rcRingThicknessWithMarginToCenter + rcRingThickness,
+                getWidth() / 2 - getPaddingEnd() + getEffectiveRadius() * RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE + rcRingThicknessWithMarginToCenter - rcRingThickness,
+                getHeight() / 2 - getPaddingBottom() + getEffectiveRadius() * RC_CENTER_AREA_MAX_WIDTH_PERCENTAGE + rcRingThicknessWithMarginToCenter - rcRingThickness);
     }
 
     private void resetRCCenterRect() {
-        rcCenterRectF.set(getPaddingStart() + getWidth() / 2 - rcCenterAreaWidth / 2,
-                getPaddingTop() + getHeight() / 2 - rcCenterAreaWidth / 2,
-                getWidth() / 2 - getPaddingEnd() + rcCenterAreaWidth / 2,
-                getHeight() / 2 - getPaddingBottom() + rcCenterAreaWidth / 2);
+        rcCenterRectF.set(getPaddingStart() + getWidth() / 2 - rcCenterAreaRadius,
+                getPaddingTop() + getHeight() / 2 - rcCenterAreaRadius,
+                getWidth() / 2 - getPaddingEnd() + rcCenterAreaRadius,
+                getHeight() / 2 - getPaddingBottom() + rcCenterAreaRadius);
     }
 
 
     /**
      * 初始化 TakePhoto 模式下的参数
      */
-    private void initTPParams(@Status int status) {
+    private void resetTPParams(@Status int status) {
         if (status == Status.RECORDING) {
             //拍照状态下的recording其实就是闪一下然后就需要把状态变为ready
             if (tpRecordAnimation != null) {
@@ -439,7 +402,7 @@ public class AWRecordButton extends View {
             float maxButtonRadius = TP_BTN_MAX_SIZE_PERCENTAGE * getEffectiveRadius();
             float minButtonRadius = TP_BTN_MIN_SIZE_PERCENTAGE * getEffectiveRadius();
 
-            float maxRingRadiusWidth = (TP_CENTER_AND_RING_MAGIN_PERCENTAGE + TP_RING_THICKNESS_PERCENTAGE) * getEffectiveRadius();
+            float maxRingRadiusWidth = (TP_CENTER_AND_RING_MARGIN_PERCENTAGE + TP_RING_THICKNESS_PERCENTAGE) * getEffectiveRadius();
             float minRingRadiusWidth = maxRingRadiusWidth;
             PropertyValuesHolder btnRadiusValuesHolder = PropertyValuesHolder.ofFloat("buttonRadius", minButtonRadius, maxButtonRadius, minButtonRadius);
             PropertyValuesHolder ringRadiusWidthValuesHolder = PropertyValuesHolder.ofFloat("ringRadiusWidth", minRingRadiusWidth, maxRingRadiusWidth, minRingRadiusWidth);
@@ -480,7 +443,7 @@ public class AWRecordButton extends View {
         } else {
             //除了recording状态，其它状态对于photo都是一样的
             tpCenterCircleRadius = TP_BTN_MIN_SIZE_PERCENTAGE * getEffectiveRadius();
-            tpRingRadiusWidth = (TP_CENTER_AND_RING_MAGIN_PERCENTAGE + TP_RING_THICKNESS_PERCENTAGE) * getEffectiveRadius();
+            tpRingRadiusWidth = (TP_CENTER_AND_RING_MARGIN_PERCENTAGE + TP_RING_THICKNESS_PERCENTAGE) * getEffectiveRadius();
             resetTPRingRect();
             invalidate();
         }
@@ -503,6 +466,15 @@ public class AWRecordButton extends View {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        cancelAllAnimations();
+        removeCallbacks(resetHandlingEventStatusRunnable);
+        isHandlingClickEvent = false;
+    }
+
+    /**
+     * 取消所有动画
+     */
+    private void cancelAllAnimations() {
         if (tpRecordAnimation != null) {
             tpRecordAnimation.cancel();
             tpRecordAnimation = null;
@@ -515,8 +487,6 @@ public class AWRecordButton extends View {
             rcRingAnimation.cancel();
             rcRingAnimation = null;
         }
-        removeCallbacks(resetHandlingEventStatusRunnable);
-        isHandlingClickEvent = false;
     }
 
     private int getColor(@ColorRes int resId) {

@@ -24,6 +24,7 @@ public class TestAudioRecordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test_audio_record);
 
         btnRecord = findViewById(R.id.btn_audio_record_to_wav);
+
         btnRecord.setMode(AWRecordButton.Mode.RECORD);
         btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
             @Override
@@ -56,16 +57,14 @@ public class TestAudioRecordActivity extends AppCompatActivity {
 //        });
 
 //        btnRecord.setMode(AWRecordButton.Mode.RECORD);
-//        btnRecord.setOnRecordListener(new AWRecordButton.OnRecordListener() {
+//        btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
 //            @Override
 //            public void onRecordStart() {
-//                mIsRecording = true;
 //                Toast.makeText(TestAudioRecordActivity.this, "start record!", Toast.LENGTH_SHORT).show();
 //            }
 //
 //            @Override
 //            public void onRecordStop() {
-//                mIsRecording = false;
 //                Toast.makeText(TestAudioRecordActivity.this, "stop record!", Toast.LENGTH_SHORT).show();
 //            }
 //        });
