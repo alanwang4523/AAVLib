@@ -22,6 +22,11 @@ import java.util.List;
  */
 public class AWAudioWaveRender {
 
+    private static final int MAX_VOLUME = 100;
+    private static final int MIN_VOLUME = 0;
+    private static final int MAX_SENSITIVITY = 20;
+    private static final int MIN_SENSITIVITY = 1;
+
     private static final int DEFAULT_SAMPLING_SIZE = 48;
     private static final float DEFAULT_OFFSET_SPEED =  180F;
     private static final int DEFAULT_SENSIBILITY =  15;
@@ -109,18 +114,7 @@ public class AWAudioWaveRender {
         }
         t.recycle();
         checkVolumeValue();
-        checkSensibilityValue();
-    }
-
-    //检查音量是否合法
-    private void checkVolumeValue(){
-        if (targetVolume > 100) targetVolume = 100;
-    }
-
-    //检查灵敏度值是否合法
-    private void checkSensibilityValue(){
-        if (sensitivity > 20) sensitivity = 20;
-        if (sensitivity < 1) sensitivity = 1;
+        checkSensitivityValue();
     }
 
     public void doDrawBackground(Canvas canvas, boolean needClear) {
@@ -356,6 +350,18 @@ public class AWAudioWaveRender {
             this.targetVolume = volume;
             checkVolumeValue();
         }
+    }
+
+    //检查音量是否合法
+    private void checkVolumeValue(){
+        if (targetVolume > MAX_VOLUME) targetVolume = MAX_VOLUME;
+        if (targetVolume < MIN_VOLUME) targetVolume = MIN_VOLUME;
+    }
+
+    //检查灵敏度值是否合法
+    private void checkSensitivityValue(){
+        if (sensitivity > MAX_SENSITIVITY) sensitivity = MAX_SENSITIVITY;
+        if (sensitivity < MIN_SENSITIVITY) sensitivity = MIN_SENSITIVITY;
     }
 
     public void setLineColor(int lineColor) {

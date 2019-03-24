@@ -27,7 +27,7 @@ public class AWAudioWaveView extends AWBaseSurfaceView {
         int STOP = 3;
     }
 
-    private AWAudioWaveRender realRender;
+    private AWAudioWaveRender audioWaveRender;
     private long randomPassedTimeMs = 0L;
     private int randomVolume = 0;
     private long startTimeMs = 0;
@@ -54,7 +54,7 @@ public class AWAudioWaveView extends AWBaseSurfaceView {
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         super.surfaceChanged(surfaceHolder, i, i1, i2);
-        realRender.setLocation(Math.round(getX()), Math.round(getY()), i1, i2);
+        audioWaveRender.setLocation(Math.round(getX()), Math.round(getY()), i1, i2);
     }
 
     @Override
@@ -66,28 +66,26 @@ public class AWAudioWaveView extends AWBaseSurfaceView {
         //使窗口支持透明度
         surfaceHolder.setFormat(PixelFormat.TRANSLUCENT);
 
-        realRender = new AWAudioWaveRender();
-        realRender.initAttr(getContext(), attrs);
+        audioWaveRender = new AWAudioWaveRender();
+        audioWaveRender.initAttr(getContext(), attrs);
     }
 
     @Override
     protected void justToDraw(Canvas canvas) {
-        realRender.doDrawBackground(canvas, true);
+        audioWaveRender.doDrawBackground(canvas, true);
 
         if (curStatus == Status.INIT || curStatus == Status.RANDOM_STATIC) {
-            realRender.onRender(canvas, randomPassedTimeMs, randomVolume);
+            audioWaveRender.onRender(canvas, randomPassedTimeMs, randomVolume);
         } else if (curStatus == Status.STOP) {
-            realRender.onRender(canvas, 0, 0);
+            audioWaveRender.onRender(canvas, 0, 0);
         }
         else {
-            realRender.onRender(canvas, (System.currentTimeMillis() - startTimeMs));
+            audioWaveRender.onRender(canvas, (System.currentTimeMillis() - startTimeMs));
         }
     }
 
     @Override
-    protected void handleLogic() {
-
-    }
+    protected void handleLogic() {}
 
     /**
      * 显示静态的随机波形
@@ -122,6 +120,6 @@ public class AWAudioWaveView extends AWBaseSurfaceView {
     }
 
     public void setVolume(int volume) {
-        realRender.setVolume(volume);
+        audioWaveRender.setVolume(volume);
     }
 }
