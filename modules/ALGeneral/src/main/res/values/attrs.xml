@@ -15,4 +15,27 @@
         <attr name="layout_maxHeight" format="dimension" />
     </declare-styleable>
 
+
+    <declare-styleable name="AudioWaveView">
+        <attr name="awvBackgroundColor" format="color"/>
+        <attr name="awvLineColor" format="color"/>
+        <attr name="awvThickLineWidth" format="dimension"/>
+        <attr name="awvThinLineWidth" format="dimension"/>
+        <attr name="awvMoveSpeed" format="float"/>
+        <attr name="awvSampleCount" format="integer"/>
+        <attr name="awvSensitivity" format="integer"/>
+        <attr name="awvLineColorShader" format="reference" />
+    </declare-styleable>
+
+
+    <color name="audio_wave_line_color_begin">#6F47FB</color>
+    <color name="audio_wave_line_color_middle">#FB498C</color>
+    <color name="audio_wave_line_color_end">#FF8D4E</color>
+
+    <integer-array name="audio_wave_line_shader">
+        <item>@color/audio_wave_line_color_begin</item>
+        <item>@color/audio_wave_line_color_middle</item>
+        <item>@color/audio_wave_line_color_end</item>
+    </integer-array>
+
 </resources>
