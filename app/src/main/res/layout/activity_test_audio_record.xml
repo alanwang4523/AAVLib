@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,11 +22,24 @@
             android:orientation="vertical"
             >
 
+
+            <com.alanwang.aav.algeneral.ui.render.AWAudioWaveView
+                android:id="@+id/wave_volume"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/margin_normal_100"
+                app:awvBackgroundColor="@color/translate"
+                app:awvThickLineWidth="2dp"
+                app:awvThinLineWidth="1dp"
+                app:awvLineColorShader="@array/audio_wave_line_shader"
+                />
+
             <com.alanwang.aav.algeneral.ui.AWRecordButton
                 android:id="@+id/btn_audio_record_to_wav"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_centerInParent="true"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/wave_volume"
+                android:layout_marginTop="@dimen/margin_normal_120"
                 android:contentDescription="@null"
                 android:layout_marginBottom="50dp"/>
 

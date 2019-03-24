@@ -2,10 +2,12 @@ package com.alanwang.aavlib;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
-import com.alanwang.aavlib.libaudio.recorder.AWWavRecorder;
-import java.io.IOException;
+import com.alanwang.aav.algeneral.ui.render.AWAudioWaveView;
+import com.alanwang.aavlib.libaudio.recorder.AWAudioDefaultRecorder;
+import com.alanwang.aavlib.libmediacore.exception.AWException;
 
 /**
  * Author: AlanWang4523.
@@ -14,14 +16,18 @@ import java.io.IOException;
  */
 public class TestAudioRecordActivity extends AppCompatActivity {
 
+    private final static int MAX_SHOW_VOLUME = 50;
     private AWRecordButton btnRecord;
-    private AWWavRecorder audioRecorder;
+    private AWAudioWaveView waveVolume;
+    private AWAudioDefaultRecorder audioRecorder;
     private String wavFilePath = "/sdcard/Alan/video/audio_recorder.wav";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_audio_record);
+
+        waveVolume = findViewById(R.id.wave_volume);
 
         btnRecord = findViewById(R.id.btn_audio_record_to_wav);
 
@@ -31,8 +37,10 @@ public class TestAudioRecordActivity extends AppCompatActivity {
             public void onRecordStart() {
                 if (audioRecorder == null) {
                     audioRecorder = createARecorder();
+                    audioRecorder.setAudioListener(audioListener);
                 }
                 if (audioRecorder != null) {
+                    waveVolume.startWave();
                     audioRecorder.start();
                 }
             }
@@ -41,42 +49,61 @@ public class TestAudioRecordActivity extends AppCompatActivity {
             public void onRecordStop() {
                 if (audioRecorder != null) {
                     audioRecorder.stop();
+                    waveVolume.stopWave();
                     audioRecorder = null;
                 }
                 Toast.makeText(TestAudioRecordActivity.this, wavFilePath, Toast.LENGTH_LONG).show();
             }
         });
-
-
-//        btnRecord.setMode(AWRecordButton.Mode.TAKE_PHOTO);
-//        btnRecord.setTakePictureListener(new AWRecordButton.OnTakePictureListener() {
-//            @Override
-//            public void onTakePicture() {
-//                Toast.makeText(TestAudioRecordActivity.this, "Take a photo!", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
-//        btnRecord.setMode(AWRecordButton.Mode.RECORD);
-//        btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
-//            @Override
-//            public void onRecordStart() {
-//                Toast.makeText(TestAudioRecordActivity.this, "start record!", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onRecordStop() {
-//                Toast.makeText(TestAudioRecordActivity.this, "stop record!", Toast.LENGTH_SHORT).show();
-//            }
-//        });
     }
 
-    private AWWavRecorder createARecorder() {
-        AWWavRecorder audioRecorder = null;
-        try {
-            audioRecorder = new AWWavRecorder(wavFilePath, 44100, 1, 16);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//    private AWWavRecorder createARecorder() {
+//        AWWavRecorder audioRecorder = null;
+//        try {
+//            audioRecorder = new AWWavRecorder(wavFilePath, 44100, 1, 16);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return audioRecorder;
+//    }
+
+    private AWAudioDefaultRecorder createARecorder() {
+        AWAudioDefaultRecorder audioRecorder = new AWAudioDefaultRecorder(44100, 1);
         return audioRecorder;
+    }
+
+    @Override
+    protected void onDestroy() {
+        waveVolume.stopWave();
+        if (audioRecorder != null) {
+            audioRecorder.stop();
+        }
+        super.onDestroy();
+    }
+
+    private AWAudioDefaultRecorder.AudioListener audioListener = new AWAudioDefaultRecorder.AudioListener() {
+        @Override
+        public void onDataAvailable(byte[] data, int len) {
+            waveVolume.setVolume(calculateVolume(data, len));
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+
+        }
+
+        @Override
+        public void onError(AWException e) {
+            Log.e("onError", e.toString());
+        }
+    };
+
+    private int calculateVolume(byte[] data, int len) {
+        long sumOfSquare = 0;
+        for (int i = 0; i < len; i++) {
+            sumOfSquare += (data[i] * data[i]);
+        }
+        int showVolume = (int) Math.min(Math.sqrt(sumOfSquare / len), MAX_SHOW_VOLUME);
+        return (int) (100 * (showVolume * 1.0f / MAX_SHOW_VOLUME));
     }
 }
