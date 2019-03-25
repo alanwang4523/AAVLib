@@ -2,12 +2,11 @@ package com.alanwang.aavlib;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.render.AWAudioWaveView;
 import com.alanwang.aavlib.libaudio.recorder.AWAudioDefaultRecorder;
-import com.alanwang.aavlib.libmediacore.exception.AWException;
+import com.alanwang.aavlib.libmediacore.listener.AWDataAvailableListener;
 
 /**
  * Author: AlanWang4523.
@@ -37,7 +36,7 @@ public class TestAudioRecordActivity extends AppCompatActivity {
             public void onRecordStart() {
                 if (audioRecorder == null) {
                     audioRecorder = createARecorder();
-                    audioRecorder.setAudioListener(audioListener);
+                    audioRecorder.setDataAvailableListener(audioListener);
                 }
                 if (audioRecorder != null) {
                     waveVolume.startWave();
@@ -81,20 +80,10 @@ public class TestAudioRecordActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private AWAudioDefaultRecorder.AudioListener audioListener = new AWAudioDefaultRecorder.AudioListener() {
+    private AWDataAvailableListener audioListener = new AWDataAvailableListener() {
         @Override
         public void onDataAvailable(byte[] data, int len) {
             waveVolume.setVolume(calculateVolume(data, len));
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-
-        }
-
-        @Override
-        public void onError(AWException e) {
-            Log.e("onError", e.toString());
         }
     };
 

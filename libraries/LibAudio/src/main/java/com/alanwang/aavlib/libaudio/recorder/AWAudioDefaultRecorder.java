@@ -4,6 +4,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
+import com.alanwang.aavlib.libmediacore.listener.AWDataAvailableListener;
 import com.alanwang.aavlib.libmediacore.listener.AWResultListener;
 
 /**
@@ -14,17 +15,9 @@ import com.alanwang.aavlib.libmediacore.listener.AWResultListener;
 public class AWAudioDefaultRecorder {
     private final static String TAG = AWAudioDefaultRecorder.class.getSimpleName();
 
-    public interface AudioListener extends AWResultListener<Void> {
-        /**
-         * 有数据到来
-         * @param data
-         * @param len
-         */
-        void onDataAvailable(byte[] data, int len);
-    }
-
     private AudioRecord mAudioRecorder;
-    private AudioListener mAudioListener;
+    private AWResultListener<Void> mResultListener;
+    private AWDataAvailableListener mDataAvailableListener;
     private byte[] mDataBuffer;
     private volatile boolean mIsRecording = false;
     private int mBufferSize;
@@ -40,11 +33,19 @@ public class AWAudioDefaultRecorder {
     }
 
     /**
-     * 设置数据监听器
+     * 设置结果监听器
      * @param audioListener
      */
-    public void setAudioListener(AudioListener audioListener) {
-        this.mAudioListener = audioListener;
+    public void setResultListener(AWResultListener<Void> audioListener) {
+        this.mResultListener = audioListener;
+    }
+
+    /**
+     * 设置数据监听器
+     * @param dataAvailableListener
+     */
+    public void setDataAvailableListener(AWDataAvailableListener dataAvailableListener) {
+        this.mDataAvailableListener = dataAvailableListener;
     }
 
     /**
@@ -77,20 +78,20 @@ public class AWAudioDefaultRecorder {
                 length = mAudioRecorder.read(mDataBuffer, 0, mBufferSize);
 
                 if (length >= 0) {
-                    if (mAudioListener != null) {
-                        mAudioListener.onDataAvailable(mDataBuffer, length);
+                    if (mDataAvailableListener != null) {
+                        mDataAvailableListener.onDataAvailable(mDataBuffer, length);
                     }
                 } else {
-                    if (mAudioListener != null) {
-                        mAudioListener.onError(new AWAudioException("Record error : " + length));
+                    if (mResultListener != null) {
+                        mResultListener.onError(new AWAudioException("Record error : " + length));
                     }
                     break;
                 }
             }
             mAudioRecorder.stop();
             mAudioRecorder.release();
-            if (mAudioListener != null) {
-                mAudioListener.onSuccess(null);
+            if (mResultListener != null) {
+                mResultListener.onSuccess(null);
             }
         }
     };

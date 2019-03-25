@@ -1,6 +1,8 @@
 package com.alanwang.aavlib.libaudio.recorder;
 
 import com.alanwang.aavlib.libmediacore.exception.AWException;
+import com.alanwang.aavlib.libmediacore.listener.AWDataAvailableListener;
+import com.alanwang.aavlib.libmediacore.listener.AWResultListener;
 import com.alanwang.aavlib.libmediacore.utils.AWWavFile;
 import com.alanwang.aavlib.libutils.ALog;
 import java.io.IOException;
@@ -20,7 +22,8 @@ public class AWWavRecorder {
     public AWWavRecorder(String wavFilePath, int sampleRate, int channelCount, int bitsPerSample) throws IOException {
         wavFile = new AWWavFile(wavFilePath, sampleRate, channelCount, bitsPerSample);
         audioRecorder = new AWAudioDefaultRecorder(sampleRate, channelCount);
-        audioRecorder.setAudioListener(audioListener);
+        audioRecorder.setResultListener(audioListener);
+        audioRecorder.setDataAvailableListener(dataAvailableListener);
         isReady = true;
     }
 
@@ -42,7 +45,7 @@ public class AWWavRecorder {
         }
     }
 
-    private AWAudioDefaultRecorder.AudioListener audioListener = new AWAudioDefaultRecorder.AudioListener() {
+    private AWDataAvailableListener dataAvailableListener = new AWDataAvailableListener() {
         @Override
         public void onDataAvailable(byte[] data, int len) {
             try {
@@ -53,6 +56,9 @@ public class AWWavRecorder {
                 e.printStackTrace();
             }
         }
+    };
+
+    private AWResultListener<Void> audioListener = new AWResultListener<Void>() {
 
         @Override
         public void onSuccess(Void result) {
