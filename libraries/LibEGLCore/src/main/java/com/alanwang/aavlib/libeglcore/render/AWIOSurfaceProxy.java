@@ -2,10 +2,13 @@ package com.alanwang.aavlib.libeglcore.render;
 
 import android.opengl.GLES20;
 import android.view.Surface;
+
+import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
 import com.alanwang.aavlib.libeglcore.common.AWFrameAvailableListener;
 import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
 import com.alanwang.aavlib.libeglcore.common.AWMessage;
 import com.alanwang.aavlib.libeglcore.common.AWSurfaceTexture;
+import com.alanwang.aavlib.libeglcore.common.Type;
 import com.alanwang.aavlib.libeglcore.engine.AWMainGLEngine;
 import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
 
@@ -21,11 +24,22 @@ import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
  */
 public class AWIOSurfaceProxy {
 
-    private AWSurfaceTexture mAAVSurface;
+    public interface OnInputSurfaceReadyListener {
+        /**
+         * 输入的 surface ready，可以在此回调将 surface 绑定到播放器或解码器
+         * @param surface
+         */
+        void onInputSurfaceReady(Surface surface);
+    }
+
+    private AWSurfaceTexture mAAVSurfaceTexture;
     private AWFrameBufferObject mSrcFrameBuffer;
     private AWMainGLEngine mMainGLEngine;
     private AWSurfaceRender mSurfaceRender;
+    private OnInputSurfaceReadyListener mOnInputSurfaceReadyListener;
 
+    private @Type.ScaleType int scaleType = Type.ScaleType.FIT_XY;
+    private volatile boolean mIsNeedUpdateTextureCoordinates = false;
     private volatile boolean mIsSurfaceReady = false;
     private int mVideoWidth;
     private int mVideoHeight;
@@ -38,11 +52,37 @@ public class AWIOSurfaceProxy {
     }
 
     /**
+     * 设置回调
+     * @param onInputSurfaceReadyListener
+     */
+    public void setOnInputSurfaceReadyListener(OnInputSurfaceReadyListener onInputSurfaceReadyListener) {
+        // 避免在 setCallback 之前就已经 ready
+        if (onInputSurfaceReadyListener != null && mAAVSurfaceTexture != null) {
+            onInputSurfaceReadyListener.onInputSurfaceReady(mAAVSurfaceTexture.getSurface());
+        }
+        this.mOnInputSurfaceReadyListener = onInputSurfaceReadyListener;
+    }
+
+    /**
+     * 设置缩放模式，目前支持：FIT_XY, CENTER_CROP
+     * @param scaleType
+     */
+    public void setScaleType(@Type.ScaleType int scaleType) {
+        if (this.scaleType != scaleType) {
+            mIsNeedUpdateTextureCoordinates = true;
+        }
+        this.scaleType = scaleType;
+    }
+
+    /**
      * 设置视频源的大小
      * @param videoWidth
      * @param videoHeight
      */
     public void setTextureSize(int videoWidth, int videoHeight) {
+        if (this.mVideoWidth != videoWidth || this.mVideoHeight != videoHeight) {
+            mIsNeedUpdateTextureCoordinates = true;
+        }
         this.mVideoWidth = videoWidth;
         this.mVideoHeight = videoHeight;
     }
@@ -87,9 +127,13 @@ public class AWIOSurfaceProxy {
         @Override
         public void onEngineStart() {
             mSrcFrameBuffer = new AWFrameBufferObject();
-            mAAVSurface = new AWSurfaceTexture();
-            mAAVSurface.setFrameAvailableListener(mFrameAvailableListener);
+            mAAVSurfaceTexture = new AWSurfaceTexture();
+            mAAVSurfaceTexture.setFrameAvailableListener(mFrameAvailableListener);
             mSurfaceRender = new AWSurfaceRender();
+
+            if (mOnInputSurfaceReadyListener != null) {
+                mOnInputSurfaceReadyListener.onInputSurfaceReady(mAAVSurfaceTexture.getSurface());
+            }
         }
 
         @Override
@@ -98,14 +142,25 @@ public class AWIOSurfaceProxy {
             GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
+            if (mViewportWidth != width || mViewportHeight != height) {
+                mIsNeedUpdateTextureCoordinates = true;
+            }
             mViewportWidth = width;
             mViewportHeight = height;
-
             mIsSurfaceReady = true;
         }
 
         @Override
         public void onRender(AWMessage msg) {
+            if (mIsNeedUpdateTextureCoordinates) {
+                if (scaleType == Type.ScaleType.CENTER_CROP) {
+                    mSurfaceRender.updateTextureCoord(AWCoordinateUtil.getCenterCropTextureCoords(
+                            mVideoWidth, mVideoHeight, mViewportWidth, mViewportHeight));
+                } else {
+                    mSurfaceRender.updateTextureCoord(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
+                }
+                mIsNeedUpdateTextureCoordinates = false;
+            }
             mSurfaceRender.drawFrame(mSrcFrameBuffer.getOutputTextureId(), mViewportWidth, mViewportHeight);
         }
 
@@ -116,9 +171,9 @@ public class AWIOSurfaceProxy {
 
         @Override
         public void onEngineRelease() {
-            if (mAAVSurface != null) {
-                mAAVSurface.release();
-                mAAVSurface = null;
+            if (mAAVSurfaceTexture != null) {
+                mAAVSurfaceTexture.release();
+                mAAVSurfaceTexture = null;
             }
             if (mSrcFrameBuffer != null) {
                 mSrcFrameBuffer.release();

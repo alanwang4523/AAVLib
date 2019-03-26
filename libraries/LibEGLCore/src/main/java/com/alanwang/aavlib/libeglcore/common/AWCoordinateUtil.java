@@ -163,4 +163,30 @@ public class AWCoordinateUtil {
     private static float flip2(float f) {
         return 1.0f - f;
     }
+
+    /**
+     * 获取 CenterCrop 模式下的纹理坐标
+     * @param srcWidth
+     * @param srcHeight
+     * @param dstWidth
+     * @param dstHeight
+     * @return
+     */
+    public static float[] getCenterCropTextureCoords(int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+        float srcTextureAspectRatio = (float)srcHeight / (float)srcWidth;
+        float dstTextureAspectRatio = (float)dstHeight / (float)dstWidth;
+        float xOffset = 0.0f;
+        float yOffset = 0.0f;
+        if(srcTextureAspectRatio > dstTextureAspectRatio){
+            int expectedHeight = (int)((float)srcHeight * dstWidth / (float)srcWidth + 0.5f);
+            yOffset = (float)(expectedHeight - dstHeight) / (2 * expectedHeight);
+        } else if(srcTextureAspectRatio < dstTextureAspectRatio){
+            int expectedWidth = (int)((float)(srcHeight * dstWidth) / (float)dstHeight + 0.5);
+            xOffset = (float)(srcWidth - expectedWidth)/(2 * srcWidth);
+        }
+        float texCoords[] = { xOffset, yOffset, (float)(1.0 - xOffset), yOffset, xOffset, (float)(1.0 - yOffset),
+                (float)(1.0 - xOffset), (float)(1.0 - yOffset) };
+
+        return texCoords;
+    }
 }
