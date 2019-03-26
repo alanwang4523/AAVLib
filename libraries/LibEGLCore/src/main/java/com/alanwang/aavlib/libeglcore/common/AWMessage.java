@@ -7,6 +7,9 @@ package com.alanwang.aavlib.libeglcore.common;
  */
 
 public class AWMessage {
+
+    public final static int MSG_DRAW = 10001;
+
     public final int msgWhat;
     public int msgArg1;
     public int msgArg2;
@@ -14,6 +17,10 @@ public class AWMessage {
 
     public AWMessage(int msgWhat) {
         this(msgWhat, 0, 0, null);
+    }
+
+    public AWMessage(int msgWhat, int msgArg1) {
+        this(msgWhat, msgArg1, 0, null);
     }
 
     public AWMessage(int msgWhat, Object msgObj) {
