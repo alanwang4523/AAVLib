@@ -11,6 +11,8 @@ import com.alanwang.aavlib.libeglcore.common.GLLog;
 import com.alanwang.aavlib.libeglcore.common.Type;
 import com.alanwang.aavlib.libeglcore.engine.AWMainGLEngine;
 import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 输入、输出 Surface 的代理器，
@@ -37,6 +39,7 @@ public class AWIOSurfaceProxy {
     private AWMainGLEngine mMainGLEngine;
     private AWSurfaceRender mSurfaceRender;
     private OnInputSurfaceReadyListener mOnInputSurfaceReadyListener;
+    private CountDownLatch mCountDownLatch;
 
     private @Type.ScaleType int scaleType = Type.ScaleType.FIT_XY;
     private volatile boolean mIsNeedUpdateTextureCoordinates = false;
@@ -47,12 +50,13 @@ public class AWIOSurfaceProxy {
     private int mViewportHeight;
 
     public AWIOSurfaceProxy() {
+        mCountDownLatch = new CountDownLatch(1);
         mMainGLEngine = new AWMainGLEngine(mIGLEngineCallback);
         mMainGLEngine.start();
     }
 
     /**
-     * 设置回调
+     * 设置回调, 异步返回 Surface，同步获取见 {@link #getInputSurface()}
      * @param onInputSurfaceReadyListener
      */
     public void setOnInputSurfaceReadyListener(OnInputSurfaceReadyListener onInputSurfaceReadyListener) {
@@ -61,6 +65,24 @@ public class AWIOSurfaceProxy {
             onInputSurfaceReadyListener.onInputSurfaceReady(mAAVSurfaceTexture.getSurface());
         }
         this.mOnInputSurfaceReadyListener = onInputSurfaceReadyListener;
+    }
+
+    /**
+     * 同步获取输入的 surface
+     * @return
+     */
+    public Surface getInputSurface() {
+        Surface surface = null;
+        try {
+            mCountDownLatch.await(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return surface;
+        }
+        if (mAAVSurfaceTexture != null) {
+            surface = mAAVSurfaceTexture.getSurface();
+        }
+        return surface;
     }
 
     /**
@@ -139,6 +161,7 @@ public class AWIOSurfaceProxy {
             mAAVSurfaceTexture = new AWSurfaceTexture();
             mAAVSurfaceTexture.setFrameAvailableListener(mFrameAvailableListener);
             mSurfaceRender = new AWSurfaceRender();
+            mCountDownLatch.countDown();
 
             if (mOnInputSurfaceReadyListener != null) {
                 mOnInputSurfaceReadyListener.onInputSurfaceReady(mAAVSurfaceTexture.getSurface());
