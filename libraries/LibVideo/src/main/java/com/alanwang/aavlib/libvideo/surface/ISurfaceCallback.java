@@ -1,5 +1,7 @@
 package com.alanwang.aavlib.libvideo.surface;
 
+import android.view.Surface;
+
 /**
  * Author: AlanWang4523.
  * Date: 19/1/26 22:57.
@@ -13,11 +15,11 @@ public interface ISurfaceCallback {
      * @param w width
      * @param h height
      */
-    void onSurfaceChanged(Object surface, int w, int h);
+    void onSurfaceChanged(Surface surface, int w, int h);
 
     /**
      * surfaceDestroyed
      * @param surface surfaceHolder
      */
-    void onSurfaceDestroyed(Object surface);
+    void onSurfaceDestroyed(Surface surface);
 }

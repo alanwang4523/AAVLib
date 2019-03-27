@@ -62,12 +62,12 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
     }
 
     @Override
-    public void onSurfaceChanged(Object surface, int w, int h) {
-        mIOSurfaceProxy.updateSurface((Surface) surface, w, h);
+    public void onSurfaceChanged(Surface surface, int w, int h) {
+        mIOSurfaceProxy.updateSurface(surface, w, h);
     }
 
     @Override
-    public void onSurfaceDestroyed(Object surface) {
+    public void onSurfaceDestroyed(Surface surface) {
         mIOSurfaceProxy.destroySurface();
     }
 
