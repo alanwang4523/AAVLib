@@ -1,6 +1,7 @@
 package com.alanwang.aavlib.libvideo.surface;
 
 import android.content.Context;
+import android.graphics.PixelFormat;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -34,7 +35,8 @@ public class AWSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private void init() {
         SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
-        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+//        surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
     }
 
     /**
@@ -48,7 +50,9 @@ public class AWSurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 return;
             }
             mSurfaceCallback = surfaceCallback;
-            if (mSurfaceHolder != null) {
+            if (mSurfaceHolder != null
+                    && mSurfaceHolder.getSurface() != null
+                    && mSurfaceHolder.getSurface().isValid()) {
                 surfaceCallback.onSurfaceChanged(mSurfaceHolder.getSurface(), mSurfaceWidth, mSurfaceHeight);
             }
         }
@@ -65,7 +69,9 @@ public class AWSurfaceView extends SurfaceView implements SurfaceHolder.Callback
             mSurfaceWidth = width;
             mSurfaceHeight = height;
             mSurfaceHolder = holder;
-            if (mSurfaceCallback != null) {
+            if (mSurfaceCallback != null
+                    && mSurfaceHolder.getSurface() != null
+                    && mSurfaceHolder.getSurface().isValid()) {
                 mSurfaceCallback.onSurfaceChanged(mSurfaceHolder.getSurface(), width, height);
             }
         }
@@ -78,7 +84,6 @@ public class AWSurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 mSurfaceCallback.onSurfaceDestroyed(mSurfaceHolder.getSurface());
             }
             mSurfaceHolder = null;
-            mSurfaceCallback = null;
         }
     }
 

@@ -73,6 +73,7 @@ public class AWMainGLEngine {
             public void run() {
                 mEGLCoreWrapper.createSurface(surface);
                 mEGLCoreWrapper.makeCurrent();
+                mIsEngineValid = true;
                 mEngineCallback.onSurfaceUpdate(surface, width, height);
             }
         });

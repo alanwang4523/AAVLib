@@ -7,6 +7,7 @@ import com.alanwang.aavlib.libeglcore.common.AWFrameAvailableListener;
 import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
 import com.alanwang.aavlib.libeglcore.common.AWMessage;
 import com.alanwang.aavlib.libeglcore.common.AWSurfaceTexture;
+import com.alanwang.aavlib.libeglcore.common.GLLog;
 import com.alanwang.aavlib.libeglcore.common.Type;
 import com.alanwang.aavlib.libeglcore.engine.AWMainGLEngine;
 import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
@@ -114,6 +115,13 @@ public class AWIOSurfaceProxy {
         @Override
         public void onFrameAvailable(AWSurfaceTexture surfaceTexture) {
             if (!mIsSurfaceReady || mSrcFrameBuffer == null || mVideoWidth == 0 || mVideoHeight == 0) {
+                StringBuilder strB = new StringBuilder();
+                strB.append("onFrameAvailable()-->Illegal Arguments : ")
+                        .append("mIsSurfaceReady = ").append(mIsSurfaceReady)
+                        .append(",mVideoWidth = ").append(mVideoWidth)
+                        .append(", mVideoHeight = ").append(mVideoHeight);
+                GLLog.e(strB.toString());
+
                 surfaceTexture.updateTexImage();
                 return;
             }
@@ -125,6 +133,8 @@ public class AWIOSurfaceProxy {
     private IGLEngineCallback mIGLEngineCallback = new IGLEngineCallback() {
         @Override
         public void onEngineStart() {
+            GLLog.d("onEngineStart()--->>");
+
             mSrcFrameBuffer = new AWFrameBufferObject();
             mAAVSurfaceTexture = new AWSurfaceTexture();
             mAAVSurfaceTexture.setFrameAvailableListener(mFrameAvailableListener);
@@ -147,6 +157,16 @@ public class AWIOSurfaceProxy {
             mViewportWidth = width;
             mViewportHeight = height;
             mIsSurfaceReady = true;
+
+            StringBuilder strB = new StringBuilder();
+            strB.append("onSurfaceUpdate()-->")
+                    .append("width = ").append(width)
+                    .append(", height = ").append(height);
+            GLLog.d(strB.toString());
+
+            if (mSurfaceRender != null && mSrcFrameBuffer != null) {
+                mMainGLEngine.postRenderMessage(new AWMessage(AWMessage.MSG_DRAW));
+            }
         }
 
         @Override
@@ -166,6 +186,7 @@ public class AWIOSurfaceProxy {
         @Override
         public void onSurfaceDestroy() {
             mIsSurfaceReady = false;
+            GLLog.d("onSurfaceDestroy()--->>");
         }
 
         @Override
@@ -182,6 +203,7 @@ public class AWIOSurfaceProxy {
                 mSurfaceRender.release();
                 mSurfaceRender = null;
             }
+            GLLog.d("onEngineRelease()--->>");
         }
     };
 }

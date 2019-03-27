@@ -72,6 +72,22 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
     }
 
     @Override
+    protected void onResume() {
+        if (mVideoPlayer != null) {
+            mVideoPlayer.resume();
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (mVideoPlayer != null) {
+            mVideoPlayer.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         mVideoPlayer.stop();
         mIOSurfaceProxy.release();
