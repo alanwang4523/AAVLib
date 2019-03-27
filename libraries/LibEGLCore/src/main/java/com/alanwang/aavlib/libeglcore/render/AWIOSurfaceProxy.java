@@ -2,7 +2,6 @@ package com.alanwang.aavlib.libeglcore.render;
 
 import android.opengl.GLES20;
 import android.view.Surface;
-
 import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
 import com.alanwang.aavlib.libeglcore.common.AWFrameAvailableListener;
 import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;

@@ -26,6 +26,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':libraries:LibEGLCore')
     implementation project(':libraries:LibVideo')
     implementation project(':libraries:LibUtils')
     implementation project(':modules:ALGeneral')

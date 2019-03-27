@@ -5,10 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Surface;
 import android.view.Window;
 import android.view.WindowManager;
-
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
-import com.alanwang.aavlib.libvideo.core.AWVideoPlayController;
+import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
+import com.alanwang.aavlib.libvideo.player.AWVideoPlayer;
+import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
 
@@ -18,12 +19,13 @@ import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfaceCallback, AWVideoPlayController.IControllerCallback {
+public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfaceCallback {
 
     private static final String VIDEO_PATH = "/sdcard/Alan/video/AlanTest.mp4";
     private EnhancedRelativeLayout mVideoLayout;
     private AWSurfaceView mAWSurfaceView;
-    private AWVideoPlayController mVideoPlayController;
+    private IVideoPlayer mVideoPlayer;
+    private AWIOSurfaceProxy mIOSurfaceProxy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,29 +41,40 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
         mAWSurfaceView = findViewById(R.id.video_surface_view);
         mAWSurfaceView.setSurfaceCallback(this);
 
-        mVideoPlayController = new AWVideoPlayController();
-        mVideoPlayController.setControllerCallback(this);
-        mVideoPlayController.setVideoPath(VIDEO_PATH);
+        mIOSurfaceProxy = new AWIOSurfaceProxy();
+        mVideoPlayer = new AWVideoPlayer();
+
+        mIOSurfaceProxy.setOnInputSurfaceReadyListener(new AWIOSurfaceProxy.OnInputSurfaceReadyListener() {
+            @Override
+            public void onInputSurfaceReady(Surface surface) {
+                mVideoPlayer.setSurface(surface);
+            }
+        });
+        mVideoPlayer.setOnPlayReadyListener(new IVideoPlayer.OnPlayReadyListener() {
+            @Override
+            public void onPlayReady(int width, int height) {
+                mVideoLayout.setRatio(1.0f * height / width);
+                mIOSurfaceProxy.setTextureSize(width, height);
+                mVideoPlayer.start();
+            }
+        });
+        mVideoPlayer.preparePlayer(VIDEO_PATH);
     }
 
     @Override
     public void onSurfaceChanged(Object surface, int w, int h) {
-        mVideoPlayController.updateSurface((Surface) surface, w, h);
+        mIOSurfaceProxy.updateSurface((Surface) surface, w, h);
     }
 
     @Override
     public void onSurfaceDestroyed(Object surface) {
-        mVideoPlayController.destroySurface();
-    }
-
-    @Override
-    public void onPlayReady(int width, int height, long duration) {
-        mVideoLayout.setRatio(1.0f * height / width);
+        mIOSurfaceProxy.destroySurface();
     }
 
     @Override
     protected void onDestroy() {
-        mVideoPlayController.release();
+        mVideoPlayer.stop();
+        mIOSurfaceProxy.release();
         super.onDestroy();
     }
 }
