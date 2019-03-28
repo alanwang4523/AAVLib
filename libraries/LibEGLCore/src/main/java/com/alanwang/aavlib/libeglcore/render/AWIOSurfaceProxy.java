@@ -32,11 +32,24 @@ public class AWIOSurfaceProxy {
          * @param surface
          */
         void onInputSurfaceCreated(Surface surface);
-
         /**
          * 输入的 surface 被销毁
          */
         void onInputSurfaceDestroyed();
+    }
+
+    public interface OnOutputSurfaceListener {
+        /**
+         * 输出的 surface 已发生改变
+         * @param surface
+         * @param w
+         * @param h
+         */
+        void onOutputSurfaceUpdated(Surface surface, int w, int h);
+        /**
+         * 输出的 surface 被销毁
+         */
+        void onOutputSurfaceDestroyed();
     }
 
     public interface OnPassFilterListener {
@@ -55,6 +68,7 @@ public class AWIOSurfaceProxy {
     private AWMainGLEngine mMainGLEngine;
     private AWSurfaceRender mSurfaceRender;
     private OnInputSurfaceListener mOnInputSurfaceListener;
+    private OnOutputSurfaceListener mOnOutputSurfaceListener;
     private OnPassFilterListener mOnPassFilterListener;
     private CountDownLatch mCountDownLatch;
 
@@ -82,6 +96,14 @@ public class AWIOSurfaceProxy {
             onInputSurfaceListener.onInputSurfaceCreated(mAAVSurfaceTexture.getSurface());
         }
         this.mOnInputSurfaceListener = onInputSurfaceListener;
+    }
+
+    /**
+     * 设置输出 surface 回调
+     * @param onOutputSurfaceListener
+     */
+    public void setOnOutputSurfaceListener(OnOutputSurfaceListener onOutputSurfaceListener) {
+        this.mOnOutputSurfaceListener = onOutputSurfaceListener;
     }
 
     /**
@@ -215,6 +237,10 @@ public class AWIOSurfaceProxy {
             if (mSurfaceRender != null && mSrcFrameBuffer != null && mVideoWidth > 0 && mVideoHeight > 0) {
                 mMainGLEngine.postRenderMessage(new AWMessage(AWMessage.MSG_DRAW));
             }
+
+            if (mOnOutputSurfaceListener != null) {
+                mOnOutputSurfaceListener.onOutputSurfaceUpdated(surface, width, height);
+            }
         }
 
         @Override
@@ -240,6 +266,9 @@ public class AWIOSurfaceProxy {
         public void onSurfaceDestroy() {
             GLLog.d("onSurfaceDestroy()--->>");
             mIsSurfaceReady = false;
+            if (mOnOutputSurfaceListener != null) {
+                mOnOutputSurfaceListener.onOutputSurfaceDestroyed();
+            }
         }
 
         @Override

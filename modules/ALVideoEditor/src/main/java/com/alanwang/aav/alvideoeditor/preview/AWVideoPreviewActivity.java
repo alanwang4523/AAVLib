@@ -58,7 +58,8 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
 
             @Override
             public void onInputSurfaceDestroyed() {
-
+                mEffectFrameBuffer.release();
+                mTestEffect.release();
             }
         });
         mIOSurfaceProxy.setOnPassFilterListener(new AWIOSurfaceProxy.OnPassFilterListener() {
