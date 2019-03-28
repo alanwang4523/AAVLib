@@ -7,11 +7,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
+import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
 import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.libvideo.player.AWVideoPlayer;
 import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
+import com.alanwang.aavlib.libvideoeffect.effects.AWGrayEffect;
 
 /**
  * Author: AlanWang4523.
@@ -26,6 +28,8 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
     private AWSurfaceView mAWSurfaceView;
     private IVideoPlayer mVideoPlayer;
     private AWIOSurfaceProxy mIOSurfaceProxy;
+    private AWFrameBufferObject mEffectFrameBuffer;
+    private AWGrayEffect mTestEffect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +48,24 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
         mIOSurfaceProxy = new AWIOSurfaceProxy();
         mVideoPlayer = new AWVideoPlayer();
 
-//        mIOSurfaceProxy.setOnInputSurfaceReadyListener(new AWIOSurfaceProxy.OnInputSurfaceReadyListener() {
-//            @Override
-//            public void onInputSurfaceReady(Surface surface) {
+        mIOSurfaceProxy.setOnInputSurfaceReadyListener(new AWIOSurfaceProxy.OnInputSurfaceReadyListener() {
+            @Override
+            public void onInputSurfaceReady(Surface surface) {
 //                mVideoPlayer.setSurface(surface);
-//            }
-//        });
+                mEffectFrameBuffer = new AWFrameBufferObject();
+                mTestEffect = new AWGrayEffect();
+            }
+        });
+        mIOSurfaceProxy.setOnPassFilterListener(new AWIOSurfaceProxy.OnPassFilterListener() {
+            @Override
+            public int onPassFilter(int textureId, int width, int height) {
+                mEffectFrameBuffer.checkInit(width, height);
+                mEffectFrameBuffer.bindFrameBuffer();
+                mTestEffect.drawFrame(textureId);
+                mEffectFrameBuffer.unbindFrameBuffer();
+                return mEffectFrameBuffer.getOutputTextureId();
+            }
+        });
 
         mVideoPlayer.setSurface(mIOSurfaceProxy.getInputSurface());
         mVideoPlayer.setOnPlayReadyListener(new IVideoPlayer.OnPlayReadyListener() {

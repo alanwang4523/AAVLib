@@ -207,7 +207,7 @@ public class AWIOSurfaceProxy {
                     .append(", height = ").append(height);
             GLLog.d(strB.toString());
 
-            if (mSurfaceRender != null && mSrcFrameBuffer != null) {
+            if (mSurfaceRender != null && mSrcFrameBuffer != null && mVideoWidth > 0 && mVideoHeight > 0) {
                 mMainGLEngine.postRenderMessage(new AWMessage(AWMessage.MSG_DRAW));
             }
         }
@@ -226,7 +226,7 @@ public class AWIOSurfaceProxy {
             int outputTextureId = mSrcFrameBuffer.getOutputTextureId();
             if (mOnPassFilterListener != null) {
                 outputTextureId = mOnPassFilterListener.onPassFilter(
-                        mSrcFrameBuffer.getOutputTextureId(), mViewportWidth, mViewportHeight);
+                        mSrcFrameBuffer.getOutputTextureId(), mVideoWidth, mVideoHeight);
             }
             mSurfaceRender.drawFrame(outputTextureId, mViewportWidth, mViewportHeight);
         }
