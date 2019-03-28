@@ -34,11 +34,23 @@ public class AWIOSurfaceProxy {
         void onInputSurfaceReady(Surface surface);
     }
 
+    public interface OnPassFilterListener {
+        /**
+         * 过滤镜回调
+         * @param textureId
+         * @param width
+         * @param height
+         * @return 返回过完滤镜后的 textureId
+         */
+        int onPassFilter(int textureId, int width, int height);
+    }
+
     private AWSurfaceTexture mAAVSurfaceTexture;
     private AWFrameBufferObject mSrcFrameBuffer;
     private AWMainGLEngine mMainGLEngine;
     private AWSurfaceRender mSurfaceRender;
     private OnInputSurfaceReadyListener mOnInputSurfaceReadyListener;
+    private OnPassFilterListener mOnPassFilterListener;
     private CountDownLatch mCountDownLatch;
 
     private @Type.ScaleType int scaleType = Type.ScaleType.FIT_XY;
@@ -65,6 +77,14 @@ public class AWIOSurfaceProxy {
             onInputSurfaceReadyListener.onInputSurfaceReady(mAAVSurfaceTexture.getSurface());
         }
         this.mOnInputSurfaceReadyListener = onInputSurfaceReadyListener;
+    }
+
+    /**
+     * 设置视频滤镜回调
+     * @param onPassFilterListener
+     */
+    public void setOnPassFilterListener(OnPassFilterListener onPassFilterListener) {
+        this.mOnPassFilterListener = onPassFilterListener;
     }
 
     /**
@@ -203,7 +223,12 @@ public class AWIOSurfaceProxy {
                 }
                 mIsNeedUpdateTextureCoordinates = false;
             }
-            mSurfaceRender.drawFrame(mSrcFrameBuffer.getOutputTextureId(), mViewportWidth, mViewportHeight);
+            int outputTextureId = mSrcFrameBuffer.getOutputTextureId();
+            if (mOnPassFilterListener != null) {
+                outputTextureId = mOnPassFilterListener.onPassFilter(
+                        mSrcFrameBuffer.getOutputTextureId(), mViewportWidth, mViewportHeight);
+            }
+            mSurfaceRender.drawFrame(outputTextureId, mViewportWidth, mViewportHeight);
         }
 
         @Override

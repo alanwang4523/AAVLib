@@ -1,5 +1,6 @@
 package com.alanwang.aavlib.libeglcore.engine;
 
+import android.graphics.PixelFormat;
 import android.media.ImageReader;
 import android.opengl.EGLContext;
 import android.os.Process;
@@ -31,7 +32,7 @@ public class AWMainGLEngine {
     public AWMainGLEngine(@NonNull IGLEngineCallback callback) {
         mEGLCoreWrapper = new AWEGLCoreWrapper(null);
         mHandlerThread = new AWHandlerThread(TAG, Process.THREAD_PRIORITY_FOREGROUND);
-        mImageReader = ImageReader.newInstance(1, 1, 1, 1);
+        mImageReader = ImageReader.newInstance(1, 1, PixelFormat.RGBA_8888, 1);
         mRenderTaskDeque = new ArrayDeque<>();
         mRenderTask = new RenderTask(this);
         mEngineCallback = callback;
