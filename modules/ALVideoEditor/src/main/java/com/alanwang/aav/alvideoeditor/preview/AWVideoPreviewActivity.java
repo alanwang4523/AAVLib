@@ -48,12 +48,17 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
         mIOSurfaceProxy = new AWIOSurfaceProxy();
         mVideoPlayer = new AWVideoPlayer();
 
-        mIOSurfaceProxy.setOnInputSurfaceReadyListener(new AWIOSurfaceProxy.OnInputSurfaceReadyListener() {
+        mIOSurfaceProxy.setOnInputSurfaceListener(new AWIOSurfaceProxy.OnInputSurfaceListener() {
             @Override
-            public void onInputSurfaceReady(Surface surface) {
+            public void onInputSurfaceCreated(Surface surface) {
 //                mVideoPlayer.setSurface(surface);
                 mEffectFrameBuffer = new AWFrameBufferObject();
                 mTestEffect = new AWGrayEffect();
+            }
+
+            @Override
+            public void onInputSurfaceDestroyed() {
+
             }
         });
         mIOSurfaceProxy.setOnPassFilterListener(new AWIOSurfaceProxy.OnPassFilterListener() {

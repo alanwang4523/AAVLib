@@ -26,12 +26,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class AWIOSurfaceProxy {
 
-    public interface OnInputSurfaceReadyListener {
+    public interface OnInputSurfaceListener {
         /**
          * 输入的 surface ready，可以在此回调将 surface 绑定到播放器或解码器
          * @param surface
          */
-        void onInputSurfaceReady(Surface surface);
+        void onInputSurfaceCreated(Surface surface);
+
+        /**
+         * 输入的 surface 被销毁
+         */
+        void onInputSurfaceDestroyed();
     }
 
     public interface OnPassFilterListener {
@@ -49,7 +54,7 @@ public class AWIOSurfaceProxy {
     private AWFrameBufferObject mSrcFrameBuffer;
     private AWMainGLEngine mMainGLEngine;
     private AWSurfaceRender mSurfaceRender;
-    private OnInputSurfaceReadyListener mOnInputSurfaceReadyListener;
+    private OnInputSurfaceListener mOnInputSurfaceListener;
     private OnPassFilterListener mOnPassFilterListener;
     private CountDownLatch mCountDownLatch;
 
@@ -69,14 +74,14 @@ public class AWIOSurfaceProxy {
 
     /**
      * 设置回调, 异步返回 Surface，同步获取见 {@link #getInputSurface()}
-     * @param onInputSurfaceReadyListener
+     * @param onInputSurfaceListener
      */
-    public void setOnInputSurfaceReadyListener(OnInputSurfaceReadyListener onInputSurfaceReadyListener) {
+    public void setOnInputSurfaceListener(OnInputSurfaceListener onInputSurfaceListener) {
         // 避免在 setCallback 之前就已经 ready
-        if (onInputSurfaceReadyListener != null && mAAVSurfaceTexture != null) {
-            onInputSurfaceReadyListener.onInputSurfaceReady(mAAVSurfaceTexture.getSurface());
+        if (onInputSurfaceListener != null && mAAVSurfaceTexture != null) {
+            onInputSurfaceListener.onInputSurfaceCreated(mAAVSurfaceTexture.getSurface());
         }
-        this.mOnInputSurfaceReadyListener = onInputSurfaceReadyListener;
+        this.mOnInputSurfaceListener = onInputSurfaceListener;
     }
 
     /**
@@ -183,8 +188,8 @@ public class AWIOSurfaceProxy {
             mSurfaceRender = new AWSurfaceRender();
             mCountDownLatch.countDown();
 
-            if (mOnInputSurfaceReadyListener != null) {
-                mOnInputSurfaceReadyListener.onInputSurfaceReady(mAAVSurfaceTexture.getSurface());
+            if (mOnInputSurfaceListener != null) {
+                mOnInputSurfaceListener.onInputSurfaceCreated(mAAVSurfaceTexture.getSurface());
             }
         }
 
@@ -233,12 +238,13 @@ public class AWIOSurfaceProxy {
 
         @Override
         public void onSurfaceDestroy() {
-            mIsSurfaceReady = false;
             GLLog.d("onSurfaceDestroy()--->>");
+            mIsSurfaceReady = false;
         }
 
         @Override
         public void onEngineRelease() {
+            GLLog.d("onEngineRelease()--->>");
             if (mAAVSurfaceTexture != null) {
                 mAAVSurfaceTexture.release();
                 mAAVSurfaceTexture = null;
@@ -251,7 +257,9 @@ public class AWIOSurfaceProxy {
                 mSurfaceRender.release();
                 mSurfaceRender = null;
             }
-            GLLog.d("onEngineRelease()--->>");
+            if (mOnInputSurfaceListener != null) {
+                mOnInputSurfaceListener.onInputSurfaceDestroyed();
+            }
         }
     };
 }
