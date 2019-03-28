@@ -63,10 +63,10 @@ public class AWIOSurfaceProxy {
         int onPassFilter(int textureId, int width, int height);
     }
 
-    private AWSurfaceTexture mAAVSurfaceTexture;
-    private AWFrameBufferObject mSrcFrameBuffer;
     private AWMainGLEngine mMainGLEngine;
-    private AWSurfaceRender mSurfaceRender;
+    private AWSurfaceTexture mInputSurfaceTexture;
+    private AWFrameBufferObject mInputFrameBuffer;
+    private AWSurfaceRender mOutputSurfaceRender;
     private OnInputSurfaceListener mOnInputSurfaceListener;
     private OnOutputSurfaceListener mOnOutputSurfaceListener;
     private OnPassFilterListener mOnPassFilterListener;
@@ -92,8 +92,8 @@ public class AWIOSurfaceProxy {
      */
     public void setOnInputSurfaceListener(OnInputSurfaceListener onInputSurfaceListener) {
         // 避免在 setCallback 之前就已经 ready
-        if (onInputSurfaceListener != null && mAAVSurfaceTexture != null) {
-            onInputSurfaceListener.onInputSurfaceCreated(mAAVSurfaceTexture.getSurface());
+        if (onInputSurfaceListener != null && mInputSurfaceTexture != null) {
+            onInputSurfaceListener.onInputSurfaceCreated(mInputSurfaceTexture.getSurface());
         }
         this.mOnInputSurfaceListener = onInputSurfaceListener;
     }
@@ -126,8 +126,8 @@ public class AWIOSurfaceProxy {
             e.printStackTrace();
             return surface;
         }
-        if (mAAVSurfaceTexture != null) {
-            surface = mAAVSurfaceTexture.getSurface();
+        if (mInputSurfaceTexture != null) {
+            surface = mInputSurfaceTexture.getSurface();
         }
         return surface;
     }
@@ -183,7 +183,7 @@ public class AWIOSurfaceProxy {
     private AWFrameAvailableListener mFrameAvailableListener = new AWFrameAvailableListener() {
         @Override
         public void onFrameAvailable(AWSurfaceTexture surfaceTexture) {
-            if (!mIsSurfaceReady || mSrcFrameBuffer == null || mVideoWidth == 0 || mVideoHeight == 0) {
+            if (!mIsSurfaceReady || mInputFrameBuffer == null || mVideoWidth == 0 || mVideoHeight == 0) {
                 StringBuilder strB = new StringBuilder();
                 strB.append("onFrameAvailable()-->Illegal Arguments : ")
                         .append("mIsSurfaceReady = ").append(mIsSurfaceReady)
@@ -194,7 +194,7 @@ public class AWIOSurfaceProxy {
                 surfaceTexture.updateTexImage();
                 return;
             }
-            surfaceTexture.drawFrame(mSrcFrameBuffer, mVideoWidth, mVideoHeight);
+            surfaceTexture.drawFrame(mInputFrameBuffer, mVideoWidth, mVideoHeight);
             mMainGLEngine.postRenderMessage(new AWMessage(AWMessage.MSG_DRAW));
         }
     };
@@ -204,14 +204,14 @@ public class AWIOSurfaceProxy {
         public void onEngineStart() {
             GLLog.d("onEngineStart()--->>");
 
-            mSrcFrameBuffer = new AWFrameBufferObject();
-            mAAVSurfaceTexture = new AWSurfaceTexture();
-            mAAVSurfaceTexture.setFrameAvailableListener(mFrameAvailableListener);
-            mSurfaceRender = new AWSurfaceRender();
+            mInputFrameBuffer = new AWFrameBufferObject();
+            mInputSurfaceTexture = new AWSurfaceTexture();
+            mInputSurfaceTexture.setFrameAvailableListener(mFrameAvailableListener);
+            mOutputSurfaceRender = new AWSurfaceRender();
             mCountDownLatch.countDown();
 
             if (mOnInputSurfaceListener != null) {
-                mOnInputSurfaceListener.onInputSurfaceCreated(mAAVSurfaceTexture.getSurface());
+                mOnInputSurfaceListener.onInputSurfaceCreated(mInputSurfaceTexture.getSurface());
             }
         }
 
@@ -234,7 +234,8 @@ public class AWIOSurfaceProxy {
                     .append(", height = ").append(height);
             GLLog.d(strB.toString());
 
-            if (mSurfaceRender != null && mSrcFrameBuffer != null && mVideoWidth > 0 && mVideoHeight > 0) {
+            if (mOutputSurfaceRender != null && mInputFrameBuffer != null
+                    && mVideoWidth > 0 && mVideoHeight > 0) {
                 mMainGLEngine.postRenderMessage(new AWMessage(AWMessage.MSG_DRAW));
             }
 
@@ -247,19 +248,19 @@ public class AWIOSurfaceProxy {
         public void onRender(AWMessage msg) {
             if (mIsNeedUpdateTextureCoordinates) {
                 if (scaleType == Type.ScaleType.CENTER_CROP) {
-                    mSurfaceRender.updateTextureCoord(AWCoordinateUtil.getCenterCropTextureCoords(
+                    mOutputSurfaceRender.updateTextureCoord(AWCoordinateUtil.getCenterCropTextureCoords(
                             mVideoWidth, mVideoHeight, mViewportWidth, mViewportHeight));
                 } else {
-                    mSurfaceRender.updateTextureCoord(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
+                    mOutputSurfaceRender.updateTextureCoord(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
                 }
                 mIsNeedUpdateTextureCoordinates = false;
             }
-            int outputTextureId = mSrcFrameBuffer.getOutputTextureId();
+            int outputTextureId = mInputFrameBuffer.getOutputTextureId();
             if (mOnPassFilterListener != null) {
                 outputTextureId = mOnPassFilterListener.onPassFilter(
-                        mSrcFrameBuffer.getOutputTextureId(), mVideoWidth, mVideoHeight);
+                        mInputFrameBuffer.getOutputTextureId(), mVideoWidth, mVideoHeight);
             }
-            mSurfaceRender.drawFrame(outputTextureId, mViewportWidth, mViewportHeight);
+            mOutputSurfaceRender.drawFrame(outputTextureId, mViewportWidth, mViewportHeight);
         }
 
         @Override
@@ -274,17 +275,17 @@ public class AWIOSurfaceProxy {
         @Override
         public void onEngineRelease() {
             GLLog.d("onEngineRelease()--->>");
-            if (mAAVSurfaceTexture != null) {
-                mAAVSurfaceTexture.release();
-                mAAVSurfaceTexture = null;
+            if (mInputSurfaceTexture != null) {
+                mInputSurfaceTexture.release();
+                mInputSurfaceTexture = null;
             }
-            if (mSrcFrameBuffer != null) {
-                mSrcFrameBuffer.release();
-                mSrcFrameBuffer = null;
+            if (mInputFrameBuffer != null) {
+                mInputFrameBuffer.release();
+                mInputFrameBuffer = null;
             }
-            if (mSurfaceRender != null) {
-                mSurfaceRender.release();
-                mSurfaceRender = null;
+            if (mOutputSurfaceRender != null) {
+                mOutputSurfaceRender.release();
+                mOutputSurfaceRender = null;
             }
             if (mOnInputSurfaceListener != null) {
                 mOnInputSurfaceListener.onInputSurfaceDestroyed();
