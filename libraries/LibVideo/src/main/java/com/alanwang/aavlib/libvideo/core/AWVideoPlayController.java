@@ -25,7 +25,6 @@ public class AWVideoPlayController {
         void onPlayReady(int width, int height, long duration);
     }
 
-    private final static int MSG_DRAW = 0x0101;
     private IVideoPlayer mVideoPlayer;
     private IControllerCallback iControllerCallback;
     private AWIOSurfaceProxy mIOSurfaceProxy;
@@ -39,7 +38,6 @@ public class AWVideoPlayController {
         mIOSurfaceProxy.setOnInputSurfaceListener(new AWIOSurfaceProxy.OnInputSurfaceListener() {
             @Override
             public void onInputSurfaceCreated(Surface surface) {
-//                mVideoPlayer.setSurface(surface);
                 mEffectFrameBuffer = new AWFrameBufferObject();
                 mTestEffect = new AWGrayEffect();
             }

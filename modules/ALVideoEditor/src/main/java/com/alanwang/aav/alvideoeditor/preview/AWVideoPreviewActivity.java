@@ -7,13 +7,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
-import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
-import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
-import com.alanwang.aavlib.libvideo.player.AWVideoPlayer;
-import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
+import com.alanwang.aavlib.libvideo.core.AWVideoPlayController;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
-import com.alanwang.aavlib.libvideoeffect.effects.AWGrayEffect;
 
 /**
  * Author: AlanWang4523.
@@ -26,10 +22,8 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
     private static final String VIDEO_PATH = "/sdcard/Alan/video/AlanTest.mp4";
     private EnhancedRelativeLayout mVideoLayout;
     private AWSurfaceView mAWSurfaceView;
-    private IVideoPlayer mVideoPlayer;
-    private AWIOSurfaceProxy mIOSurfaceProxy;
-    private AWFrameBufferObject mEffectFrameBuffer;
-    private AWGrayEffect mTestEffect;
+    private AWVideoPlayController mVideoPlayController;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,76 +39,48 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
         mAWSurfaceView = findViewById(R.id.video_surface_view);
         mAWSurfaceView.setSurfaceCallback(this);
 
-        mIOSurfaceProxy = new AWIOSurfaceProxy();
-        mVideoPlayer = new AWVideoPlayer();
-
-        mIOSurfaceProxy.setOnInputSurfaceListener(new AWIOSurfaceProxy.OnInputSurfaceListener() {
+        mVideoPlayController = new AWVideoPlayController();
+        mVideoPlayController.setControllerCallback(new AWVideoPlayController.IControllerCallback() {
             @Override
-            public void onInputSurfaceCreated(Surface surface) {
-//                mVideoPlayer.setSurface(surface);
-                mEffectFrameBuffer = new AWFrameBufferObject();
-                mTestEffect = new AWGrayEffect();
-            }
-
-            @Override
-            public void onInputSurfaceDestroyed() {
-                mEffectFrameBuffer.release();
-                mTestEffect.release();
-            }
-        });
-        mIOSurfaceProxy.setOnPassFilterListener(new AWIOSurfaceProxy.OnPassFilterListener() {
-            @Override
-            public int onPassFilter(int textureId, int width, int height) {
-                mEffectFrameBuffer.checkInit(width, height);
-                mEffectFrameBuffer.bindFrameBuffer();
-                mTestEffect.drawFrame(textureId);
-                mEffectFrameBuffer.unbindFrameBuffer();
-                return mEffectFrameBuffer.getOutputTextureId();
-            }
-        });
-
-        mVideoPlayer.setSurface(mIOSurfaceProxy.getInputSurface());
-        mVideoPlayer.setOnPlayReadyListener(new IVideoPlayer.OnPlayReadyListener() {
-            @Override
-            public void onPlayReady(int width, int height) {
+            public void onPlayReady(int width, int height, long duration) {
                 mVideoLayout.setRatio(1.0f * height / width);
-                mIOSurfaceProxy.setTextureSize(width, height);
-                mVideoPlayer.start();
+                mVideoPlayController.startPlay();
             }
         });
-        mVideoPlayer.preparePlayer(VIDEO_PATH);
+        mVideoPlayController.setVideoPath(VIDEO_PATH);
+
     }
 
     @Override
     public void onSurfaceChanged(Surface surface, int w, int h) {
-        mIOSurfaceProxy.updateSurface(surface, w, h);
+        mVideoPlayController.updateSurface(surface, w, h);
     }
 
     @Override
     public void onSurfaceDestroyed(Surface surface) {
-        mIOSurfaceProxy.destroySurface();
+        mVideoPlayController.destroySurface();
     }
 
     @Override
     protected void onResume() {
-        if (mVideoPlayer != null) {
-            mVideoPlayer.resume();
+        if (mVideoPlayController != null) {
+            mVideoPlayController.startPlay();
         }
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        if (mVideoPlayer != null) {
-            mVideoPlayer.pause();
+        if (mVideoPlayController != null) {
+            mVideoPlayController.stopPlay();
         }
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        mVideoPlayer.stop();
-        mIOSurfaceProxy.release();
+        mVideoPlayController.stopPlay();
+        mVideoPlayController.release();
         super.onDestroy();
     }
 }
