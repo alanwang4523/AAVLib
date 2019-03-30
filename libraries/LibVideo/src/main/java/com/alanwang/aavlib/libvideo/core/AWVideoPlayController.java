@@ -1,16 +1,11 @@
 package com.alanwang.aavlib.libvideo.core;
 
-import android.opengl.GLES20;
 import android.view.Surface;
-
-import com.alanwang.aavlib.libeglcore.common.AWFrameAvailableListener;
 import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
-import com.alanwang.aavlib.libeglcore.common.AWMessage;
-import com.alanwang.aavlib.libeglcore.common.AWSurfaceTexture;
-import com.alanwang.aavlib.libeglcore.engine.AWMainGLEngine;
-import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
+import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.libvideo.player.AWVideoPlayer;
 import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
+import com.alanwang.aavlib.libvideoeffect.effects.AWGrayEffect;
 
 /**
  * Author: AlanWang4523.
@@ -32,22 +27,50 @@ public class AWVideoPlayController {
 
     private final static int MSG_DRAW = 0x0101;
     private IVideoPlayer mVideoPlayer;
-    private AWSurfaceTexture mAAVSurface;
-    private AWFrameBufferObject mSrcFrameBuffer;
-    private AWMainGLEngine mMainGLEngine;
     private IControllerCallback iControllerCallback;
-    private AWVideoPreviewRender mPreviewRender;
-
-    private volatile boolean mIsPlayerReady = false;
-    private volatile boolean mIsSurfaceReady = false;
-    private int mVideoWidth;
-    private int mVideoHeight;
+    private AWIOSurfaceProxy mIOSurfaceProxy;
+    private AWFrameBufferObject mEffectFrameBuffer;
+    private AWGrayEffect mTestEffect;
 
     public AWVideoPlayController() {
         mVideoPlayer = new AWVideoPlayer();
-        mVideoPlayer.setOnPlayReadyListener(mOnPlayReadyListener);
-        mMainGLEngine = new AWMainGLEngine(mIGLEngineCallback);
-        mMainGLEngine.start();
+        mIOSurfaceProxy = new AWIOSurfaceProxy();
+
+        mIOSurfaceProxy.setOnInputSurfaceListener(new AWIOSurfaceProxy.OnInputSurfaceListener() {
+            @Override
+            public void onInputSurfaceCreated(Surface surface) {
+//                mVideoPlayer.setSurface(surface);
+                mEffectFrameBuffer = new AWFrameBufferObject();
+                mTestEffect = new AWGrayEffect();
+            }
+
+            @Override
+            public void onInputSurfaceDestroyed() {
+                mEffectFrameBuffer.release();
+                mTestEffect.release();
+            }
+        });
+        mIOSurfaceProxy.setOnPassFilterListener(new AWIOSurfaceProxy.OnPassFilterListener() {
+            @Override
+            public int onPassFilter(int textureId, int width, int height) {
+                mEffectFrameBuffer.checkInit(width, height);
+                mEffectFrameBuffer.bindFrameBuffer();
+                mTestEffect.drawFrame(textureId);
+                mEffectFrameBuffer.unbindFrameBuffer();
+                return mEffectFrameBuffer.getOutputTextureId();
+            }
+        });
+
+        mVideoPlayer.setSurface(mIOSurfaceProxy.getInputSurface());
+        mVideoPlayer.setOnPlayReadyListener(new IVideoPlayer.OnPlayReadyListener() {
+            @Override
+            public void onPlayReady(int width, int height) {
+                mIOSurfaceProxy.setTextureSize(width, height);
+                if (iControllerCallback != null) {
+                    iControllerCallback.onPlayReady(width, height, mVideoPlayer.getDuration());
+                }
+            }
+        });
     }
 
     /**
@@ -66,7 +89,6 @@ public class AWVideoPlayController {
         if (mVideoPlayer.isPlaying()) {
             mVideoPlayer.stop();
         }
-        mIsPlayerReady = false;
         mVideoPlayer.preparePlayer(videoPath);
     }
 
@@ -107,92 +129,17 @@ public class AWVideoPlayController {
      * @param h
      */
     public void updateSurface(Surface surface, int w, int h) {
-        mMainGLEngine.updateSurface(surface, w, h);
+        mIOSurfaceProxy.updateSurface(surface, w, h);
     }
 
     /**
      * 销毁 surface
      */
     public void destroySurface() {
-        mMainGLEngine.destroySurface();
+        mIOSurfaceProxy.destroySurface();
     }
 
     public void release() {
-        mMainGLEngine.release();
+        mIOSurfaceProxy.release();
     }
-
-    private boolean isAllReady() {
-        return mIsPlayerReady && mIsSurfaceReady;
-    }
-
-    private void tryToStartPlay() {
-        if (isAllReady() && !mVideoPlayer.isPlaying()) {
-            mVideoPlayer.start();
-        }
-    }
-
-    private AWFrameAvailableListener mFrameAvailableListener = new AWFrameAvailableListener() {
-        @Override
-        public void onFrameAvailable(AWSurfaceTexture surfaceTexture) {
-            surfaceTexture.drawFrame(mSrcFrameBuffer, mVideoWidth, mVideoHeight);
-            mMainGLEngine.postRenderMessage(new AWMessage(MSG_DRAW));
-        }
-    };
-
-    private IGLEngineCallback mIGLEngineCallback = new IGLEngineCallback() {
-        @Override
-        public void onEngineStart() {
-            mSrcFrameBuffer = new AWFrameBufferObject();
-            mAAVSurface = new AWSurfaceTexture();
-            mAAVSurface.setFrameAvailableListener(mFrameAvailableListener);
-            mVideoPlayer.setSurface(mAAVSurface.getSurface());
-            mPreviewRender = new AWVideoPreviewRender();
-        }
-
-        @Override
-        public void onSurfaceUpdate(Surface surface, int width, int height) {
-            GLES20.glViewport(0, 0, width, height);
-            GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
-            mPreviewRender.updatePreviewSize(width, height);
-            mIsSurfaceReady = true;
-            tryToStartPlay();
-        }
-
-        @Override
-        public void onRender(AWMessage msg) {
-            mPreviewRender.draw(mSrcFrameBuffer.getOutputTextureId(), mVideoWidth, mVideoHeight);
-        }
-
-        @Override
-        public void onSurfaceDestroy() {
-            mIsSurfaceReady = false;
-        }
-
-        @Override
-        public void onEngineRelease() {
-            if (mAAVSurface != null) {
-                mAAVSurface.release();
-            }
-
-            mVideoPlayer.stop();
-            mVideoPlayer.release();
-            mSrcFrameBuffer.release();
-            mPreviewRender.release();
-        }
-    };
-
-    private IVideoPlayer.OnPlayReadyListener mOnPlayReadyListener = new IVideoPlayer.OnPlayReadyListener() {
-        @Override
-        public void onPlayReady(int width, int height) {
-            mIsPlayerReady = true;
-            if (iControllerCallback != null) {
-                iControllerCallback.onPlayReady(width, height, mVideoPlayer.getDuration());
-            }
-            mVideoWidth = width;
-            mVideoHeight = height;
-            tryToStartPlay();
-        }
-    };
 }
