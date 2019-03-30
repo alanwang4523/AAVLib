@@ -26,7 +26,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':libraries:LibEGLCore')
     implementation project(':libraries:LibVideo')
     implementation project(':libraries:LibUtils')
     implementation project(':modules:ALGeneral')
@@ -34,5 +33,4 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    compile project(path: ':libraries:LibVideoEffect')
 }

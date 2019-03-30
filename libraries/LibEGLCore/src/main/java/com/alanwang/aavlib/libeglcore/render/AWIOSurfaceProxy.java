@@ -234,6 +234,7 @@ public class AWIOSurfaceProxy {
                     .append(", height = ").append(height);
             GLLog.d(strB.toString());
 
+            // 确保在切换输入surface ready 后把最新的一帧数据更新到输出 surface
             if (mOutputSurfaceRender != null && mInputFrameBuffer != null
                     && mVideoWidth > 0 && mVideoHeight > 0) {
                 mMainGLEngine.postRenderMessage(new AWMessage(AWMessage.MSG_DRAW));
