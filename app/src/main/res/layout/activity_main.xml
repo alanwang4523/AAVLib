@@ -20,10 +20,23 @@
             android:layout_marginTop="@dimen/margin_normal_48"
             android:orientation="vertical"
             >
+
+            <TextView
+                android:id="@+id/btn_goto_camera_record"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/margin_normal_45"
+                android:text="@string/test_module_camera_record"
+                android:textSize="@dimen/text_size_16"
+                android:textColor="@color/white"
+                android:layout_centerInParent="true"
+                android:background="@color/colorPrimaryDark"
+                android:gravity="center"/>
+
             <TextView
                 android:id="@+id/btn_goto_video_editor"
                 android:layout_width="match_parent"
-                android:layout_height="45dip"
+                android:layout_height="@dimen/margin_normal_45"
+                android:layout_marginTop="@dimen/margin_normal_20"
                 android:text="@string/test_module_video_editor"
                 android:textSize="@dimen/text_size_16"
                 android:textColor="@color/white"

@@ -4,6 +4,11 @@
     <application>
 
         <activity
+            android:name=".preview.AWCameraRecordActivity"
+            android:resizeableActivity="false"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
             android:name=".preview.AWVideoPreviewActivity"
             android:resizeableActivity="false"
             android:screenOrientation="portrait">
