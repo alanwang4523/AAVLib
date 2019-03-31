@@ -23,6 +23,7 @@
     </com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/rl_top_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_normal_8"
@@ -55,9 +56,40 @@
             android:layout_alignParentRight="true"
             android:layout_marginEnd="@dimen/margin_normal_8"
             />
-
-
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/iv_btn_record_speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rl_top_options"
+        android:layout_marginTop="@dimen/margin_normal_12"
+        android:layout_marginEnd="@dimen/margin_normal_8"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/record_speed_selector"
+        />
+
+    <ImageView
+        android:id="@+id/iv_btn_record_beauty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_btn_record_speed"
+        android:layout_marginTop="@dimen/margin_normal_12"
+        android:layout_marginEnd="@dimen/margin_normal_8"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/face_beauty_selector"
+        />
+
+    <ImageView
+        android:id="@+id/iv_btn_record_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_btn_record_beauty"
+        android:layout_marginTop="@dimen/margin_normal_12"
+        android:layout_marginEnd="@dimen/margin_normal_8"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/icon_record_filter"
+        />
 
 
 
