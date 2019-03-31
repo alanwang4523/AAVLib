@@ -5,6 +5,7 @@
 
         <activity
             android:name=".preview.AWCameraRecordActivity"
+            android:theme="@style/AppThemeNoActionBar"
             android:resizeableActivity="false"
             android:screenOrientation="portrait">
         </activity>

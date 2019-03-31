@@ -22,4 +22,15 @@
 
     </com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout>
 
+    <com.alanwang.aav.algeneral.ui.AWRecordButton
+        android:id="@+id/btn_camera_record"
+        android:layout_width="@dimen/margin_normal_100"
+        android:layout_height="@dimen/margin_normal_100"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/margin_normal_120"
+        android:layout_marginBottom="@dimen/margin_normal_50"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@null"
+        />
+
 </RelativeLayout>

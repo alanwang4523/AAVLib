@@ -6,6 +6,7 @@ import android.view.Surface;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
@@ -20,6 +21,7 @@ public class AWCameraRecordActivity extends AppCompatActivity implements ISurfac
 
     private EnhancedRelativeLayout mVideoLayout;
     private AWSurfaceView mAWSurfaceView;
+    private AWRecordButton btnRecord;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +30,23 @@ public class AWCameraRecordActivity extends AppCompatActivity implements ISurfac
         //取消状态栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.aav_activity_video_preview);
+        setContentView(R.layout.aav_activity_camera_record);
 
         mVideoLayout = findViewById(R.id.video_lyt);
 
         mAWSurfaceView = findViewById(R.id.video_surface_view);
         mAWSurfaceView.setSurfaceCallback(this);
+
+        btnRecord = findViewById(R.id.btn_camera_record);
+        btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
+            @Override
+            public void onRecordStart() {
+            }
+
+            @Override
+            public void onRecordStop() {
+            }
+        });
     }
 
 
