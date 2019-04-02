@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
@@ -27,8 +26,11 @@ public class AWCameraRecordActivity extends AppCompatActivity
     private AWSurfaceView mAWSurfaceView;
     private AWRecordButton btnRecord;
     private ImageView btnClose;
-    private ImageView btnCameraSwitchcover;
-    private ImageView btnFlashlightSwitchcover;
+    private ImageView btnCameraSwitchCover;
+    private ImageView btnFlashlightSwitchCover;
+    private ImageView btnSpeedSwitchCover;
+    private ImageView btnFaceBeauty;
+    private ImageView btnStyleFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +49,21 @@ public class AWCameraRecordActivity extends AppCompatActivity
         btnClose = findViewById(R.id.iv_btn_close);
         btnClose.setOnClickListener(this);
 
-        btnFlashlightSwitchcover = findViewById(R.id.iv_btn_flashlight_switchover);
-        btnFlashlightSwitchcover.setOnClickListener(this);
-        btnFlashlightSwitchcover.setSelected(false);
+        btnFlashlightSwitchCover = findViewById(R.id.iv_btn_flashlight_switchover);
+        btnFlashlightSwitchCover.setOnClickListener(this);
+        btnFlashlightSwitchCover.setSelected(false);
 
-        btnCameraSwitchcover = findViewById(R.id.iv_btn_camera_switchover);
-        btnCameraSwitchcover.setOnClickListener(this);
+        btnCameraSwitchCover = findViewById(R.id.iv_btn_camera_switchover);
+        btnCameraSwitchCover.setOnClickListener(this);
+
+        btnSpeedSwitchCover = findViewById(R.id.iv_btn_record_speed);
+        btnSpeedSwitchCover.setOnClickListener(this);
+
+        btnFaceBeauty = findViewById(R.id.iv_btn_record_beauty);
+        btnFaceBeauty.setOnClickListener(this);
+
+        btnStyleFilter = findViewById(R.id.iv_btn_record_filter);
+        btnStyleFilter.setOnClickListener(this);
 
         btnRecord = findViewById(R.id.btn_camera_record);
         btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
@@ -82,12 +93,26 @@ public class AWCameraRecordActivity extends AppCompatActivity
         if (v.getId() == R.id.iv_btn_close) {
             finish();
         } else if (v.getId() == R.id.iv_btn_flashlight_switchover) {
-            if (btnFlashlightSwitchcover.isSelected()) {
-                btnFlashlightSwitchcover.setSelected(false);
+            if (btnFlashlightSwitchCover.isSelected()) {
+                btnFlashlightSwitchCover.setSelected(false);
             } else {
-                btnFlashlightSwitchcover.setSelected(true);
+                btnFlashlightSwitchCover.setSelected(true);
             }
         } else if (v.getId() == R.id.iv_btn_camera_switchover) {
+
+        } else if (v.getId() == R.id.iv_btn_record_speed) {
+            if (btnSpeedSwitchCover.isSelected()) {
+                btnSpeedSwitchCover.setSelected(false);
+            } else {
+                btnSpeedSwitchCover.setSelected(true);
+            }
+        } else if (v.getId() == R.id.iv_btn_record_beauty) {
+            if (btnFaceBeauty.isSelected()) {
+                btnFaceBeauty.setSelected(false);
+            } else {
+                btnFaceBeauty.setSelected(true);
+            }
+        } else if (v.getId() == R.id.iv_btn_record_filter) {
 
         }
     }
