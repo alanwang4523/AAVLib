@@ -133,6 +133,23 @@ public class AWIOSurfaceProxy {
     }
 
     /**
+     * 同步获取输入的 mInputSurfaceTexture
+     * @return
+     */
+    public AWSurfaceTexture getInputSurfaceTexture() {
+        try {
+            mCountDownLatch.await(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return null;
+        }
+        if (mInputSurfaceTexture != null) {
+            return mInputSurfaceTexture;
+        }
+        return null;
+    }
+
+    /**
      * 设置缩放模式，目前支持：FIT_XY, CENTER_CROP
      * @param scaleType
      */
@@ -226,6 +243,10 @@ public class AWIOSurfaceProxy {
             }
             mViewportWidth = width;
             mViewportHeight = height;
+
+            if (mOnOutputSurfaceListener != null) {
+                mOnOutputSurfaceListener.onOutputSurfaceUpdated(surface, width, height);
+            }
             mIsSurfaceReady = true;
 
             StringBuilder strB = new StringBuilder();
@@ -238,10 +259,6 @@ public class AWIOSurfaceProxy {
             if (mOutputSurfaceRender != null && mInputFrameBuffer != null
                     && mVideoWidth > 0 && mVideoHeight > 0) {
                 mMainGLEngine.postRenderMessage(new AWMessage(AWMessage.MSG_DRAW));
-            }
-
-            if (mOnOutputSurfaceListener != null) {
-                mOnOutputSurfaceListener.onOutputSurfaceUpdated(surface, width, height);
             }
         }
 

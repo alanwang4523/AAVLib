@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
+import com.alanwang.aavlib.libvideo.core.AWCameraRecordController;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
 
@@ -32,6 +32,8 @@ public class AWCameraRecordActivity extends AppCompatActivity
     private ImageView btnFaceBeauty;
     private ImageView btnStyleFilter;
 
+    private AWCameraRecordController mCameraRecordController;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +42,8 @@ public class AWCameraRecordActivity extends AppCompatActivity
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.aav_activity_camera_record);
+
+        mCameraRecordController = new AWCameraRecordController();
 
         mVideoLayout = findViewById(R.id.video_lyt);
 
@@ -80,12 +84,12 @@ public class AWCameraRecordActivity extends AppCompatActivity
 
     @Override
     public void onSurfaceChanged(Surface surface, int w, int h) {
-
+        mCameraRecordController.updateSurface(surface, w, h);
     }
 
     @Override
     public void onSurfaceDestroyed(Surface surface) {
-
+        mCameraRecordController.destroySurface();
     }
 
     @Override
@@ -115,5 +119,11 @@ public class AWCameraRecordActivity extends AppCompatActivity
         } else if (v.getId() == R.id.iv_btn_record_filter) {
 
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mCameraRecordController.release();
+        super.onDestroy();
     }
 }

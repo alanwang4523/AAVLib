@@ -2,6 +2,7 @@ package com.alanwang.aavlib.libvideo.camera;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
+import com.alanwang.aavlib.libeglcore.common.AWSurfaceTexture;
 import com.alanwang.aavlib.libutils.ALog;
 import com.alanwang.aavlib.libvideo.common.AWVideoSize;
 import java.util.List;
@@ -28,6 +29,36 @@ public class AWCamera {
         }
         mVideoRatio = videoRatio;
         return configCamera(facingId);
+    }
+
+    /**
+     * 设置相机的输出纹理
+     * @param surfaceTexture
+     * @throws AWCameraException
+     */
+    public void setPreviewTexture(AWSurfaceTexture surfaceTexture) throws AWCameraException {
+        try {
+            mCamera.setPreviewTexture(surfaceTexture.getSurfaceTexture());
+            mCamera.startPreview();
+        } catch (Exception e) {
+            throw new AWCameraException(AWCameraException.ERROR_CAMERA_SETTING_FAILED,
+                    "mCamera setPreviewTexture failed!", e);
+        }
+    }
+
+    /**
+     * 自动聚焦
+     * @throws AWCameraException
+     */
+    public void autoFocus() throws AWCameraException {
+        if (mCamera != null) {
+            try {
+                mCamera.autoFocus(null);//设置自动对焦
+            } catch (Exception e) {
+                throw new AWCameraException(AWCameraException.ERROR_CAMERA_SETTING_FAILED,
+                        "Camera auto focus failed!", e);
+            }
+        }
     }
 
     /**
