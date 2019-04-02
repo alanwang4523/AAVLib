@@ -30,6 +30,12 @@ public interface IGLEngineCallback {
     void onRender(AWMessage msg);
 
     /**
+     * 处理非渲染消息
+     * @param msg
+     */
+    void onHandleMsg(AWMessage msg);
+
+    /**
      * Surface destroy
      */
     void onSurfaceDestroy();

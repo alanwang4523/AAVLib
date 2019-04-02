@@ -212,7 +212,7 @@ public class AWIOSurfaceProxy {
                 return;
             }
             surfaceTexture.drawFrame(mInputFrameBuffer, mVideoWidth, mVideoHeight);
-            mMainGLEngine.postRenderMessage(new AWMessage(AWMessage.MSG_DRAW));
+            mMainGLEngine.postMessage(new AWMessage(AWMessage.MSG_DRAW));
         }
     };
 
@@ -258,7 +258,7 @@ public class AWIOSurfaceProxy {
             // 确保在切换输入surface ready 后把最新的一帧数据更新到输出 surface
             if (mOutputSurfaceRender != null && mInputFrameBuffer != null
                     && mVideoWidth > 0 && mVideoHeight > 0) {
-                mMainGLEngine.postRenderMessage(new AWMessage(AWMessage.MSG_DRAW));
+                mMainGLEngine.postMessage(new AWMessage(AWMessage.MSG_DRAW));
             }
         }
 
@@ -279,6 +279,11 @@ public class AWIOSurfaceProxy {
                         mInputFrameBuffer.getOutputTextureId(), mVideoWidth, mVideoHeight);
             }
             mOutputSurfaceRender.drawFrame(outputTextureId, mViewportWidth, mViewportHeight);
+        }
+
+        @Override
+        public void onHandleMsg(AWMessage msg) {
+
         }
 
         @Override

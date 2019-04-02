@@ -24,8 +24,8 @@ public class AWMainGLEngine {
     private final AWEGLCoreWrapper mEGLCoreWrapper;
     private final AWHandlerThread mHandlerThread;
     private final ImageReader mImageReader;
-    private final Deque<AWMessage> mRenderTaskDeque;
-    private final RenderTask mRenderTask;
+    private final Deque<AWMessage> mMessageDeque;
+    private final MessageTask mMessageTask;
     private IGLEngineCallback mEngineCallback;
     private volatile boolean mIsEngineValid = false;
 
@@ -33,8 +33,8 @@ public class AWMainGLEngine {
         mEGLCoreWrapper = new AWEGLCoreWrapper(null);
         mHandlerThread = new AWHandlerThread(TAG, Process.THREAD_PRIORITY_FOREGROUND);
         mImageReader = ImageReader.newInstance(1, 1, PixelFormat.RGBA_8888, 1);
-        mRenderTaskDeque = new ArrayDeque<>();
-        mRenderTask = new RenderTask(this);
+        mMessageDeque = new ArrayDeque<>();
+        mMessageTask = new MessageTask(this);
         mEngineCallback = callback;
     }
 
@@ -84,15 +84,15 @@ public class AWMainGLEngine {
      * 发送一个渲染消息
      * @param msg
      */
-    public void postRenderMessage(AWMessage msg) {
+    public void postMessage(AWMessage msg) {
         if (mIsEngineValid) {
-            synchronized (mRenderTaskDeque) {
-                if (mRenderTaskDeque.size() > 100) {
-                    mRenderTaskDeque.clear();
+            synchronized (mMessageDeque) {
+                if (mMessageDeque.size() > 100) {
+                    mMessageDeque.clear();
                 }
-                mRenderTaskDeque.add(msg);
+                mMessageDeque.add(msg);
             }
-            mHandlerThread.postTask(mRenderTask);
+            mHandlerThread.postTask(mMessageTask);
         }
     }
 
@@ -100,11 +100,15 @@ public class AWMainGLEngine {
      * 真正的处理渲染消息
      * @param msg
      */
-    private void handleRenderMsg(AWMessage msg) {
-        if (mEGLCoreWrapper.isEGLContextValid()) {
-            mEGLCoreWrapper.makeCurrent();
-            mEngineCallback.onRender(msg);
-            mEGLCoreWrapper.swapBuffers();
+    private void handleMsg(AWMessage msg) {
+        if (msg.msgWhat == AWMessage.MSG_DRAW) {
+            if (mEGLCoreWrapper.isEGLContextValid()) {
+                mEGLCoreWrapper.makeCurrent();
+                mEngineCallback.onRender(msg);
+                mEGLCoreWrapper.swapBuffers();
+            }
+        } else {
+            mEngineCallback.onHandleMsg(msg);
         }
     }
 
@@ -141,21 +145,21 @@ public class AWMainGLEngine {
     /**
      * 渲染任务
      */
-    private static class RenderTask implements  Runnable {
+    private static class MessageTask implements  Runnable {
         private final AWMainGLEngine mMainGLEngine;
 
-        public RenderTask(AWMainGLEngine mainGLEngine) {
+        public MessageTask(AWMainGLEngine mainGLEngine) {
             this.mMainGLEngine = mainGLEngine;
         }
 
         @Override
         public void run() {
             AWMessage msg;
-            synchronized (mMainGLEngine.mRenderTaskDeque) {
-                msg = mMainGLEngine.mRenderTaskDeque.poll();
+            synchronized (mMainGLEngine.mMessageDeque) {
+                msg = mMainGLEngine.mMessageDeque.poll();
             }
             if (msg != null) {
-                mMainGLEngine.handleRenderMsg(msg);
+                mMainGLEngine.handleMsg(msg);
             }
         }
     }
