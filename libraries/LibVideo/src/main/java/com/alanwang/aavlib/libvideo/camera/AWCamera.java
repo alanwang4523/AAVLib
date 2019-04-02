@@ -129,7 +129,7 @@ public class AWCamera {
      */
     public void release() {
         try {
-            if (mCamera == null) {
+            if (mCamera != null) {
                 mCamera.setPreviewCallback(null);
                 mCamera.release();
                 mCamera = null;

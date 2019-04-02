@@ -10,6 +10,9 @@ public class AWMessage {
 
     public final static int MSG_DRAW = 10001;
 
+    public final static int MSG_CAMERA_SWITCH = 10101;// 切换摄像头
+    public final static int MSG_CAMERA_TOGGLE_FLASH_LIGHT = 10102;// 开关闪光灯
+
     public final int msgWhat;
     public int msgArg1;
     public int msgArg2;

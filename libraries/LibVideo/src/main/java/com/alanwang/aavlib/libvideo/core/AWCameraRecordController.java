@@ -2,7 +2,6 @@ package com.alanwang.aavlib.libvideo.core;
 
 import android.hardware.Camera;
 import android.view.Surface;
-
 import com.alanwang.aavlib.libeglcore.common.AWMessage;
 import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.libvideo.camera.AWCamera;
@@ -27,6 +26,16 @@ public class AWCameraRecordController {
         mIOSurfaceProxy.setOnOutputSurfaceListener(mOnOutputSurfaceListener);
         mIOSurfaceProxy.setOnPassFilterListener(mOnPassFilterListener);
         mIOSurfaceProxy.setOnMessageListener(mOnMessageListener);
+    }
+
+    /**
+     * 切换摄像头
+     * @param isFrontCamera
+     */
+    public void switchCamera(boolean isFrontCamera) {
+        mIOSurfaceProxy.postMessage(new AWMessage(AWMessage.MSG_CAMERA_SWITCH,
+                isFrontCamera ? Camera.CameraInfo.CAMERA_FACING_FRONT :
+                        Camera.CameraInfo.CAMERA_FACING_BACK));
     }
 
     /**
@@ -69,6 +78,7 @@ public class AWCameraRecordController {
                 try {
                     AWVideoSize textureSize = AWVideoSize.getTextureSize(AWVideoSize.Ratio.RATIO_16_9);
                     mIOSurfaceProxy.setTextureSize(textureSize.width, textureSize.height);
+
                     mCamera.config(Camera.CameraInfo.CAMERA_FACING_FRONT, AWVideoSize.Ratio.RATIO_16_9);
                     mCamera.setPreviewTexture(mIOSurfaceProxy.getInputSurfaceTexture());
                     mIsCameraOpen = true;
@@ -96,7 +106,15 @@ public class AWCameraRecordController {
     private AWIOSurfaceProxy.OnMessageListener mOnMessageListener = new AWIOSurfaceProxy.OnMessageListener() {
         @Override
         public void onHandleMessage(AWMessage msg) {
-
+            if (msg.msgWhat == AWMessage.MSG_CAMERA_SWITCH) {
+                try {
+                    mCamera.config(msg.msgArg1, AWVideoSize.Ratio.RATIO_16_9);
+                    mCamera.setPreviewTexture(mIOSurfaceProxy.getInputSurfaceTexture());
+                    mIsCameraOpen = true;
+                } catch (AWCameraException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     };
 }

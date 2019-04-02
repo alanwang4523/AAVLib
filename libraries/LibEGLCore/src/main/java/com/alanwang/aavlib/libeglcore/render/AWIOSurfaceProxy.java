@@ -194,6 +194,14 @@ public class AWIOSurfaceProxy {
     }
 
     /**
+     * 发送消息到 GL 线程
+     * @param msg
+     */
+    public void postMessage(AWMessage msg) {
+        mMainGLEngine.postMessage(msg);
+    }
+
+    /**
      * 更新 surface
      * @param surface
      * @param w

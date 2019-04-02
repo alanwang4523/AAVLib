@@ -33,6 +33,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
     private ImageView btnStyleFilter;
 
     private AWCameraRecordController mCameraRecordController;
+    private boolean mIsFrontCamera = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +104,8 @@ public class AWCameraRecordActivity extends AppCompatActivity
                 btnFlashlightSwitchCover.setSelected(true);
             }
         } else if (v.getId() == R.id.iv_btn_camera_switchover) {
-
+            mIsFrontCamera = !mIsFrontCamera;
+            mCameraRecordController.switchCamera(mIsFrontCamera);
         } else if (v.getId() == R.id.iv_btn_record_speed) {
             if (btnSpeedSwitchCover.isSelected()) {
                 btnSpeedSwitchCover.setSelected(false);
