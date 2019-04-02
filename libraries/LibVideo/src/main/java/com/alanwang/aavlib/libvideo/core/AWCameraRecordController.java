@@ -39,6 +39,15 @@ public class AWCameraRecordController {
     }
 
     /**
+     * 开关闪光灯
+     * @param isOpenFlashlight
+     */
+    public void toggleFlashlight(boolean isOpenFlashlight) {
+        mIOSurfaceProxy.postMessage(new AWMessage(AWMessage.MSG_CAMERA_TOGGLE_FLASH_LIGHT,
+                isOpenFlashlight ? 1 : 0));
+    }
+
+    /**
      * 更新 surface
      * @param surface
      * @param w
@@ -111,6 +120,16 @@ public class AWCameraRecordController {
                     mCamera.config(msg.msgArg1, AWVideoSize.Ratio.RATIO_16_9);
                     mCamera.setPreviewTexture(mIOSurfaceProxy.getInputSurfaceTexture());
                     mIsCameraOpen = true;
+                } catch (AWCameraException e) {
+                    e.printStackTrace();
+                }
+            } else if (msg.msgWhat == AWMessage.MSG_CAMERA_TOGGLE_FLASH_LIGHT) {
+                try {
+                    if (msg.msgArg1 == 1) {
+                        mCamera.openFlashLight();
+                    } else {
+                        mCamera.closeFlashlight();
+                    }
                 } catch (AWCameraException e) {
                     e.printStackTrace();
                 }

@@ -56,7 +56,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
 
         btnFlashlightSwitchCover = findViewById(R.id.iv_btn_flashlight_switchover);
         btnFlashlightSwitchCover.setOnClickListener(this);
-        btnFlashlightSwitchCover.setSelected(false);
+        btnFlashlightSwitchCover.setSelected(true);
 
         btnCameraSwitchCover = findViewById(R.id.iv_btn_camera_switchover);
         btnCameraSwitchCover.setOnClickListener(this);
@@ -100,8 +100,10 @@ public class AWCameraRecordActivity extends AppCompatActivity
         } else if (v.getId() == R.id.iv_btn_flashlight_switchover) {
             if (btnFlashlightSwitchCover.isSelected()) {
                 btnFlashlightSwitchCover.setSelected(false);
+                mCameraRecordController.toggleFlashlight(true);
             } else {
                 btnFlashlightSwitchCover.setSelected(true);
+                mCameraRecordController.toggleFlashlight(false);
             }
         } else if (v.getId() == R.id.iv_btn_camera_switchover) {
             mIsFrontCamera = !mIsFrontCamera;
