@@ -63,6 +63,17 @@ public class AWIOSurfaceProxy {
         int onPassFilter(int textureId, int width, int height);
     }
 
+    /**
+     * 消息处理回调
+     */
+    public interface OnMessageListener {
+        /**
+         * 处理消息
+         * @param msg
+         */
+        void onHandleMessage(AWMessage msg);
+    }
+
     private AWMainGLEngine mMainGLEngine;
     private AWSurfaceTexture mInputSurfaceTexture;
     private AWFrameBufferObject mInputFrameBuffer;
@@ -70,6 +81,7 @@ public class AWIOSurfaceProxy {
     private OnInputSurfaceListener mOnInputSurfaceListener;
     private OnOutputSurfaceListener mOnOutputSurfaceListener;
     private OnPassFilterListener mOnPassFilterListener;
+    private OnMessageListener mOnMessageListener;
     private CountDownLatch mCountDownLatch;
 
     private @Type.ScaleType int scaleType = Type.ScaleType.FIT_XY;
@@ -112,6 +124,14 @@ public class AWIOSurfaceProxy {
      */
     public void setOnPassFilterListener(OnPassFilterListener onPassFilterListener) {
         this.mOnPassFilterListener = onPassFilterListener;
+    }
+
+    /**
+     * 设置消息回调
+     * @param onMessageListener
+     */
+    public void setOnMessageListener(OnMessageListener onMessageListener) {
+        this.mOnMessageListener = onMessageListener;
     }
 
     /**
@@ -283,7 +303,9 @@ public class AWIOSurfaceProxy {
 
         @Override
         public void onHandleMsg(AWMessage msg) {
-
+            if (mOnMessageListener != null) {
+                mOnMessageListener.onHandleMessage(msg);
+            }
         }
 
         @Override

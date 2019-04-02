@@ -2,6 +2,8 @@ package com.alanwang.aavlib.libvideo.core;
 
 import android.hardware.Camera;
 import android.view.Surface;
+
+import com.alanwang.aavlib.libeglcore.common.AWMessage;
 import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.libvideo.camera.AWCamera;
 import com.alanwang.aavlib.libvideo.camera.AWCameraException;
@@ -16,6 +18,7 @@ public class AWCameraRecordController {
 
     private AWCamera mCamera;
     private AWIOSurfaceProxy mIOSurfaceProxy;
+    private boolean mIsCameraOpen = false;
 
     public AWCameraRecordController() {
         mCamera = new AWCamera();
@@ -23,6 +26,7 @@ public class AWCameraRecordController {
         mIOSurfaceProxy.setOnInputSurfaceListener(mOnInputSurfaceListener);
         mIOSurfaceProxy.setOnOutputSurfaceListener(mOnOutputSurfaceListener);
         mIOSurfaceProxy.setOnPassFilterListener(mOnPassFilterListener);
+        mIOSurfaceProxy.setOnMessageListener(mOnMessageListener);
     }
 
     /**
@@ -61,19 +65,24 @@ public class AWCameraRecordController {
     private AWIOSurfaceProxy.OnOutputSurfaceListener mOnOutputSurfaceListener = new AWIOSurfaceProxy.OnOutputSurfaceListener() {
         @Override
         public void onOutputSurfaceUpdated(Surface surface, int w, int h) {
-            try {
-                AWVideoSize textureSize = AWVideoSize.getTextureSize(AWVideoSize.Ratio.RATIO_16_9);
-                mIOSurfaceProxy.setTextureSize(textureSize.width, textureSize.height);
-                mCamera.config(Camera.CameraInfo.CAMERA_FACING_FRONT, AWVideoSize.Ratio.RATIO_16_9);
-                mCamera.setPreviewTexture(mIOSurfaceProxy.getInputSurfaceTexture());
-            } catch (AWCameraException e) {
-                e.printStackTrace();
+            if (!mIsCameraOpen) {
+                try {
+                    AWVideoSize textureSize = AWVideoSize.getTextureSize(AWVideoSize.Ratio.RATIO_16_9);
+                    mIOSurfaceProxy.setTextureSize(textureSize.width, textureSize.height);
+                    mCamera.config(Camera.CameraInfo.CAMERA_FACING_FRONT, AWVideoSize.Ratio.RATIO_16_9);
+                    mCamera.setPreviewTexture(mIOSurfaceProxy.getInputSurfaceTexture());
+                    mIsCameraOpen = true;
+                } catch (AWCameraException e) {
+                    e.printStackTrace();
+                }
             }
+
         }
 
         @Override
         public void onOutputSurfaceDestroyed() {
             mCamera.release();
+            mIsCameraOpen = false;
         }
     };
 
@@ -81,6 +90,13 @@ public class AWCameraRecordController {
         @Override
         public int onPassFilter(int textureId, int width, int height) {
             return textureId;
+        }
+    };
+
+    private AWIOSurfaceProxy.OnMessageListener mOnMessageListener = new AWIOSurfaceProxy.OnMessageListener() {
+        @Override
+        public void onHandleMessage(AWMessage msg) {
+
         }
     };
 }
