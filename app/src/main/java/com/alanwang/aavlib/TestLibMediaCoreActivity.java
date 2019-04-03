@@ -11,7 +11,7 @@ import com.alanwang.aavlib.libmediacore.clipper.AWVideoClipper;
 import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderToPCM;
 import com.alanwang.aavlib.libmediacore.decoder.AWAudioHWDecoderToWav;
 import com.alanwang.aavlib.libmediacore.encoder.AWAudioWavFileEncoder;
-import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
+import com.alanwang.aavlib.libmediacore.exception.AWMediaException;
 import com.alanwang.aavlib.libmediacore.exception.AWException;
 import com.alanwang.aavlib.libmediacore.listener.AWVoidResultListener;
 import com.alanwang.aavlib.libmediacore.muxer.AWAVAndroidMuxer;
@@ -213,7 +213,7 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
             wavFileEncoder.setProcessListener(new CommonProgressListener(
                     "AWAudioWavFileEncoder", outputPath));
             wavFileEncoder.start();
-        } catch (AWAudioException e) {
+        } catch (AWMediaException e) {
             e.printStackTrace();
         }
     }

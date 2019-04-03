@@ -3,7 +3,7 @@ package com.alanwang.aavlib.libaudio.recorder;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
+import com.alanwang.aavlib.libmediacore.exception.AWMediaException;
 import com.alanwang.aavlib.libmediacore.listener.AWDataAvailableListener;
 import com.alanwang.aavlib.libmediacore.listener.AWResultListener;
 
@@ -83,7 +83,7 @@ public class AWAudioDefaultRecorder {
                     }
                 } else {
                     if (mResultListener != null) {
-                        mResultListener.onError(new AWAudioException("Record error : " + length));
+                        mResultListener.onError(new AWMediaException("Record error : " + length));
                     }
                     break;
                 }

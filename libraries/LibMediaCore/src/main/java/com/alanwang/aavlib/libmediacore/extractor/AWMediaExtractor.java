@@ -6,7 +6,7 @@ import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.text.TextUtils;
 
-import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
+import com.alanwang.aavlib.libmediacore.exception.AWMediaException;
 import com.alanwang.aavlib.libmediacore.listener.AWVoidResultListener;
 
 import java.io.IOException;
@@ -213,7 +213,7 @@ public abstract class AWMediaExtractor {
             while (mIsRunning) {
                 ByteBuffer byteBuffer = getBufferForOutputData();
                 if (byteBuffer == null && mProcessListener != null) {
-                    mProcessListener.onError(new AWAudioException("Buffer cannot be null！"));
+                    mProcessListener.onError(new AWMediaException("Buffer cannot be null！"));
                     break;
                 }
                 byteBuffer.clear();
@@ -222,7 +222,7 @@ public abstract class AWMediaExtractor {
                     readCount = mExtractor.readSampleData(byteBuffer, 0);
                 } catch (IllegalArgumentException e) {
                     if (mProcessListener != null) {
-                        mProcessListener.onError(new AWAudioException("Buffer not enough！"));
+                        mProcessListener.onError(new AWMediaException("Buffer not enough！"));
                     }
                     break;
                 }

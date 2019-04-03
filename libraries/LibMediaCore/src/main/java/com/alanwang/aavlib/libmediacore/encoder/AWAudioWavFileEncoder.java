@@ -3,7 +3,7 @@ package com.alanwang.aavlib.libmediacore.encoder;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
-import com.alanwang.aavlib.libmediacore.exception.AWAudioException;
+import com.alanwang.aavlib.libmediacore.exception.AWMediaException;
 import com.alanwang.aavlib.libmediacore.listener.AWVoidResultListener;
 import com.alanwang.aavlib.libmediacore.utils.AWWavFileHelper;
 import java.io.File;
@@ -40,10 +40,10 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
      * @param outputFilePath
      * @throws IOException
      */
-    public void setDataSource(String wavFilePath, String outputFilePath) throws AWAudioException {
+    public void setDataSource(String wavFilePath, String outputFilePath) throws AWMediaException {
         File wavFile = new File(wavFilePath);
         if (!wavFile.exists()) {
-            throw new AWAudioException("Wav file is not found!");
+            throw new AWMediaException("Wav file is not found!");
         }
 
         // 获取音频信息
@@ -51,7 +51,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
         try {
             headerInfo = AWWavFileHelper.getWavHeaderInfo(wavFile);
         } catch (IOException e) {
-            throw new AWAudioException("Get wav header info failed!", e);
+            throw new AWMediaException("Get wav header info failed!", e);
         }
         mSampleRate = headerInfo.sampleRate;
         mChannelCount = headerInfo.channelCount;
@@ -61,15 +61,15 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
         try {
             mMediaMuxer = new MediaMuxer(outputFilePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
         } catch (IOException e) {
-            throw new AWAudioException("Create MediaMuxer failed!", e);
+            throw new AWMediaException("Create MediaMuxer failed!", e);
         }
         try {
             mWavInputStream = new FileInputStream(wavFile);
             mWavInputStream.skip(44);//跳过wav文件头，从00H~2BH
         } catch (FileNotFoundException e) {
-            throw new AWAudioException("The wav file not found!", e);
+            throw new AWMediaException("The wav file not found!", e);
         } catch (IOException e) {
-            throw new AWAudioException("Input stream skip failed!", e);
+            throw new AWMediaException("Input stream skip failed!", e);
         }
         mTempBuffer = new byte[10 * 1024];
 
@@ -81,10 +81,10 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
      * @param startTimeMs
      * @param endTimeMs 为 -1 时表示编码到文件尾
      */
-    public void setEncodeTime(long startTimeMs, long endTimeMs) throws AWAudioException {
+    public void setEncodeTime(long startTimeMs, long endTimeMs) throws AWMediaException {
         checkIsReady();
         if (endTimeMs != -1 && startTimeMs >= endTimeMs) {
-            throw new AWAudioException("Illegal Arguments: start time could not be larger than end time!");
+            throw new AWMediaException("Illegal Arguments: start time could not be larger than end time!");
         }
         long needSkipLen = getLenByTime(mSampleRate, mChannelCount, mBytePerSample, startTimeMs);
         if (endTimeMs != -1) {
@@ -94,7 +94,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
         try {
             mWavInputStream.skip(needSkipLen);
         } catch (IOException e) {
-            throw new AWAudioException("skip failed!", e);
+            throw new AWMediaException("skip failed!", e);
         }
     }
 
@@ -104,14 +104,14 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void setup(int bitRate) throws AWAudioException {
+    public void setup(int bitRate) throws AWMediaException {
         checkIsReady();
         try {
             super.setup(mSampleRate, mChannelCount, bitRate);
         } catch (IOException e) {
-            throw new AWAudioException("Set up failed!", e);
+            throw new AWMediaException("Set up failed!", e);
         } catch (InterruptedException e) {
-            throw new AWAudioException("Set up failed!", e);
+            throw new AWMediaException("Set up failed!", e);
         }
     }
 
@@ -214,7 +214,7 @@ public class AWAudioWavFileEncoder extends AWAudioHWEncoderCore {
                 bytesRead = mWavInputStream.read(mTempBuffer, 0, inputBuffer.limit());
             } catch (IOException e) {
                 if (mProcessListener != null) {
-                    mProcessListener.onError(new AWAudioException("Read file error!"));
+                    mProcessListener.onError(new AWMediaException("Read file error!"));
                 }
                 return false;
             }
