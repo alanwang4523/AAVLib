@@ -9,6 +9,9 @@ import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
 import com.alanwang.aavlib.libeglcore.egl.AWEGLCoreWrapper;
 import com.alanwang.aavlib.libeglcore.render.AWSurfaceRender;
 import com.alanwang.aavlib.libmediacore.encoder.AWVideoRecordEncoder;
+import com.alanwang.aavlib.libvideo.common.DefaultEncodeTimeProvider;
+import com.alanwang.aavlib.libvideo.common.IEncodeTimeProvider;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
@@ -33,6 +36,8 @@ public class AWVideoFileRecorder {
     private final AWEGLCoreWrapper mEGLCoreWrapper;
     private AWSurfaceRender mSurfaceRender;
     private AWVideoRecordEncoder mVideoEncoderCore;
+    private IEncodeTimeProvider mEncodeTimeProvider;
+    private DefaultEncodeTimeProvider mDefaultEncodeTimeProvider;
 
     private volatile boolean isEnableEncode = false;
     private int mVideoWidth = -1;
@@ -44,6 +49,14 @@ public class AWVideoFileRecorder {
         this.mHandlerThread = new HandlerThread(TAG);
         this.mHandlerThread.start();
         this.mHandler = new EncodeHandler(this, this.mHandlerThread.getLooper());
+    }
+
+    /**
+     * 设置编码时间提供器
+     * @param encodeTimeProvider
+     */
+    public void setEncodeTimeProvider(IEncodeTimeProvider encodeTimeProvider) {
+        this.mEncodeTimeProvider = encodeTimeProvider;
     }
 
     /**
@@ -99,6 +112,14 @@ public class AWVideoFileRecorder {
         mEGLCoreWrapper.createSurface(mVideoEncoderCore.getInputSurface());
         mEGLCoreWrapper.makeCurrent();
 
+        // 如果外部没有设置编码时间提供器，则使用默认的
+        if (mEncodeTimeProvider == null && mDefaultEncodeTimeProvider != null) {
+            mDefaultEncodeTimeProvider = new DefaultEncodeTimeProvider();
+        }
+        if (mDefaultEncodeTimeProvider != null) {
+            mDefaultEncodeTimeProvider.reset();
+        }
+
         isEnableEncode = true;
     }
 
@@ -125,6 +146,9 @@ public class AWVideoFileRecorder {
      * 暂停录制，暂停往录制文件写入数据
      */
     public void pauseRecord() {
+        if (mDefaultEncodeTimeProvider != null) {
+            mDefaultEncodeTimeProvider.pauseRecord();
+        }
         isEnableEncode = false;
     }
 
@@ -132,6 +156,9 @@ public class AWVideoFileRecorder {
      * 恢复录制，继续向当前的录制文件写入数据
      */
     public void resumeRecord() {
+        if (mDefaultEncodeTimeProvider != null) {
+            mDefaultEncodeTimeProvider.resumeRecord();
+        }
         isEnableEncode = true;
     }
 
@@ -173,9 +200,24 @@ public class AWVideoFileRecorder {
      */
     public void encodeFrame(int textureId) {
         if (isEnableEncode) {
-            long encodeTimestamp = System.currentTimeMillis();
+            long encodeTimestamp = getEncodeTimeStampMs();
             mHandler.sendMessage(mHandler.obtainMessage(MSG_FRAME_AVAILABLE, new FrameArg(textureId, encodeTimestamp)));
         }
+    }
+
+    /**
+     * 返回编码时间戳，单位 ：纳秒
+     * @return
+     */
+    private long getEncodeTimeStampMs() {
+        long encodeTimestampMs;
+        if (mEncodeTimeProvider != null) {
+            encodeTimestampMs = mEncodeTimeProvider.getTimeStampMS();
+        } else {
+            encodeTimestampMs = mDefaultEncodeTimeProvider.getTimeStampMS();
+        }
+
+        return encodeTimestampMs;
     }
 
     /**
