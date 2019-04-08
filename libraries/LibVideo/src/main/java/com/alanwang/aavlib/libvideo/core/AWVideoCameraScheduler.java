@@ -7,6 +7,7 @@ import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.libvideo.camera.AWCamera;
 import com.alanwang.aavlib.libvideo.camera.AWCameraException;
 import com.alanwang.aavlib.libvideo.common.AWVideoSize;
+import com.alanwang.aavlib.libvideoeffect.processors.AWCameraPreviewVEProcessor;
 
 /**
  * Author: AlanWang4523.
@@ -17,10 +18,13 @@ public class AWVideoCameraScheduler {
 
     private AWCamera mCamera;
     private AWIOSurfaceProxy mIOSurfaceProxy;
+    private AWCameraPreviewVEProcessor mVEProcessor;
     private boolean mIsCameraOpen = false;
+    private boolean mTestEnableEffect = false;// 测试是否使用滤镜
 
     public AWVideoCameraScheduler() {
         mCamera = new AWCamera();
+        mVEProcessor = new AWCameraPreviewVEProcessor();
         mIOSurfaceProxy = new AWIOSurfaceProxy();
         mIOSurfaceProxy.setOnInputSurfaceListener(mOnInputSurfaceListener);
         mIOSurfaceProxy.setOnOutputSurfaceListener(mOnOutputSurfaceListener);
@@ -104,6 +108,7 @@ public class AWVideoCameraScheduler {
         @Override
         public void onOutputSurfaceDestroyed() {
             mCamera.release();
+            mVEProcessor.release();
             mIsCameraOpen = false;
         }
     };
@@ -111,6 +116,9 @@ public class AWVideoCameraScheduler {
     private AWIOSurfaceProxy.OnPassFilterListener mOnPassFilterListener = new AWIOSurfaceProxy.OnPassFilterListener() {
         @Override
         public int onPassFilter(int textureId, int width, int height) {
+            if (mTestEnableEffect) {
+                return mVEProcessor.processFrame(textureId, width, height);
+            }
             return textureId;
         }
     };
