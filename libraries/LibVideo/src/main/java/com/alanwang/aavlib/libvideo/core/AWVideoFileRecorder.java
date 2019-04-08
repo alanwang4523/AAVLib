@@ -11,7 +11,6 @@ import com.alanwang.aavlib.libeglcore.render.AWSurfaceRender;
 import com.alanwang.aavlib.libmediacore.encoder.AWVideoRecordEncoder;
 import com.alanwang.aavlib.libvideo.common.DefaultEncodeTimeProvider;
 import com.alanwang.aavlib.libvideo.common.IEncodeTimeProvider;
-
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 

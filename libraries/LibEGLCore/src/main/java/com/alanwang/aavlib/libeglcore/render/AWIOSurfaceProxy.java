@@ -1,5 +1,6 @@
 package com.alanwang.aavlib.libeglcore.render;
 
+import android.opengl.EGLContext;
 import android.opengl.GLES20;
 import android.view.Surface;
 import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
@@ -132,6 +133,14 @@ public class AWIOSurfaceProxy {
      */
     public void setOnMessageListener(OnMessageListener onMessageListener) {
         this.mOnMessageListener = onMessageListener;
+    }
+
+    /**
+     * 获取共享的 EGLContext
+     * @return
+     */
+    public EGLContext getSharedEGLContext() {
+        return mMainGLEngine.getEGLContext();
     }
 
     /**
