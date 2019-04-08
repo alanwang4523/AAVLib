@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
-import com.alanwang.aavlib.libvideo.core.AWCameraRecordController;
+import com.alanwang.aavlib.libvideo.core.AWVideoCameraScheduler;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
 
@@ -32,7 +32,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
     private ImageView btnFaceBeauty;
     private ImageView btnStyleFilter;
 
-    private AWCameraRecordController mCameraRecordController;
+    private AWVideoCameraScheduler mVideoCameraScheduler;
     private boolean mIsFrontCamera = true;
 
     @Override
@@ -44,7 +44,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.aav_activity_camera_record);
 
-        mCameraRecordController = new AWCameraRecordController();
+        mVideoCameraScheduler = new AWVideoCameraScheduler();
 
         mVideoLayout = findViewById(R.id.video_lyt);
 
@@ -85,12 +85,12 @@ public class AWCameraRecordActivity extends AppCompatActivity
 
     @Override
     public void onSurfaceChanged(Surface surface, int w, int h) {
-        mCameraRecordController.updateSurface(surface, w, h);
+        mVideoCameraScheduler.updateSurface(surface, w, h);
     }
 
     @Override
     public void onSurfaceDestroyed(Surface surface) {
-        mCameraRecordController.destroySurface();
+        mVideoCameraScheduler.destroySurface();
     }
 
     @Override
@@ -100,14 +100,14 @@ public class AWCameraRecordActivity extends AppCompatActivity
         } else if (v.getId() == R.id.iv_btn_flashlight_switchover) {
             if (btnFlashlightSwitchCover.isSelected()) {
                 btnFlashlightSwitchCover.setSelected(false);
-                mCameraRecordController.toggleFlashlight(true);
+                mVideoCameraScheduler.toggleFlashlight(true);
             } else {
                 btnFlashlightSwitchCover.setSelected(true);
-                mCameraRecordController.toggleFlashlight(false);
+                mVideoCameraScheduler.toggleFlashlight(false);
             }
         } else if (v.getId() == R.id.iv_btn_camera_switchover) {
             mIsFrontCamera = !mIsFrontCamera;
-            mCameraRecordController.switchCamera(mIsFrontCamera);
+            mVideoCameraScheduler.switchCamera(mIsFrontCamera);
         } else if (v.getId() == R.id.iv_btn_record_speed) {
             if (btnSpeedSwitchCover.isSelected()) {
                 btnSpeedSwitchCover.setSelected(false);
@@ -127,7 +127,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        mCameraRecordController.release();
+        mVideoCameraScheduler.release();
         super.onDestroy();
     }
 }

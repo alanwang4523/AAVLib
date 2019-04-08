@@ -13,13 +13,13 @@ import com.alanwang.aavlib.libvideo.common.AWVideoSize;
  * Date: 19/4/2 08:25.
  * Mail: alanwang4523@gmail.com
  */
-public class AWCameraRecordController {
+public class AWVideoCameraScheduler {
 
     private AWCamera mCamera;
     private AWIOSurfaceProxy mIOSurfaceProxy;
     private boolean mIsCameraOpen = false;
 
-    public AWCameraRecordController() {
+    public AWVideoCameraScheduler() {
         mCamera = new AWCamera();
         mIOSurfaceProxy = new AWIOSurfaceProxy();
         mIOSurfaceProxy.setOnInputSurfaceListener(mOnInputSurfaceListener);
@@ -48,7 +48,7 @@ public class AWCameraRecordController {
     }
 
     /**
-     * 更新 surface
+     * 更新输出的 surface
      * @param surface
      * @param w
      * @param h
@@ -58,12 +58,15 @@ public class AWCameraRecordController {
     }
 
     /**
-     * 销毁 surface
+     * 销毁输出的 surface
      */
     public void destroySurface() {
         mIOSurfaceProxy.destroySurface();
     }
 
+    /**
+     * 释放资源
+     */
     public void release() {
         mIOSurfaceProxy.release();
     }
