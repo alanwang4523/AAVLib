@@ -88,7 +88,7 @@
         android:layout_marginTop="@dimen/margin_normal_12"
         android:layout_marginEnd="@dimen/margin_normal_8"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/icon_record_filter"
+        android:src="@drawable/icon_preview_filter"
         />
 
 
