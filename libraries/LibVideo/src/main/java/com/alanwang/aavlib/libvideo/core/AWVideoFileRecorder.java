@@ -112,7 +112,7 @@ public class AWVideoFileRecorder {
         mEGLCoreWrapper.makeCurrent();
 
         // 如果外部没有设置编码时间提供器，则使用默认的
-        if (mEncodeTimeProvider == null && mDefaultEncodeTimeProvider != null) {
+        if (mEncodeTimeProvider == null && mDefaultEncodeTimeProvider == null) {
             mDefaultEncodeTimeProvider = new DefaultEncodeTimeProvider();
         }
         if (mDefaultEncodeTimeProvider != null) {

@@ -7,12 +7,16 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
 import com.alanwang.aavlib.libvideo.core.AWVideoCameraScheduler;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
+
+import java.io.File;
 
 /**
  * Author: AlanWang4523.
@@ -34,6 +38,8 @@ public class AWCameraRecordActivity extends AppCompatActivity
 
     private AWVideoCameraScheduler mVideoCameraScheduler;
     private boolean mIsFrontCamera = true;
+    private File mVideoSaveDir = new File("/sdcard/Alan/record");
+    private File mCurVideoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +51,10 @@ public class AWCameraRecordActivity extends AppCompatActivity
         setContentView(R.layout.aav_activity_camera_record);
 
         mVideoCameraScheduler = new AWVideoCameraScheduler();
+        mVideoCameraScheduler.setupRecord(576, 1024, 5 * 1024 * 1024);
+        if (!mVideoSaveDir.exists()) {
+            mVideoSaveDir.mkdirs();
+        }
 
         mVideoLayout = findViewById(R.id.video_lyt);
 
@@ -74,10 +84,14 @@ public class AWCameraRecordActivity extends AppCompatActivity
         btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
             @Override
             public void onRecordStart() {
+                mCurVideoFile = new File(mVideoSaveDir, "AW_Video_" + System.currentTimeMillis() + ".mp4");
+                mVideoCameraScheduler.startRecord(mCurVideoFile.getAbsolutePath());
             }
 
             @Override
             public void onRecordStop() {
+                mVideoCameraScheduler.stopRecord();
+                Toast.makeText(AWCameraRecordActivity.this, "" + mCurVideoFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -127,6 +141,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
+        mVideoCameraScheduler.finishRecord();
         mVideoCameraScheduler.release();
         super.onDestroy();
     }
