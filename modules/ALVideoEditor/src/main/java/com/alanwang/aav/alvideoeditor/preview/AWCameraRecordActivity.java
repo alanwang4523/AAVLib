@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
+import com.alanwang.aavlib.libutils.TimeUtils;
 import com.alanwang.aavlib.libvideo.core.AWVideoCameraScheduler;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
@@ -84,7 +85,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
         btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
             @Override
             public void onRecordStart() {
-                mCurVideoFile = new File(mVideoSaveDir, "AW_Video_" + System.currentTimeMillis() + ".mp4");
+                mCurVideoFile = new File(mVideoSaveDir, "AWVideo_" + TimeUtils.getCurrentTime() + ".mp4");
                 mVideoCameraScheduler.startRecord(mCurVideoFile.getAbsolutePath());
             }
 
