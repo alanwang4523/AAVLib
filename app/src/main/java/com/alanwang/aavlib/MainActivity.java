@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-
 import com.alanwang.aav.alvideoeditor.preview.AWCameraRecordActivity;
 import com.alanwang.aav.alvideoeditor.preview.AWVideoPreviewActivity;
 import com.alanwang.aavlib.libutils.RuntimePermissionsHelper;
@@ -43,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(MainActivity.this, AWCameraRecordActivity.class));
                 break;
             case R.id.btn_goto_video_editor:
-                startActivity(new Intent(MainActivity.this, AWVideoPreviewActivity.class));
+                String VIDEO_PATH = "/sdcard/Alan/video/AlanTest.mp4";
+                AWVideoPreviewActivity.launchVideoPreviewActivity(MainActivity.this, VIDEO_PATH);
                 break;
             case R.id.btn_goto_test_libmediacore:
                 startActivity(new Intent(MainActivity.this, TestLibMediaCoreActivity.class));

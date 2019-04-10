@@ -11,6 +11,7 @@
         </activity>
         <activity
             android:name=".preview.AWVideoPreviewActivity"
+            android:theme="@style/AppThemeNoActionBar"
             android:resizeableActivity="false"
             android:screenOrientation="portrait">
         </activity>

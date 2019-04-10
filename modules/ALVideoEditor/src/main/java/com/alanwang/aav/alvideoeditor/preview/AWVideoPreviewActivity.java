@@ -1,15 +1,23 @@
 package com.alanwang.aav.alvideoeditor.preview;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.Surface;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
+
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
+import com.alanwang.aavlib.libutils.ALog;
 import com.alanwang.aavlib.libvideo.core.AWVideoPlayController;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
+
+import java.io.File;
 
 /**
  * Author: AlanWang4523.
@@ -17,13 +25,19 @@ import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
  * Mail: alanwang4523@gmail.com
  */
 
-public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfaceCallback {
+public class AWVideoPreviewActivity extends AppCompatActivity {
+    private static final String KEY_VIDEO_PATH = "video_path";
 
-    private static final String VIDEO_PATH = "/sdcard/Alan/video/AlanTest.mp4";
+    private String mVideoPath;
     private EnhancedRelativeLayout mVideoLayout;
     private AWSurfaceView mAWSurfaceView;
     private AWVideoPlayController mVideoPlayController;
 
+    public static void launchVideoPreviewActivity(Context context, String videoPath) {
+        Intent intent = new Intent(context, AWVideoPreviewActivity.class);
+        intent.putExtra(KEY_VIDEO_PATH, videoPath);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +48,25 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.aav_activity_video_preview);
 
+        mVideoPath = getIntent().getStringExtra(KEY_VIDEO_PATH);
+        ALog.e("mVideoPath = " + mVideoPath);
+        if (TextUtils.isEmpty(mVideoPath)) {
+            Toast.makeText(this, "Video file path is null!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        File videoFile = new File(mVideoPath);
+        if (!videoFile.exists()) {
+            Toast.makeText(this, "Video file not exist!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         mVideoLayout = findViewById(R.id.video_lyt);
 
         mAWSurfaceView = findViewById(R.id.video_surface_view);
-        mAWSurfaceView.setSurfaceCallback(this);
+        mAWSurfaceView.setSurfaceCallback(mSurfaceCallback);
 
         mVideoPlayController = new AWVideoPlayController();
         mVideoPlayController.setControllerCallback(new AWVideoPlayController.IControllerCallback() {
@@ -47,18 +76,8 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
                 mVideoPlayController.startPlay();
             }
         });
-        mVideoPlayController.setVideoPath(VIDEO_PATH);
+        mVideoPlayController.setVideoPath(mVideoPath);
 
-    }
-
-    @Override
-    public void onSurfaceChanged(Surface surface, int w, int h) {
-        mVideoPlayController.updateSurface(surface, w, h);
-    }
-
-    @Override
-    public void onSurfaceDestroyed(Surface surface) {
-        mVideoPlayController.destroySurface();
     }
 
     @Override
@@ -83,4 +102,16 @@ public class AWVideoPreviewActivity extends AppCompatActivity implements ISurfac
         mVideoPlayController.release();
         super.onDestroy();
     }
+
+    private ISurfaceCallback mSurfaceCallback = new ISurfaceCallback() {
+        @Override
+        public void onSurfaceChanged(Surface surface, int w, int h) {
+            mVideoPlayController.updateSurface(surface, w, h);
+        }
+
+        @Override
+        public void onSurfaceDestroyed(Surface surface) {
+            mVideoPlayController.destroySurface();
+        }
+    };
 }

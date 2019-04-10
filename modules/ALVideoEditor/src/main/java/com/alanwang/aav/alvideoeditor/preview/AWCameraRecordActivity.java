@@ -92,7 +92,8 @@ public class AWCameraRecordActivity extends AppCompatActivity
             @Override
             public void onRecordStop() {
                 mVideoCameraScheduler.stopRecord();
-                Toast.makeText(AWCameraRecordActivity.this, "" + mCurVideoFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(AWCameraRecordActivity.this, "" + mCurVideoFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                AWVideoPreviewActivity.launchVideoPreviewActivity(AWCameraRecordActivity.this, mCurVideoFile.getAbsolutePath());
             }
         });
     }
