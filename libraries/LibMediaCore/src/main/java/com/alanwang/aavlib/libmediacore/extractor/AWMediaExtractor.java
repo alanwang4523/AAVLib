@@ -190,7 +190,6 @@ public abstract class AWMediaExtractor {
             mExtractor.release();
             mExtractor = null;
         }
-        mIsRunning = false;
         mIsExtractorReady = false;
     }
 
@@ -226,30 +225,30 @@ public abstract class AWMediaExtractor {
                     }
                     break;
                 }
-                if (readCount < 0) {
+
+                if (readCount != -1) {
+                    mBufferInfo.size = readCount;
+                    mBufferInfo.offset = 0;
+                    mBufferInfo.flags = mExtractor.getSampleFlags();
+                    mBufferInfo.presentationTimeUs = mExtractor.getSampleTime();
+
+                    onDataAvailable(byteBuffer, mBufferInfo);
+
+                    if (mProcessListener != null) {
+                        mProcessListener.onProgress((int) (100.0f *
+                                (mBufferInfo.presentationTimeUs - mStartPosTimeUs) /
+                                (mEndPosTimeUs - mStartPosTimeUs)));
+                    }
+                } else {
                     isSuccess = true;
                     break;
                 }
-
-                mBufferInfo.size = readCount;
-                mBufferInfo.offset = 0;
-                mBufferInfo.flags = mExtractor.getSampleFlags();
-                mBufferInfo.presentationTimeUs = mExtractor.getSampleTime();
 
                 if (mBufferInfo.presentationTimeUs >= mEndPosTimeUs) {
                     isSuccess = true;
                     break;
                 }
-
-                if (mIsRunning) {
-                    onDataAvailable(byteBuffer, mBufferInfo);
-                    mExtractor.advance();
-                }
-                if (mProcessListener != null) {
-                    mProcessListener.onProgress((int) (100.0f *
-                            (mBufferInfo.presentationTimeUs - mStartPosTimeUs) /
-                            (mEndPosTimeUs - mStartPosTimeUs)));
-                }
+                mExtractor.advance();
             }
             release();
             onRunPost();
@@ -259,6 +258,7 @@ public abstract class AWMediaExtractor {
                     mProcessListener.onSuccess(null);
                 }
             }
+            mIsRunning = false;
         }
     };
 }
