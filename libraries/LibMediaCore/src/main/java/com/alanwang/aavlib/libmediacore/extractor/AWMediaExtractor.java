@@ -252,6 +252,13 @@ public abstract class AWMediaExtractor {
             }
             release();
             onRunPost();
+            if (!mIsRunning) {
+                if (mProcessListener != null) {
+                    mProcessListener.onCanceled();
+                }
+                mIsRunning = false;
+                return;
+            }
             if (isSuccess) {
                 if (mProcessListener != null) {
                     mProcessListener.onProgress(100);

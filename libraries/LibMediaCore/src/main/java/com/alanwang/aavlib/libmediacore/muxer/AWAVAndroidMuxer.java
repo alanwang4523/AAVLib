@@ -28,6 +28,8 @@ public class AWAVAndroidMuxer {
     private int mVideoTrackIndex;
     private volatile boolean mIsAudioProcessFinish = false;
     private volatile boolean mIsVideoProcessFinish = false;
+    private volatile boolean mIsAudioProcessCanceled = false;
+    private volatile boolean mIsVideoProcessCanceled = false;
     private int mMaxProgress = 0;
     private volatile int mAudioProgress = 0;
     private volatile int mVideoProgress = 0;
@@ -241,8 +243,28 @@ public class AWAVAndroidMuxer {
             }
         }
 
+        @Override
+        public void onCanceled() {
+            if (mediaType == TYPE_AUDIO) {
+                mIsAudioProcessCanceled = true;
+            } else if (mediaType == TYPE_VIDEO) {
+                mIsVideoProcessCanceled = true;
+            }
+
+            if (isAllCanceled()) {
+                release();
+                if (mProcessListener != null) {
+                    mProcessListener.onCanceled();
+                }
+            }
+        }
+
         private boolean isAllFinish() {
             return mIsAudioProcessFinish && mIsVideoProcessFinish;
+        }
+
+        private boolean isAllCanceled() {
+            return mIsAudioProcessCanceled && mIsVideoProcessCanceled;
         }
 
         private void notifyProcess() {

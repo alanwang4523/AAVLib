@@ -330,6 +330,11 @@ public class TestLibMediaCoreActivity extends AppCompatActivity implements View.
             ALog.d(Tag + "::onError()-->" + e);
             toastInUiThread(Tag + " error!-->" + e.getErrorMsg(), true);
         }
+
+        @Override
+        public void onCanceled() {
+            ALog.d(Tag + "::onCanceled()-->");
+        }
     }
 
 }
