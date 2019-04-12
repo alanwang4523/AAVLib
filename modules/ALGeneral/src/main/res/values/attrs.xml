@@ -38,4 +38,18 @@
         <item>@color/audio_wave_line_color_end</item>
     </integer-array>
 
+
+    <declare-styleable name="AWSegmentProgressBar">
+        <attr name="spb_maxValue" format="integer"/><!-- 控件progress最大值 -->
+        <attr name="spb_progressValue" format="integer"/><!--  当前 progress value -->
+        <attr name="spb_progressColor" format="color"/><!-- progress 进度条颜色 -->
+        <attr name="spb_backgroundColor" format="color"/><!-- progress 背景 颜色 -->
+        <attr name="spb_segmentColor" format="color"/><!-- progress 分段 颜色 -->
+        <attr name="spb_segmentWidth" format="dimension"/><!-- progress 分段 宽度 -->
+        <attr name="spb_segmentsDividingLineColor" format="color"/><!-- progress 分段间隔(当前进度游标位置) 颜色 -->
+        <attr name="spb_segmentsDividingLineWidth" format="dimension"/><!-- progress 分段间隔(当前进度游标位置) 宽度 -->
+        <attr name="spb_square_radius" format="dimension"/><!-- 圆角矩形 半径-->
+
+    </declare-styleable>
+
 </resources>
