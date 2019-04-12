@@ -21,8 +21,6 @@ public class AWSegmentProgressBar extends View {
 
     private final int DEFAULT_MAX_PROGRESS = 100;
     private final int DEFAULT_PROGRESS = 0;
-    private final int DEFAULT_PROGRESS_COLOR = Color.parseColor("#76B034");
-    private final int DEFAULT_PROGRESS_BACK_COLOR = Color.parseColor("#EFEFEF");
     private final int DEFAULT_SEGMENT_DIVIDING_LINE_WIDTH = 4;
     private final float LAST_SEGMENT_ALPHA_NORMAL = 1.0f;
     private final float LAST_SEGMENT_ALPHA_PRE_DELETE = 0.4f;
@@ -32,9 +30,8 @@ public class AWSegmentProgressBar extends View {
     private long mMinProgress = DEFAULT_PROGRESS;
 
     private Paint mPaint;
-    private int mProgressColor = DEFAULT_PROGRESS_COLOR;
-    private int mProgressBgColor = DEFAULT_PROGRESS_BACK_COLOR;
-    private int mProgressSegmentColor = mProgressColor;
+    private int mProgressColor;
+    private int mBackgroundColor;
     private int mSegmentsDividingLineColor = Color.GRAY;// 两片段间分割线的颜色
 
     private float mLastSegmentAlpha = LAST_SEGMENT_ALPHA_NORMAL;
@@ -42,8 +39,7 @@ public class AWSegmentProgressBar extends View {
 
     private float mWidth, mHeight;
     private float mStartX, mStartY;
-    private float mSegmentWidth = DEFAULT_SEGMENT_DIVIDING_LINE_WIDTH;
-    private float mCurProgressPosWidth = 0f;// 当前进度位置的宽度，默认为零，及没有位置指示器
+    private float mSegmentsDividingLineWidth;
     private List<Long> mSegmentList;
     private boolean isSupportDeleteWhenRunning = false;
 
@@ -62,82 +58,67 @@ public class AWSegmentProgressBar extends View {
 
     private void initView(Context context, AttributeSet attrs, int defStyleAttr) {
         TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.AWSegmentProgressBar, defStyleAttr, 0);
-        mMaxProgress = attributes.getInteger(R.styleable.AWSegmentProgressBar_spb_maxValue, (int) DEFAULT_MAX_PROGRESS);
-        mCurProgress = attributes.getInteger(R.styleable.AWSegmentProgressBar_spb_progressValue, (int) DEFAULT_PROGRESS);
-        mProgressColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_progressColor, DEFAULT_PROGRESS_COLOR);
-        mProgressBgColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_backgroundColor, DEFAULT_PROGRESS_BACK_COLOR);
-        mProgressSegmentColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_segmentColor, DEFAULT_PROGRESS_COLOR);
-        mSegmentWidth = attributes.getDimension(R.styleable.AWSegmentProgressBar_spb_segmentDividingLineWidth, DEFAULT_SEGMENT_DIVIDING_LINE_WIDTH);
+        mMaxProgress = attributes.getInteger(R.styleable.AWSegmentProgressBar_spb_maxValue, DEFAULT_MAX_PROGRESS);
+        mCurProgress = attributes.getInteger(R.styleable.AWSegmentProgressBar_spb_progressValue, DEFAULT_PROGRESS);
+        mProgressColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_progressColor, getResources().getColor(R.color.lib_video_record_progress));
+        mBackgroundColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_backgroundColor, getResources().getColor(R.color.lib_general_white_fa_4c));
+        mSegmentsDividingLineWidth = attributes.getDimension(R.styleable.AWSegmentProgressBar_spb_segmentDividingLineWidth, DEFAULT_SEGMENT_DIVIDING_LINE_WIDTH);
         mSegmentsDividingLineColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_segmentsDividingLineColor, Color.GRAY);
-        mCurProgressPosWidth = attributes.getDimension(R.styleable.AWSegmentProgressBar_spb_currentProgressPosWidth, 0f);
-
-        mPaint = new Paint();
-        mSegmentList = new ArrayList<>();
-
-        mPaint.setAntiAlias(true);
-        mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setColor(Color.parseColor("#EFEFEF"));
-        mPaint.setStyle(Paint.Style.FILL);
-
         attributes.recycle();
 
+        mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setStyle(Paint.Style.FILL);
+
+        mSegmentList = new ArrayList<>();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        mPaint.setColor(mProgressBgColor);//
-        mPaint.setStrokeWidth(10);//
+        // 绘制背景
+        mPaint.setColor(mBackgroundColor);
+        mPaint.setStrokeWidth(10);
         mStartX = 0;
         mStartY = 0;
-
         canvas.drawRect(mStartX, mStartY, mWidth, mHeight, mPaint);
 
-        //先画最短分段
+        //绘制最短位置分割线
         if (mMinProgress > 0 && mMinProgress < mMaxProgress) {
-            mPaint.setColor(mProgressSegmentColor);
-            mPaint.setStrokeWidth(mSegmentWidth);
+            mPaint.setColor(mSegmentsDividingLineColor);
+            mPaint.setStrokeWidth(mSegmentsDividingLineWidth);
             canvas.drawLine(mMinProgress * mWidth / mMaxProgress, mStartY, mMinProgress * mWidth / mMaxProgress, mHeight, mPaint);
         }
 
         mPaint.setColor(mProgressColor);
         mPaint.setStrokeWidth(10);//
         if (mSegmentList == null || mSegmentList.isEmpty()) {
-            canvas.drawRect(mStartX, mStartY, ((float) mCurProgress / mMaxProgress) * mWidth,
-                    mHeight, mPaint);
+            canvas.drawRect(mStartX, mStartY, ((float) mCurProgress / mMaxProgress) * mWidth, mHeight, mPaint);
         } else {
-            //如果段数多余1，那就先绘制前面的progress
+            //如果片段数大于 1，则先绘制前面的progress
             float lastSegmentStart = 0f;
             if (mSegmentList.size() > 1) {
-                canvas.drawRect(mStartX, mStartY, (mSegmentList.get(mSegmentList.size() - 2) * 1.0f / mMaxProgress) * mWidth,
-                        mHeight, mPaint);
+                canvas.drawRect(mStartX, mStartY, (mSegmentList.get(mSegmentList.size() - 2) * 1.0f / mMaxProgress) * mWidth, mHeight, mPaint);
                 lastSegmentStart = (mSegmentList.get(mSegmentList.size() - 2) * 1.0f / mMaxProgress) * mWidth;
             }
             mPaint.setAlpha((int) (mLastSegmentAlpha * 255));
-            canvas.drawRect(lastSegmentStart, mStartY, ((float) mCurProgress / mMaxProgress) * mWidth,
-                    mHeight, mPaint);
+            canvas.drawRect(lastSegmentStart, mStartY, ((float) mCurProgress / mMaxProgress) * mWidth, mHeight, mPaint);
         }
 
-
-        mPaint.setColor(mProgressSegmentColor);
-        mPaint.setStrokeWidth(mSegmentWidth);
+        mPaint.setColor(mSegmentsDividingLineColor);
+        mPaint.setStrokeWidth(mSegmentsDividingLineWidth);
         mPaint.setAlpha(255);
 
         if (mSegmentList.size() > 0) {
             for (int i = 0; i < mSegmentList.size() ; i++) {
-                canvas.drawLine(((float) mSegmentList.get(i) / mMaxProgress) * mWidth, mStartY,
-                        ((float) mSegmentList.get(i) / mMaxProgress) * mWidth, mStartY +
-                                (mHeight - mStartY), mPaint);
+                canvas.drawLine(
+                        ((float) mSegmentList.get(i) / mMaxProgress) * mWidth, mStartY,
+                        ((float) mSegmentList.get(i) / mMaxProgress) * mWidth,
+                        mStartY + (mHeight - mStartY),
+                        mPaint);
             }
-        }
-
-        if (mCurProgressPosWidth > 0) {
-            mPaint.setColor(mSegmentsDividingLineColor);
-            mPaint.setStrokeWidth(mCurProgressPosWidth);
-            canvas.drawLine(((float) mCurProgress / mMaxProgress) * mWidth, mStartY,
-                    ((float) mCurProgress / mMaxProgress) * mWidth, mStartY + (mHeight - mStartY),
-                    mPaint);
         }
     }
 

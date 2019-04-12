@@ -29,10 +29,8 @@
         android:layout_margin="@dimen/margin_normal_8"
         app:spb_progressColor="@color/lib_video_record_progress"
         app:spb_backgroundColor="@color/lib_general_white_fa_4c"
-        app:spb_segmentColor="@color/white"
         app:spb_segmentDividingLineWidth="2dp"
         app:spb_segmentsDividingLineColor="@color/white"
-        app:spb_currentProgressPosWidth="0dp"
         />
 
     <RelativeLayout

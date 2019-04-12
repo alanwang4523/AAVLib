@@ -98,7 +98,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
         btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
             @Override
             public void onRecordStart() {
-                mCurVideoFile = new File(mVideoSaveDir, "AWVideo_" + TimeUtils.getCurrentTime() + ".mp4");
+                mCurVideoFile = new File(mVideoSaveDir, "AW_video_" + TimeUtils.getCurrentTime() + ".mp4");
                 mVideoCameraScheduler.startRecord(mCurVideoFile.getAbsolutePath());
                 mRecordTimer.start();
             }

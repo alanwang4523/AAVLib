@@ -44,11 +44,8 @@
         <attr name="spb_progressValue" format="integer"/><!--  当前 progress value -->
         <attr name="spb_progressColor" format="color"/><!-- progress 进度条颜色 -->
         <attr name="spb_backgroundColor" format="color"/><!-- progress 背景 颜色 -->
-        <attr name="spb_segmentColor" format="color"/><!-- progress 分段 颜色 -->
         <attr name="spb_segmentDividingLineWidth" format="dimension"/><!-- progress 分段分割线宽度 -->
         <attr name="spb_segmentsDividingLineColor" format="color"/><!-- progress 分段间隔(当前进度游标位置) 颜色 -->
-        <attr name="spb_currentProgressPosWidth" format="dimension"/><!-- 当前进度游标位置宽度 -->
-        <attr name="spb_square_radius" format="dimension"/><!-- 圆角矩形 半径-->
 
     </declare-styleable>
 
