@@ -48,6 +48,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
     private File mCurVideoFile;
 
     private AWTimer mRecordTimer;
+    private long mMinRecordProgress = 3 * 1000;
     private long mMaxRecordProgress = 15 * 1000;
     private long mCurRecordProgress = 0L;
 
@@ -72,7 +73,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
         mAWSurfaceView.setSurfaceCallback(this);
 
         mSegmentProgressBar = findViewById(R.id.spb_record_progress);
-        mSegmentProgressBar.setMinProgress(3 * 1000);
+        mSegmentProgressBar.setMinProgress(mMinRecordProgress);
         mSegmentProgressBar.setMaxProgress(mMaxRecordProgress);
 
         btnClose = findViewById(R.id.iv_btn_close);

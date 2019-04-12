@@ -9,6 +9,14 @@
     <color name="gray01">#333333</color>
     <color name="translate">#00FFFFFF</color>
 
+    <color name="black_10">#19000000</color>
+    <color name="black_20">#33000000</color>
+    <color name="black_30">#4C000000</color>
+    <color name="black_40">#66000000</color>
+    <color name="black_50">#7F000000</color>
+    <color name="black_70">#B3000000</color>
+    <color name="black_80">#CC000000</color>
+    <color name="black_90">#E6000000</color>
 
     <color name="colorTextDefault">#000000</color>
     <color name="colorTextSelect">#F54E3F</color>
@@ -18,5 +26,6 @@
     <color name="lib_general_white_ff_55">#55FFFFFF</color>
 
     <color name="lib_video_record_progress">#FFFFDB26</color>
+    <color name="lib_video_delete_bg_color">#FFFF4A26</color>
 
 </resources>

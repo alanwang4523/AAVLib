@@ -61,7 +61,7 @@ public class AWRecordButton extends View {
 
     // 录制按钮相关参数
     private final static long RC_CENTER_AREA_ANIMATION_DURATION = 500L;// 中间方形的动画时长
-    private final static long RC_RING_REPEAT_ANIMATION_DURATION = 1000L;// 环形呼吸动画时长
+    private final static long RC_RING_REPEAT_ANIMATION_DURATION = 800L;// 环形呼吸动画时长
     // 中间方形参数
     private final static float RC_CENTER_AREA_MIN_CORNER_RADIUS_PERCENTAGE = 0.08f;// 中间方形圆角的最小百分比
     private final static float RC_CENTER_AREA_MIN_RADIUS_PERCENTAGE = 0.28f;// 中间矩形的最小宽度百分比
