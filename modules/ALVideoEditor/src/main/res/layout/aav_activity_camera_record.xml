@@ -30,9 +30,9 @@
         app:spb_progressColor="@color/lib_video_record_progress"
         app:spb_backgroundColor="@color/lib_general_white_fa_4c"
         app:spb_segmentColor="@color/white"
-        app:spb_segmentWidth="1dp"
+        app:spb_segmentDividingLineWidth="2dp"
         app:spb_segmentsDividingLineColor="@color/white"
-        app:spb_segmentsDividingLineWidth="0dp"
+        app:spb_currentProgressPosWidth="0dp"
         />
 
     <RelativeLayout

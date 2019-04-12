@@ -251,7 +251,7 @@ public class AWRecordButton extends View {
         this.onTakePictureListener = onTakePictureListener;
     }
 
-    private void setRecordStatus(@Status int status) {
+    public void setRecordStatus(@Status int status) {
         setRecordStatus(status, false);
     }
 

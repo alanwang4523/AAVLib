@@ -23,7 +23,7 @@ public class AWSegmentProgressBar extends View {
     private final int DEFAULT_PROGRESS = 0;
     private final int DEFAULT_PROGRESS_COLOR = Color.parseColor("#76B034");
     private final int DEFAULT_PROGRESS_BACK_COLOR = Color.parseColor("#EFEFEF");
-    private final int DEFAULT_SEGMENT_WIDTH = 4;
+    private final int DEFAULT_SEGMENT_DIVIDING_LINE_WIDTH = 4;
     private final float LAST_SEGMENT_ALPHA_NORMAL = 1.0f;
     private final float LAST_SEGMENT_ALPHA_PRE_DELETE = 0.4f;
 
@@ -42,8 +42,8 @@ public class AWSegmentProgressBar extends View {
 
     private float mWidth, mHeight;
     private float mStartX, mStartY;
-    private float mSegmentWidth = DEFAULT_SEGMENT_WIDTH;
-    private float mSegmentsDividingLineWidth = 0f;
+    private float mSegmentWidth = DEFAULT_SEGMENT_DIVIDING_LINE_WIDTH;
+    private float mCurProgressPosWidth = 0f;// 当前进度位置的宽度，默认为零，及没有位置指示器
     private List<Long> mSegmentList;
     private boolean isSupportDeleteWhenRunning = false;
 
@@ -67,9 +67,9 @@ public class AWSegmentProgressBar extends View {
         mProgressColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_progressColor, DEFAULT_PROGRESS_COLOR);
         mProgressBgColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_backgroundColor, DEFAULT_PROGRESS_BACK_COLOR);
         mProgressSegmentColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_segmentColor, DEFAULT_PROGRESS_COLOR);
-        mSegmentWidth = attributes.getDimension(R.styleable.AWSegmentProgressBar_spb_segmentWidth, DEFAULT_SEGMENT_WIDTH);
+        mSegmentWidth = attributes.getDimension(R.styleable.AWSegmentProgressBar_spb_segmentDividingLineWidth, DEFAULT_SEGMENT_DIVIDING_LINE_WIDTH);
         mSegmentsDividingLineColor = attributes.getColor(R.styleable.AWSegmentProgressBar_spb_segmentsDividingLineColor, Color.GRAY);
-        mSegmentsDividingLineWidth = attributes.getDimension(R.styleable.AWSegmentProgressBar_spb_segmentsDividingLineWidth, 0f);
+        mCurProgressPosWidth = attributes.getDimension(R.styleable.AWSegmentProgressBar_spb_currentProgressPosWidth, 0f);
 
         mPaint = new Paint();
         mSegmentList = new ArrayList<>();
@@ -132,9 +132,9 @@ public class AWSegmentProgressBar extends View {
             }
         }
 
-        if (mSegmentsDividingLineWidth > 0) {
+        if (mCurProgressPosWidth > 0) {
             mPaint.setColor(mSegmentsDividingLineColor);
-            mPaint.setStrokeWidth(mSegmentsDividingLineWidth);
+            mPaint.setStrokeWidth(mCurProgressPosWidth);
             canvas.drawLine(((float) mCurProgress / mMaxProgress) * mWidth, mStartY,
                     ((float) mCurProgress / mMaxProgress) * mWidth, mStartY + (mHeight - mStartY),
                     mPaint);

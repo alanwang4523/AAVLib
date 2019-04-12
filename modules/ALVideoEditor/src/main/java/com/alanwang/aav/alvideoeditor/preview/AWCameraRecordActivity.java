@@ -9,7 +9,9 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.alanwang.aav.algeneral.common.AWTimer;
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
+import com.alanwang.aav.algeneral.ui.AWSegmentProgressBar;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
 import com.alanwang.aavlib.libutils.TimeUtils;
@@ -25,10 +27,13 @@ import java.io.File;
  * Mail: alanwang4523@gmail.com
  */
 public class AWCameraRecordActivity extends AppCompatActivity
-        implements ISurfaceCallback, View.OnClickListener {
+        implements ISurfaceCallback, View.OnClickListener, AWTimer.TimerListener {
+
+    private final static int TIME_UPDATE_INTERVAL = 50;
 
     private EnhancedRelativeLayout mVideoLayout;
     private AWSurfaceView mAWSurfaceView;
+    private AWSegmentProgressBar mSegmentProgressBar;
     private AWRecordButton btnRecord;
     private ImageView btnClose;
     private ImageView btnCameraSwitchCover;
@@ -41,6 +46,10 @@ public class AWCameraRecordActivity extends AppCompatActivity
     private boolean mIsFrontCamera = true;
     private File mVideoSaveDir = new File("/sdcard/Alan/record");
     private File mCurVideoFile;
+
+    private AWTimer mRecordTimer;
+    private long mMaxRecordProgress = 15 * 1000;
+    private long mCurRecordProgress = 0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +70,10 @@ public class AWCameraRecordActivity extends AppCompatActivity
 
         mAWSurfaceView = findViewById(R.id.video_surface_view);
         mAWSurfaceView.setSurfaceCallback(this);
+
+        mSegmentProgressBar = findViewById(R.id.spb_record_progress);
+        mSegmentProgressBar.setMinProgress(3 * 1000);
+        mSegmentProgressBar.setMaxProgress(mMaxRecordProgress);
 
         btnClose = findViewById(R.id.iv_btn_close);
         btnClose.setOnClickListener(this);
@@ -87,15 +100,19 @@ public class AWCameraRecordActivity extends AppCompatActivity
             public void onRecordStart() {
                 mCurVideoFile = new File(mVideoSaveDir, "AWVideo_" + TimeUtils.getCurrentTime() + ".mp4");
                 mVideoCameraScheduler.startRecord(mCurVideoFile.getAbsolutePath());
+                mRecordTimer.start();
             }
 
             @Override
             public void onRecordStop() {
-                mVideoCameraScheduler.stopRecord();
 //                Toast.makeText(AWCameraRecordActivity.this, "" + mCurVideoFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
-                AWVideoPreviewActivity.launchVideoPreviewActivity(AWCameraRecordActivity.this, mCurVideoFile.getAbsolutePath());
+//                AWVideoPreviewActivity.launchVideoPreviewActivity(AWCameraRecordActivity.this, mCurVideoFile.getAbsolutePath());
+                pauseRecord();
             }
         });
+
+        mRecordTimer = new AWTimer(TIME_UPDATE_INTERVAL);
+        mRecordTimer.setTimerListener(this);
     }
 
 
@@ -142,9 +159,27 @@ public class AWCameraRecordActivity extends AppCompatActivity
     }
 
     @Override
+    public void onTimeUpdate() {
+        mCurRecordProgress += TIME_UPDATE_INTERVAL;
+        if (mCurRecordProgress >= mMaxRecordProgress) {
+            mCurRecordProgress = mMaxRecordProgress;
+            btnRecord.setRecordStatus(AWRecordButton.Status.IDLE);
+            pauseRecord();
+        }
+        mSegmentProgressBar.setProgress(mCurRecordProgress);
+    }
+
+    @Override
     protected void onDestroy() {
         mVideoCameraScheduler.finishRecord();
         mVideoCameraScheduler.release();
+        mRecordTimer.stop();
         super.onDestroy();
+    }
+
+    private void pauseRecord() {
+        mVideoCameraScheduler.stopRecord();
+        mRecordTimer.stop();
+        mSegmentProgressBar.finishASegment();
     }
 }
