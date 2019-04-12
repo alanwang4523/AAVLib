@@ -3,7 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#F54E3F</color>
+
     <color name="white">#FFFFFF</color>
+
     <color name="gray01">#333333</color>
     <color name="translate">#00FFFFFF</color>
 
@@ -14,5 +16,7 @@
     <color name="lib_general_white_alpha_ff">#FFEEEEEE</color>
     <color name="lib_general_white_fa_4c">#4CFAFAFA</color>
     <color name="lib_general_white_ff_55">#55FFFFFF</color>
+
+    <color name="lib_video_record_progress">#FFFFDB26</color>
 
 </resources>

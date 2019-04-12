@@ -22,11 +22,24 @@
 
     </com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout>
 
+    <com.alanwang.aav.algeneral.ui.AWSegmentProgressBar
+        android:id="@+id/spb_record_progress"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/margin_normal_6"
+        android:layout_margin="@dimen/margin_normal_8"
+        app:spb_progressColor="@color/lib_video_record_progress"
+        app:spb_backgroundColor="@color/lib_general_white_fa_4c"
+        app:spb_segmentColor="@color/white"
+        app:spb_segmentWidth="1dp"
+        app:spb_segmentsDividingLineColor="@color/white"
+        app:spb_segmentsDividingLineWidth="0dp"
+        />
+
     <RelativeLayout
         android:id="@+id/rl_top_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_normal_8"
+        android:layout_below="@+id/spb_record_progress"
         >
 
         <ImageView

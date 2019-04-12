@@ -94,7 +94,7 @@ public class AWSegmentProgressBar extends View {
 
         canvas.drawRect(mStartX, mStartY, mWidth, mHeight, mPaint);
 
-        //先画最短分段分割线
+        //先画最短分段
         if (mMinProgress > 0 && mMinProgress < mMaxProgress) {
             mPaint.setColor(mProgressSegmentColor);
             mPaint.setStrokeWidth(mSegmentWidth);
