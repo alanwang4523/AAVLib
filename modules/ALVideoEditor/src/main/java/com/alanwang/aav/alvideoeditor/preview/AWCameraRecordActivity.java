@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.alanwang.aav.algeneral.common.AWTimer;
@@ -34,13 +35,19 @@ public class AWCameraRecordActivity extends AppCompatActivity
     private EnhancedRelativeLayout mVideoLayout;
     private AWSurfaceView mAWSurfaceView;
     private AWSegmentProgressBar mSegmentProgressBar;
-    private AWRecordButton btnRecord;
+
+    private RelativeLayout rlTopOperation;
     private ImageView btnClose;
     private ImageView btnCameraSwitchCover;
     private ImageView btnFlashlightSwitchCover;
+
     private ImageView btnSpeedSwitchCover;
     private ImageView btnFaceBeauty;
     private ImageView btnStyleFilter;
+    
+    private ImageView btnDeleteSegment;
+    private AWRecordButton btnRecord;
+    private ImageView btnRecordDone;
 
     private AWVideoCameraScheduler mVideoCameraScheduler;
     private boolean mIsFrontCamera = true;
@@ -76,6 +83,8 @@ public class AWCameraRecordActivity extends AppCompatActivity
         mSegmentProgressBar.setMinProgress(mMinRecordProgress);
         mSegmentProgressBar.setMaxProgress(mMaxRecordProgress);
 
+
+        rlTopOperation = findViewById(R.id.rl_top_options);
         btnClose = findViewById(R.id.iv_btn_close);
         btnClose.setOnClickListener(this);
 
@@ -102,6 +111,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
                 mCurVideoFile = new File(mVideoSaveDir, "AW_video_" + TimeUtils.getCurrentTime() + ".mp4");
                 mVideoCameraScheduler.startRecord(mCurVideoFile.getAbsolutePath());
                 mRecordTimer.start();
+                hiddenOperationViews();
             }
 
             @Override
@@ -111,6 +121,12 @@ public class AWCameraRecordActivity extends AppCompatActivity
                 pauseRecord();
             }
         });
+        
+        btnDeleteSegment = findViewById(R.id.btn_video_segment_delete);
+        btnDeleteSegment.setOnClickListener(this);
+        
+        btnRecordDone = findViewById(R.id.btn_video_record_done);
+        btnRecordDone.setOnClickListener(this);
 
         mRecordTimer = new AWTimer(TIME_UPDATE_INTERVAL);
         mRecordTimer.setTimerListener(this);
@@ -132,6 +148,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
         if (v.getId() == R.id.iv_btn_close) {
             finish();
         } else if (v.getId() == R.id.iv_btn_flashlight_switchover) {
+            // 闪光灯按钮
             if (btnFlashlightSwitchCover.isSelected()) {
                 btnFlashlightSwitchCover.setSelected(false);
                 mVideoCameraScheduler.toggleFlashlight(true);
@@ -140,21 +157,38 @@ public class AWCameraRecordActivity extends AppCompatActivity
                 mVideoCameraScheduler.toggleFlashlight(false);
             }
         } else if (v.getId() == R.id.iv_btn_camera_switchover) {
+            // 切换相机按钮
             mIsFrontCamera = !mIsFrontCamera;
             mVideoCameraScheduler.switchCamera(mIsFrontCamera);
         } else if (v.getId() == R.id.iv_btn_record_speed) {
+            // 录制速度按钮
             if (btnSpeedSwitchCover.isSelected()) {
                 btnSpeedSwitchCover.setSelected(false);
             } else {
                 btnSpeedSwitchCover.setSelected(true);
             }
         } else if (v.getId() == R.id.iv_btn_record_beauty) {
+            // 美颜按钮
             if (btnFaceBeauty.isSelected()) {
                 btnFaceBeauty.setSelected(false);
             } else {
                 btnFaceBeauty.setSelected(true);
             }
         } else if (v.getId() == R.id.iv_btn_record_filter) {
+            // 滤镜按钮
+
+        } else if (v.getId() == R.id.btn_video_segment_delete) {
+            // 删除片段按钮
+            if (btnDeleteSegment.isSelected()) {
+                deleteLastSegment();
+                btnDeleteSegment.setSelected(false);
+                btnDeleteSegment.setBackgroundResource(R.drawable.record_delete_video_bg_normal);
+            } else {
+                btnDeleteSegment.setSelected(true);
+                btnDeleteSegment.setBackgroundResource(R.drawable.record_delete_video_bg_sure);
+            }
+        } else if (v.getId() == R.id.btn_video_record_done) {
+            // 结束录制按钮
 
         }
     }
@@ -182,5 +216,39 @@ public class AWCameraRecordActivity extends AppCompatActivity
         mVideoCameraScheduler.stopRecord();
         mRecordTimer.stop();
         mSegmentProgressBar.finishASegment();
+        showOperationViews();
+    }
+
+    /**
+     * 删除上一个片段
+     */
+    private void deleteLastSegment() {
+        mSegmentProgressBar.deleteLastSegment();
+    }
+
+    /**
+     * 录制过程中隐藏操作按钮
+     */
+    private void hiddenOperationViews() {
+        rlTopOperation.setVisibility(View.GONE);
+        btnSpeedSwitchCover.setVisibility(View.GONE);
+        btnFaceBeauty.setVisibility(View.GONE);
+        btnStyleFilter.setVisibility(View.GONE);
+        btnDeleteSegment.setVisibility(View.GONE);
+        btnRecordDone.setVisibility(View.GONE);
+    }
+
+    /**
+     * 录制暂停时显示操作控件
+     */
+    private void showOperationViews() {
+        rlTopOperation.setVisibility(View.VISIBLE);
+        btnSpeedSwitchCover.setVisibility(View.VISIBLE);
+        btnFaceBeauty.setVisibility(View.VISIBLE);
+        btnStyleFilter.setVisibility(View.VISIBLE);
+        btnDeleteSegment.setVisibility(View.VISIBLE);
+
+        btnRecordDone.setVisibility(View.VISIBLE);
+        btnRecordDone.setAlpha(mCurRecordProgress > mMinRecordProgress ? 1.0f : 0.5f);
     }
 }
