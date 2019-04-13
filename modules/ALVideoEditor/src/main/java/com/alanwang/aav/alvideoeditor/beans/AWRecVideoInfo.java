@@ -2,6 +2,9 @@ package com.alanwang.aav.alvideoeditor.beans;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,6 +52,10 @@ public class AWRecVideoInfo implements Parcelable {
      * 片段列表
      */
     private List<AWSegmentInfo> segmentList;
+
+    public AWRecVideoInfo() {
+        segmentList = new ArrayList<AWSegmentInfo>();
+    }
 
     public String getCurrentDir() {
         return currentDir;
@@ -110,6 +117,23 @@ public class AWRecVideoInfo implements Parcelable {
         return segmentList;
     }
 
+    public int getSegmentsSize() {
+        return segmentList.size();
+    }
+
+    public void addSegment(AWSegmentInfo segmentInfo) {
+        segmentList.add(segmentInfo);
+    }
+
+    public void deleteLastSegment() {
+        AWSegmentInfo lastSegment = segmentList.get(getSegmentsSize() - 1);
+        File file = new File(lastSegment.getFilePath());
+        if (file.exists()) {
+            file.delete();
+        }
+        segmentList.remove(lastSegment);
+    }
+
     protected AWRecVideoInfo(Parcel in) {
         currentDir = in.readString();
         mergedPath = in.readString();
@@ -148,5 +172,19 @@ public class AWRecVideoInfo implements Parcelable {
         dest.writeInt(bitrate);
         dest.writeLong(duration);
         dest.writeTypedList(segmentList);
+    }
+
+    @Override
+    public String toString() {
+        return "AWRecVideoInfo{" +
+                "currentDir='" + currentDir + '\'' +
+                ", mergedPath='" + mergedPath + '\'' +
+                ", finalOutputPath='" + finalOutputPath + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                ", bitrate=" + bitrate +
+                ", duration=" + duration +
+                ", segmentList=" + segmentList +
+                '}';
     }
 }

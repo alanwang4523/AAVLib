@@ -37,6 +37,9 @@ public class AWSegmentInfo implements Parcelable {
      */
     private int speedType;
 
+    public AWSegmentInfo() {
+    }
+
     public String getFilePath() {
         return filePath;
     }
@@ -110,5 +113,16 @@ public class AWSegmentInfo implements Parcelable {
         dest.writeLong(endTimeMs);
         dest.writeInt(effectId);
         dest.writeInt(speedType);
+    }
+
+    @Override
+    public String toString() {
+        return "AWSegmentInfo{" +
+                "filePath='" + filePath + '\'' +
+                ", startTimeMs=" + startTimeMs +
+                ", endTimeMs=" + endTimeMs +
+                ", effectId=" + effectId +
+                ", speedType=" + speedType +
+                '}';
     }
 }

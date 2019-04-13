@@ -120,6 +120,7 @@
             android:layout_toStartOf="@+id/btn_camera_record"
             android:layout_marginEnd="@dimen/margin_normal_20"
             android:padding="@dimen/margin_normal_2"
+            android:visibility="gone"
             />
 
         <com.alanwang.aav.algeneral.ui.AWRecordButton
@@ -141,6 +142,7 @@
             android:layout_marginStart="@dimen/margin_normal_20"
             android:padding="@dimen/margin_normal_2"
             android:alpha="0.5"
+            android:visibility="gone"
             />
 
     </RelativeLayout>

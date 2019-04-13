@@ -15,6 +15,9 @@ import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.AWSegmentProgressBar;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
+import com.alanwang.aav.alvideoeditor.beans.AWRecVideoInfo;
+import com.alanwang.aav.alvideoeditor.beans.AWSegmentInfo;
+import com.alanwang.aavlib.libutils.ALog;
 import com.alanwang.aavlib.libutils.TimeUtils;
 import com.alanwang.aavlib.libvideo.core.AWVideoCameraScheduler;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
@@ -52,7 +55,8 @@ public class AWCameraRecordActivity extends AppCompatActivity
     private AWVideoCameraScheduler mVideoCameraScheduler;
     private boolean mIsFrontCamera = true;
     private File mVideoSaveDir = new File("/sdcard/Alan/record");
-    private File mCurVideoFile;
+    private AWRecVideoInfo mRecVideoInfo = new AWRecVideoInfo();
+    private AWSegmentInfo mLastSegmentInfo;
 
     private AWTimer mRecordTimer;
     private long mMinRecordProgress = 3 * 1000;
@@ -68,11 +72,17 @@ public class AWCameraRecordActivity extends AppCompatActivity
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.aav_activity_camera_record);
 
-        mVideoCameraScheduler = new AWVideoCameraScheduler();
-        mVideoCameraScheduler.setupRecord(576, 1024, 5 * 1024 * 1024);
         if (!mVideoSaveDir.exists()) {
             mVideoSaveDir.mkdirs();
         }
+
+        mRecVideoInfo.setCurrentDir(mVideoSaveDir.getAbsolutePath());
+        mRecVideoInfo.setWidth(576);
+        mRecVideoInfo.setHeight(1024);
+        mRecVideoInfo.setBitrate(5 * 1024 * 1024);
+
+        mVideoCameraScheduler = new AWVideoCameraScheduler();
+        mVideoCameraScheduler.setupRecord(mRecVideoInfo.getWidth(), mRecVideoInfo.getHeight(), mRecVideoInfo.getBitrate());
 
         mVideoLayout = findViewById(R.id.video_lyt);
 
@@ -108,17 +118,23 @@ public class AWCameraRecordActivity extends AppCompatActivity
         btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
             @Override
             public void onRecordStart() {
-                mCurVideoFile = new File(mVideoSaveDir, "AW_video_" + TimeUtils.getCurrentTime() + ".mp4");
-                mVideoCameraScheduler.startRecord(mCurVideoFile.getAbsolutePath());
+                mLastSegmentInfo = new AWSegmentInfo();
+                File file = new File(mVideoSaveDir, "AW_video_" + TimeUtils.getCurrentTime() + ".mp4");
+                mLastSegmentInfo.setFilePath(file.getAbsolutePath());
+                mLastSegmentInfo.setStartTimeMs(mCurRecordProgress);
+                mVideoCameraScheduler.startRecord(mLastSegmentInfo.getFilePath());
                 mRecordTimer.start();
                 hiddenOperationViews();
             }
 
             @Override
             public void onRecordStop() {
-//                Toast.makeText(AWCameraRecordActivity.this, "" + mCurVideoFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
-//                AWVideoPreviewActivity.launchVideoPreviewActivity(AWCameraRecordActivity.this, mCurVideoFile.getAbsolutePath());
                 pauseRecord();
+                mLastSegmentInfo.setEndTimeMs(mCurRecordProgress);
+                mRecVideoInfo.addSegment(mLastSegmentInfo);
+
+                btnDeleteSegment.setVisibility(View.VISIBLE);
+                btnRecordDone.setVisibility(View.VISIBLE);
             }
         });
         
@@ -178,6 +194,9 @@ public class AWCameraRecordActivity extends AppCompatActivity
             // 滤镜按钮
 
         } else if (v.getId() == R.id.btn_video_segment_delete) {
+            if (mRecVideoInfo.getSegmentsSize() <= 0) {
+                return;
+            }
             // 删除片段按钮
             if (btnDeleteSegment.isSelected()) {
                 deleteLastSegment();
@@ -189,7 +208,8 @@ public class AWCameraRecordActivity extends AppCompatActivity
             }
         } else if (v.getId() == R.id.btn_video_record_done) {
             // 结束录制按钮
-
+            mRecVideoInfo.setDuration(mCurRecordProgress);
+            ALog.e("" + mRecVideoInfo);
         }
     }
 
@@ -224,6 +244,14 @@ public class AWCameraRecordActivity extends AppCompatActivity
      */
     private void deleteLastSegment() {
         mSegmentProgressBar.deleteLastSegment();
+        mCurRecordProgress = mLastSegmentInfo.getStartTimeMs();
+        mRecVideoInfo.deleteLastSegment();
+
+        btnRecordDone.setAlpha(mCurRecordProgress > mMinRecordProgress ? 1.0f : 0.5f);
+        if (mRecVideoInfo.getSegmentsSize() <= 0) {
+            btnDeleteSegment.setVisibility(View.GONE);
+            btnRecordDone.setVisibility(View.GONE);
+        }
     }
 
     /**
