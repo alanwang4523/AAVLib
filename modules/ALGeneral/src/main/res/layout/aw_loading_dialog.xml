@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:layoutDirection="locale"
+        android:orientation="vertical"
+        android:background="@drawable/aw_loading_dialog_bg">
+
+        <ProgressBar
+            android:id="@+id/aw_loading_view"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/colorAccent"
+            android:indeterminateTintMode="src_atop"
+            android:padding="@dimen/margin_normal_20" />
+
+        <TextView
+            android:id="@+id/tv_loading_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_14"
+            android:textColor="@color/white_80"
+            android:layout_marginBottom="@dimen/margin_normal_24"
+            android:layout_marginStart="@dimen/margin_normal_30"
+            android:layout_marginEnd="@dimen/margin_normal_30"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+</FrameLayout>

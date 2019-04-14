@@ -5,10 +5,18 @@
     <color name="colorAccent">#F54E3F</color>
     <!--<color name="colorAccent">#FFEEEEEE</color>-->
 
-    <color name="white">#FFFFFF</color>
-
     <color name="gray01">#333333</color>
-    <color name="translate">#00FFFFFF</color>
+    <color name="transparent">#00FFFFFF</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="white_10">#19FFFFFF</color>
+    <color name="white_20">#33FFFFFF</color>
+    <color name="white_30">#4CFFFFFF</color>
+    <color name="white_40">#66FFFFFF</color>
+    <color name="white_50">#7FFFFFFF</color>
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="white_80">#CCFFFFFF</color>
+    <color name="white_90">#E6FFFFFF</color>
 
     <color name="black_10">#19000000</color>
     <color name="black_20">#33000000</color>

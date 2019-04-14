@@ -27,7 +27,7 @@
                 android:id="@+id/wave_volume"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/margin_normal_100"
-                app:awvBackgroundColor="@color/translate"
+                app:awvBackgroundColor="@color/transparent"
                 app:awvThickLineWidth="2dp"
                 app:awvThinLineWidth="1dp"
                 app:awvLineColorShader="@array/audio_wave_line_shader"
