@@ -5,13 +5,13 @@
 
         <activity
             android:name=".preview.AWCameraRecordActivity"
-            android:theme="@style/AppThemeNoActionBar"
+            android:theme="@style/AppTheme.NoActionBar.FullScreen"
             android:resizeableActivity="false"
             android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".preview.AWVideoPreviewActivity"
-            android:theme="@style/AppThemeNoActionBar"
+            android:theme="@style/AppTheme.NoActionBar.FullScreen"
             android:resizeableActivity="false"
             android:screenOrientation="portrait">
         </activity>

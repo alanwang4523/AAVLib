@@ -121,10 +121,17 @@ public class AWRecVideoInfo implements Parcelable {
         return segmentList.size();
     }
 
+    /**
+     * 添加一个片段
+     * @param segmentInfo
+     */
     public void addSegment(AWSegmentInfo segmentInfo) {
         segmentList.add(segmentInfo);
     }
 
+    /**
+     * 删除上一个片段
+     */
     public void deleteLastSegment() {
         AWSegmentInfo lastSegment = segmentList.get(getSegmentsSize() - 1);
         File file = new File(lastSegment.getFilePath());
@@ -132,6 +139,19 @@ public class AWRecVideoInfo implements Parcelable {
             file.delete();
         }
         segmentList.remove(lastSegment);
+    }
+
+    /**
+     * 删除所有片段
+     */
+    public void deleteAllSegments() {
+        for (AWSegmentInfo segment: segmentList) {
+            File file = new File(segment.getFilePath());
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+        segmentList.clear();
     }
 
     protected AWRecVideoInfo(Parcel in) {

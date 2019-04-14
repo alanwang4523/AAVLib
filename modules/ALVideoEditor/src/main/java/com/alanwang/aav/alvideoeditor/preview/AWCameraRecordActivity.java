@@ -1,7 +1,10 @@
 package com.alanwang.aav.alvideoeditor.preview;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.Window;
@@ -30,8 +33,11 @@ import java.io.File;
  * Date: 19/4/1 00:26.
  * Mail: alanwang4523@gmail.com
  */
-public class AWCameraRecordActivity extends AppCompatActivity
-        implements ISurfaceCallback, View.OnClickListener, AWTimer.TimerListener {
+public class AWCameraRecordActivity extends AppCompatActivity implements
+        ISurfaceCallback,
+        View.OnClickListener,
+        AWTimer.TimerListener,
+        View.OnTouchListener {
 
     private final static int TIME_UPDATE_INTERVAL = 50;
 
@@ -57,6 +63,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
     private File mVideoSaveDir = new File("/sdcard/Alan/record");
     private AWRecVideoInfo mRecVideoInfo = new AWRecVideoInfo();
     private AWSegmentInfo mLastSegmentInfo;
+    private AlertDialog mExitDialog;
 
     private AWTimer mRecordTimer;
     private long mMinRecordProgress = 3 * 1000;
@@ -85,6 +92,7 @@ public class AWCameraRecordActivity extends AppCompatActivity
         mVideoCameraScheduler.setupRecord(mRecVideoInfo.getWidth(), mRecVideoInfo.getHeight(), mRecVideoInfo.getBitrate());
 
         mVideoLayout = findViewById(R.id.video_lyt);
+        mVideoLayout.setOnTouchListener(this);
 
         mAWSurfaceView = findViewById(R.id.video_surface_view);
         mAWSurfaceView.setSurfaceCallback(this);
@@ -160,6 +168,12 @@ public class AWCameraRecordActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        btnSpeedSwitchCover.setSelected(false);
+        return true;
+    }
+
+    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_btn_close) {
             finish();
@@ -225,6 +239,18 @@ public class AWCameraRecordActivity extends AppCompatActivity
     }
 
     @Override
+    public void onBackPressed() {
+        if (mRecVideoInfo.getSegmentsSize() > 0) {
+            if (mExitDialog == null) {
+                mExitDialog = creatExitDialog();
+            }
+            mExitDialog.show();
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onDestroy() {
         mVideoCameraScheduler.finishRecord();
         mVideoCameraScheduler.release();
@@ -278,5 +304,26 @@ public class AWCameraRecordActivity extends AppCompatActivity
 
         btnRecordDone.setVisibility(View.VISIBLE);
         btnRecordDone.setAlpha(mCurRecordProgress > mMinRecordProgress ? 1.0f : 0.5f);
+    }
+
+    /**
+     * 退出录制
+     */
+    private void exitRecordActivity() {
+        mRecVideoInfo.deleteAllSegments();
+        AWCameraRecordActivity.this.finish();
+    }
+
+    private AlertDialog creatExitDialog() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setMessage(R.string.lib_video_editor_record_exit_msg)
+                .setNegativeButton(R.string.lib_video_editor_cancel, null)
+                .setPositiveButton(R.string.lib_video_editor_exit, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        exitRecordActivity();
+                    }
+                }).create();
+        return alertDialog;
     }
 }
