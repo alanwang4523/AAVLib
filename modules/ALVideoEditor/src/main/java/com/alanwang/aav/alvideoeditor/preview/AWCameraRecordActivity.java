@@ -61,7 +61,7 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
 
     private AWVideoCameraScheduler mVideoCameraScheduler;
     private boolean mIsFrontCamera = true;
-    private File mVideoSaveDir = new File("/sdcard/Alan/record");
+    private File mVideoSaveDir;
     private AWRecVideoInfo mRecVideoInfo = new AWRecVideoInfo();
     private AWSegmentInfo mLastSegmentInfo;
 
@@ -82,6 +82,8 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.aav_activity_camera_record);
 
+
+        mVideoSaveDir = new File("/sdcard/Alan/record/" + TimeUtils.getCurrentTime());
         if (!mVideoSaveDir.exists()) {
             mVideoSaveDir.mkdirs();
         }
@@ -130,7 +132,7 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
             @Override
             public void onRecordStart() {
                 mLastSegmentInfo = new AWSegmentInfo();
-                File file = new File(mVideoSaveDir, "AW_video_" + TimeUtils.getCurrentTime() + ".mp4");
+                File file = new File(mVideoSaveDir, "aw_video_" + mRecVideoInfo.getSegmentsSize() + ".mp4");
                 mLastSegmentInfo.setFilePath(file.getAbsolutePath());
                 mLastSegmentInfo.setStartTimeMs(mCurRecordProgress);
                 mVideoCameraScheduler.startRecord(mLastSegmentInfo.getFilePath());
