@@ -63,7 +63,7 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
     private File mVideoSaveDir = new File("/sdcard/Alan/record");
     private AWRecVideoInfo mRecVideoInfo = new AWRecVideoInfo();
     private AWSegmentInfo mLastSegmentInfo;
-    private AlertDialog mExitDialog;
+    private AlertDialog mExitConfirmDialog;
 
     private AWTimer mRecordTimer;
     private long mMinRecordProgress = 3 * 1000;
@@ -169,7 +169,8 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        btnSpeedSwitchCover.setSelected(false);
+        btnDeleteSegment.setSelected(false);
+        btnDeleteSegment.setBackgroundResource(R.drawable.record_delete_video_bg_normal);
         return true;
     }
 
@@ -222,8 +223,13 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
             }
         } else if (v.getId() == R.id.btn_video_record_done) {
             // 结束录制按钮
-            mRecVideoInfo.setDuration(mCurRecordProgress);
-            ALog.e("" + mRecVideoInfo);
+            if (mCurRecordProgress <= mMinRecordProgress) {
+                Toast toast = Toast.makeText(AWCameraRecordActivity.this, null, Toast.LENGTH_SHORT);
+                toast.setText(R.string.lib_video_editor_record_too_short);// 目的是为了去掉小米手机强制加的应用名
+                toast.show();
+            } else {
+                handleRecordDone();
+            }
         }
     }
 
@@ -241,10 +247,10 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         if (mRecVideoInfo.getSegmentsSize() > 0) {
-            if (mExitDialog == null) {
-                mExitDialog = creatExitDialog();
+            if (mExitConfirmDialog == null) {
+                mExitConfirmDialog = createExitConfirmDialog();
             }
-            mExitDialog.show();
+            mExitConfirmDialog.show();
             return;
         }
         super.onBackPressed();
@@ -252,6 +258,9 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
 
     @Override
     protected void onDestroy() {
+        if (mExitConfirmDialog != null && mExitConfirmDialog.isShowing()) {
+            mExitConfirmDialog.dismiss();
+        }
         mVideoCameraScheduler.finishRecord();
         mVideoCameraScheduler.release();
         mRecordTimer.stop();
@@ -263,6 +272,14 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
         mRecordTimer.stop();
         mSegmentProgressBar.finishASegment();
         showOperationViews();
+    }
+
+    /**
+     * 处理录制完成
+     */
+    private void handleRecordDone() {
+        mRecVideoInfo.setDuration(mCurRecordProgress);
+        ALog.e("" + mRecVideoInfo);
     }
 
     /**
@@ -314,7 +331,7 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
         AWCameraRecordActivity.this.finish();
     }
 
-    private AlertDialog creatExitDialog() {
+    private AlertDialog createExitConfirmDialog() {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setMessage(R.string.lib_video_editor_record_exit_msg)
                 .setNegativeButton(R.string.lib_video_editor_cancel, null)

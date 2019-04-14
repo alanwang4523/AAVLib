@@ -4,4 +4,6 @@
     <string name="lib_video_editor_record_exit_msg">Are you sure to exit?</string>
     <string name="lib_video_editor_cancel">Cancel</string>
     <string name="lib_video_editor_exit">Exit</string>
+
+    <string name="lib_video_editor_record_too_short">The video must be over 3s</string>
 </resources>
