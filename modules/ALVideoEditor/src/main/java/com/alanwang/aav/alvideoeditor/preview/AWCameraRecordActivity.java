@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.alanwang.aav.algeneral.common.AWTimer;
+import com.alanwang.aav.algeneral.ui.AWLoadingDialog;
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.AWSegmentProgressBar;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
@@ -63,7 +64,9 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
     private File mVideoSaveDir = new File("/sdcard/Alan/record");
     private AWRecVideoInfo mRecVideoInfo = new AWRecVideoInfo();
     private AWSegmentInfo mLastSegmentInfo;
+
     private AlertDialog mExitConfirmDialog;
+    private AWLoadingDialog mLoadingDialog;
 
     private AWTimer mRecordTimer;
     private long mMinRecordProgress = 3 * 1000;
@@ -261,6 +264,9 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
         if (mExitConfirmDialog != null && mExitConfirmDialog.isShowing()) {
             mExitConfirmDialog.dismiss();
         }
+        if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
+            mLoadingDialog.dismiss();
+        }
         mVideoCameraScheduler.finishRecord();
         mVideoCameraScheduler.release();
         mRecordTimer.stop();
@@ -278,8 +284,16 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
      * 处理录制完成
      */
     private void handleRecordDone() {
+        if (mLoadingDialog == null) {
+            mLoadingDialog = new AWLoadingDialog(this, true);
+            mLoadingDialog.setCancelable(true);
+        }
+        mLoadingDialog.show();
         mRecVideoInfo.setDuration(mCurRecordProgress);
         ALog.e("" + mRecVideoInfo);
+
+        // TODO Alan 拼接文件
+        // mLoadingDialog.dismiss();
     }
 
     /**
