@@ -94,9 +94,9 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
         }
 
         mRecVideoInfo.setCurrentDir(mVideoSaveDir.getAbsolutePath());
-        mRecVideoInfo.setWidth(576);
-        mRecVideoInfo.setHeight(1024);
-        mRecVideoInfo.setBitrate(5 * 1024 * 1024);
+        mRecVideoInfo.setWidth(AWMediaConstants.VIDEO_ENCODE_WIDTH);
+        mRecVideoInfo.setHeight(AWMediaConstants.VIDEO_ENCODE_HEIGHT);
+        mRecVideoInfo.setBitrate(AWMediaConstants.VIDEO_ENCODE_BITRATE);
 
         mVideoCameraScheduler = new AWVideoCameraScheduler();
         mVideoCameraScheduler.setupRecord(mRecVideoInfo.getWidth(), mRecVideoInfo.getHeight(), mRecVideoInfo.getBitrate());

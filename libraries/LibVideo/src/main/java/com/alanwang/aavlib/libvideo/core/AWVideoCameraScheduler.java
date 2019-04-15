@@ -1,6 +1,7 @@
 package com.alanwang.aavlib.libvideo.core;
 
 import android.hardware.Camera;
+import android.opengl.GLES20;
 import android.view.Surface;
 import com.alanwang.aavlib.libeglcore.common.AWMessage;
 import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
@@ -195,6 +196,7 @@ public class AWVideoCameraScheduler {
             if (mTestEnableEffect) {
                 outputTexture = mVEProcessor.processFrame(textureId, width, height);
             }
+            GLES20.glFinish();
             if (mVideoFileRecorder != null) {
                 mVideoFileRecorder.encodeFrame(outputTexture);
             }

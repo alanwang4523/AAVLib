@@ -27,4 +27,9 @@ public class AWMediaConstants {
      */
     public final static String MERGED_OUT_VIDEO_NAME = "aw_video_merged.mp4";
 
+
+    public final static int VIDEO_ENCODE_WIDTH = 576;
+    public final static int VIDEO_ENCODE_HEIGHT = 1024;
+    public final static int VIDEO_ENCODE_BITRATE = 5 * 1024 * 1024;
+
 }
