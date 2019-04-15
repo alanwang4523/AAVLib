@@ -3,6 +3,8 @@ package com.alanwang.aav.alvideoeditor.beans;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.alanwang.aavlib.libutils.FileUtils;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,6 +154,15 @@ public class AWRecVideoInfo implements Parcelable {
             }
         }
         segmentList.clear();
+    }
+
+    /**
+     * 删除当前录制目录下的所有文件
+     */
+    public void deleteAllFiles() {
+        segmentList.clear();
+        File curDir = new File(currentDir);
+        FileUtils.deleteFile(curDir);
     }
 
     protected AWRecVideoInfo(Parcel in) {

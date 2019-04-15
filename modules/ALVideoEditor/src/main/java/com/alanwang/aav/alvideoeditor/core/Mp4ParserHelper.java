@@ -1,5 +1,6 @@
 package com.alanwang.aav.alvideoeditor.core;
 
+import com.alanwang.aavlib.libutils.ALog;
 import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
@@ -37,6 +38,7 @@ public class Mp4ParserHelper {
 
         for (Movie m : inputMovies) {
             for (Track t : m.getTracks()) {
+                ALog.e("getHandler = " + t.getHandler());
                 if ("soun".equals(t.getHandler())) {
                     audioTracks.add(t);
                 }

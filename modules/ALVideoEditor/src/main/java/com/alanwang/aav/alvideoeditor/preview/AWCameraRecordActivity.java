@@ -21,6 +21,7 @@ import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
 import com.alanwang.aav.alvideoeditor.beans.AWRecVideoInfo;
 import com.alanwang.aav.alvideoeditor.beans.AWSegmentInfo;
+import com.alanwang.aav.alvideoeditor.core.Mp4ParserHelper;
 import com.alanwang.aavlib.libutils.ALog;
 import com.alanwang.aavlib.libutils.TimeUtils;
 import com.alanwang.aavlib.libvideo.core.AWVideoCameraScheduler;
@@ -28,6 +29,9 @@ import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: AlanWang4523.
@@ -292,10 +296,21 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
         }
         mLoadingDialog.show();
         mRecVideoInfo.setDuration(mCurRecordProgress);
-        ALog.e("" + mRecVideoInfo);
 
-        // TODO Alan 拼接文件
-        // mLoadingDialog.dismiss();
+        //拼接各视频片段
+        List<String> videoList = new ArrayList<>();
+        for (AWSegmentInfo segmentInfo: mRecVideoInfo.getSegmentList()) {
+            videoList.add(segmentInfo.getFilePath());
+        }
+        File mergedFile = new File(mVideoSaveDir, "aw_video_merged.mp4");
+        try {
+            Mp4ParserHelper.mergeVideos(videoList, mergedFile.getAbsolutePath());
+            mRecVideoInfo.setMergedPath(mergedFile.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ALog.e("" + mRecVideoInfo);
+        mLoadingDialog.dismiss();
     }
 
     /**
@@ -343,7 +358,7 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
      * 退出录制
      */
     private void exitRecordActivity() {
-        mRecVideoInfo.deleteAllSegments();
+        mRecVideoInfo.deleteAllFiles();
         AWCameraRecordActivity.this.finish();
     }
 
