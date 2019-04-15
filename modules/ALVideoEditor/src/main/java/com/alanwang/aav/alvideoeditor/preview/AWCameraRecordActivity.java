@@ -21,7 +21,8 @@ import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
 import com.alanwang.aav.alvideoeditor.beans.AWRecVideoInfo;
 import com.alanwang.aav.alvideoeditor.beans.AWSegmentInfo;
-import com.alanwang.aav.alvideoeditor.core.Mp4ParserHelper;
+import com.alanwang.aav.alvideoeditor.core.AWMediaConstants;
+import com.alanwang.aav.alvideoeditor.core.AWMp4ParserHelper;
 import com.alanwang.aavlib.libutils.ALog;
 import com.alanwang.aavlib.libutils.TimeUtils;
 import com.alanwang.aavlib.libvideo.core.AWVideoCameraScheduler;
@@ -87,7 +88,7 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
         setContentView(R.layout.aav_activity_camera_record);
 
 
-        mVideoSaveDir = new File("/sdcard/Alan/record/" + TimeUtils.getCurrentTime());
+        mVideoSaveDir = new File(AWMediaConstants.VIDEO_RECORD_DIR_PATH + TimeUtils.getCurrentTime());
         if (!mVideoSaveDir.exists()) {
             mVideoSaveDir.mkdirs();
         }
@@ -136,7 +137,10 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
             @Override
             public void onRecordStart() {
                 mLastSegmentInfo = new AWSegmentInfo();
-                File file = new File(mVideoSaveDir, "aw_video_" + mRecVideoInfo.getSegmentsSize() + ".mp4");
+                File file = new File(mVideoSaveDir,
+                        AWMediaConstants.PREFIX_VIDEO_SEGMENT_NAME +
+                                mRecVideoInfo.getSegmentsSize() +
+                                AWMediaConstants.SUFFIX_MP4);
                 mLastSegmentInfo.setFilePath(file.getAbsolutePath());
                 mLastSegmentInfo.setStartTimeMs(mCurRecordProgress);
                 mVideoCameraScheduler.startRecord(mLastSegmentInfo.getFilePath());
@@ -302,15 +306,17 @@ public class AWCameraRecordActivity extends AppCompatActivity implements
         for (AWSegmentInfo segmentInfo: mRecVideoInfo.getSegmentList()) {
             videoList.add(segmentInfo.getFilePath());
         }
-        File mergedFile = new File(mVideoSaveDir, "aw_video_merged.mp4");
+        File mergedFile = new File(mVideoSaveDir, AWMediaConstants.MERGED_OUT_VIDEO_NAME);
         try {
-            Mp4ParserHelper.mergeVideos(videoList, mergedFile.getAbsolutePath());
+            AWMp4ParserHelper.mergeVideos(videoList, mergedFile.getAbsolutePath());
             mRecVideoInfo.setMergedPath(mergedFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
         ALog.e("" + mRecVideoInfo);
         mLoadingDialog.dismiss();
+
+        AWVideoPreviewActivity.launchVideoPreviewActivity(AWCameraRecordActivity.this, mRecVideoInfo.getMergedPath());
     }
 
     /**

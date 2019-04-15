@@ -1,6 +1,5 @@
 package com.alanwang.aav.alvideoeditor.core;
 
-import com.alanwang.aavlib.libutils.ALog;
 import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
@@ -19,7 +18,9 @@ import java.util.List;
  * Date: 19/4/15 01:46.
  * Mail: alanwang4523@gmail.com
  */
-public class Mp4ParserHelper {
+public class AWMp4ParserHelper {
+    private final static String PREFIX_VIDEO_HANDLER = "vide";
+    private final static String PREFIX_AUDIO_HANDLER = "soun";
 
     /**
      * 合并视频
@@ -38,11 +39,10 @@ public class Mp4ParserHelper {
 
         for (Movie m : inputMovies) {
             for (Track t : m.getTracks()) {
-                ALog.e("getHandler = " + t.getHandler());
-                if ("soun".equals(t.getHandler())) {
+                if (PREFIX_AUDIO_HANDLER.equals(t.getHandler())) {
                     audioTracks.add(t);
                 }
-                if (t.getHandler().equals("vide")) {
+                if (PREFIX_VIDEO_HANDLER.equals(t.getHandler())) {
                     videoTracks.add(t);
                 }
             }
