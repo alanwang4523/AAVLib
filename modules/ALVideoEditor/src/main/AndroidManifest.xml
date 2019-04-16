@@ -4,13 +4,13 @@
     <application>
 
         <activity
-            android:name=".preview.AWCameraRecordActivity"
+            android:name=".business.record.AWCameraRecordActivity"
             android:theme="@style/AppTheme.NoActionBar.FullScreen"
             android:resizeableActivity="false"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".preview.AWVideoPreviewActivity"
+            android:name=".business.preview.AWVideoPreviewActivity"
             android:theme="@style/AppTheme.NoActionBar.FullScreen"
             android:resizeableActivity="false"
             android:screenOrientation="portrait">

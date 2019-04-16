@@ -1,4 +1,4 @@
-package com.alanwang.aav.alvideoeditor.preview;
+package com.alanwang.aav.alvideoeditor.business.record;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -23,6 +23,7 @@ import com.alanwang.aav.alvideoeditor.beans.AWRecVideoInfo;
 import com.alanwang.aav.alvideoeditor.beans.AWSegmentInfo;
 import com.alanwang.aav.alvideoeditor.core.AWMediaConstants;
 import com.alanwang.aav.alvideoeditor.core.AWMp4ParserHelper;
+import com.alanwang.aav.alvideoeditor.business.preview.AWVideoPreviewActivity;
 import com.alanwang.aavlib.libutils.ALog;
 import com.alanwang.aavlib.libutils.TimeUtils;
 import com.alanwang.aavlib.libvideo.core.AWVideoCameraScheduler;

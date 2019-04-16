@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-import com.alanwang.aav.alvideoeditor.preview.AWCameraRecordActivity;
-import com.alanwang.aav.alvideoeditor.preview.AWVideoPreviewActivity;
+import com.alanwang.aav.alvideoeditor.business.record.AWCameraRecordActivity;
+import com.alanwang.aav.alvideoeditor.business.preview.AWVideoPreviewActivity;
 import com.alanwang.aavlib.libutils.RuntimePermissionsHelper;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {

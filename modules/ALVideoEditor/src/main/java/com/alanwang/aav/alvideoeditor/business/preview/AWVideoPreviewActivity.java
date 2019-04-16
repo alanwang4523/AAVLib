@@ -1,4 +1,4 @@
-package com.alanwang.aav.alvideoeditor.preview;
+package com.alanwang.aav.alvideoeditor.business.preview;
 
 import android.content.Context;
 import android.content.Intent;
