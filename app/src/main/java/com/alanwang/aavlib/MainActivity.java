@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 import com.alanwang.aav.alvideoeditor.business.record.AWCameraRecordActivity;
 import com.alanwang.aav.alvideoeditor.business.preview.AWVideoPreviewActivity;
+import com.alanwang.aav.alvideoeditor.business.record.CameraRecordActivity;
 import com.alanwang.aavlib.libutils.RuntimePermissionsHelper;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_goto_camera_record:
-                startActivity(new Intent(MainActivity.this, AWCameraRecordActivity.class));
+//                startActivity(new Intent(MainActivity.this, AWCameraRecordActivity.class));
+                startActivity(new Intent(MainActivity.this, CameraRecordActivity.class));
                 break;
             case R.id.btn_goto_video_editor:
                 String VIDEO_PATH = "/sdcard/Alan/video/AlanTest.mp4";
