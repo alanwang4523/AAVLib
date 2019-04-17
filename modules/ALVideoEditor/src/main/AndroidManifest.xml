@@ -4,12 +4,6 @@
     <application>
 
         <activity
-            android:name=".business.record.AWCameraRecordActivity"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen"
-            android:resizeableActivity="false"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
             android:name=".business.record.CameraRecordActivity"
             android:theme="@style/AppTheme.NoActionBar.FullScreen"
             android:resizeableActivity="false"

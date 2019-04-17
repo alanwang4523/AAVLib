@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
-
 import com.alanwang.aav.alvideoeditor.R;
 
 /**
@@ -15,6 +14,8 @@ import com.alanwang.aav.alvideoeditor.R;
  * Mail: alanwang4523@gmail.com
  */
 public class CameraRecordActivity extends AppCompatActivity {
+
+    private CameraRecordFragment recordFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,10 +26,16 @@ public class CameraRecordActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.aav_common_fragment_activity);
 
-        CameraRecordFragment recordFragment = CameraRecordFragment.newInstance();
+        recordFragment = CameraRecordFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.frag_container, recordFragment);
         transaction.commitAllowingStateLoss();
+    }
+
+    @Override
+    public void onBackPressed() {
+        recordFragment.onBackPressed();
+        super.onBackPressed();
     }
 }
