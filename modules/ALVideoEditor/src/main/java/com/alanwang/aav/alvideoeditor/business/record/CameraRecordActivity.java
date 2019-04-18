@@ -13,7 +13,8 @@ import com.alanwang.aav.alvideoeditor.R;
  * Date: 19/4/17 07:56.
  * Mail: alanwang4523@gmail.com
  */
-public class CameraRecordActivity extends AppCompatActivity {
+public class CameraRecordActivity extends AppCompatActivity implements
+        CameraRecordFragment.CameraRecordFragmentListener {
 
     private CameraRecordFragment recordFragment;
 
@@ -27,6 +28,7 @@ public class CameraRecordActivity extends AppCompatActivity {
         setContentView(R.layout.aav_common_fragment_activity);
 
         recordFragment = CameraRecordFragment.newInstance();
+        recordFragment.setCameraRecordFragmentListener(this);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.frag_container, recordFragment);
@@ -36,6 +38,10 @@ public class CameraRecordActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         recordFragment.onBackPressed();
-        super.onBackPressed();
+    }
+
+    @Override
+    public void closeCameraRecordFragment() {
+        supportFinishAfterTransition();
     }
 }

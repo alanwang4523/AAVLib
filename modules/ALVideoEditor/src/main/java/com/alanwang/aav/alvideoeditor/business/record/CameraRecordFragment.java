@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
 import com.alanwang.aav.algeneral.common.AWTimer;
 import com.alanwang.aav.algeneral.ui.AWLoadingDialog;
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
@@ -29,6 +30,7 @@ import com.alanwang.aavlib.libutils.TimeUtils;
 import com.alanwang.aavlib.libvideo.core.AWVideoCameraScheduler;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,10 +43,14 @@ import java.util.List;
  */
 public class CameraRecordFragment extends Fragment implements
         ISurfaceCallback,
-        CameraRecordContract.View,
         AWTimer.TimerListener,
         View.OnClickListener,
         View.OnTouchListener {
+
+    public interface CameraRecordFragmentListener {
+
+        void closeCameraRecordFragment();
+    }
 
     public static CameraRecordFragment newInstance() {
         return new CameraRecordFragment();
@@ -77,6 +83,7 @@ public class CameraRecordFragment extends Fragment implements
 
     private AlertDialog mExitConfirmDialog;
     private AWLoadingDialog mLoadingDialog;
+    private CameraRecordFragmentListener mFragmentLister;
 
     private AWTimer mRecordTimer;
     private long mMinRecordProgress = 3 * 1000;
@@ -181,17 +188,6 @@ public class CameraRecordFragment extends Fragment implements
         mRecordTimer.setTimerListener(this);
     }
 
-
-    @Override
-    public void showLoadingView() {
-
-    }
-
-    @Override
-    public void dismissLoadingView() {
-
-    }
-
     @Override
     public void onSurfaceChanged(Surface surface, int w, int h) {
         mVideoCameraScheduler.updateSurface(surface, w, h);
@@ -201,7 +197,6 @@ public class CameraRecordFragment extends Fragment implements
     public void onSurfaceDestroyed(Surface surface) {
         mVideoCameraScheduler.destroySurface();
     }
-
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -288,10 +283,11 @@ public class CameraRecordFragment extends Fragment implements
             mExitConfirmDialog.show();
             return;
         }
+        exitRecordPage();
     }
 
     @Override
-    public void onDetach() {
+    public void onDestroy() {
         if (mExitConfirmDialog != null && mExitConfirmDialog.isShowing()) {
             mExitConfirmDialog.dismiss();
         }
@@ -301,7 +297,11 @@ public class CameraRecordFragment extends Fragment implements
         mVideoCameraScheduler.finishRecord();
         mVideoCameraScheduler.release();
         mRecordTimer.stop();
-        super.onDetach();
+        super.onDestroy();
+    }
+
+    public void setCameraRecordFragmentListener(CameraRecordFragmentListener fragmentListener) {
+        this.mFragmentLister = fragmentListener;
     }
 
     private void pauseRecord() {
@@ -384,9 +384,11 @@ public class CameraRecordFragment extends Fragment implements
     /**
      * 退出录制
      */
-    private void exitRecordActivity() {
+    private void exitRecordPage() {
         mRecVideoInfo.deleteAllFiles();
-        getActivity().finish();
+        if (mFragmentLister != null) {
+            mFragmentLister.closeCameraRecordFragment();
+        }
     }
 
     private AlertDialog createExitConfirmDialog() {
@@ -396,7 +398,7 @@ public class CameraRecordFragment extends Fragment implements
                 .setPositiveButton(R.string.lib_video_editor_exit, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        exitRecordActivity();
+                        exitRecordPage();
                     }
                 }).create();
         return alertDialog;
