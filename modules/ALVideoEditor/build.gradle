@@ -29,7 +29,10 @@ dependencies {
     implementation project(':libraries:LibVideo')
     implementation project(':libraries:LibUtils')
     implementation project(':modules:ALGeneral')
+
     implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
     implementation 'com.googlecode.mp4parser:isoparser:1.1.21'
 
     testImplementation 'junit:junit:4.12'
