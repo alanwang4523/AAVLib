@@ -6,4 +6,15 @@
     <string name="lib_video_editor_exit">Exit</string>
 
     <string name="lib_video_editor_record_too_short">The video must be over 3s</string>
+
+    <!-- 风格滤镜 -->
+    <string name="lib_video_editor_video_effect_name_original">原图</string>
+    <string name="lib_video_editor_video_effect_name_romantic">浪漫</string>
+    <string name="lib_video_editor_video_effect_name_fresh">清新</string>
+    <string name="lib_video_editor_video_effect_name_beautiful">唯美</string>
+    <string name="lib_video_editor_video_effect_name_pink">粉嫩</string>
+    <string name="lib_video_editor_video_effect_name_reminiscence">怀旧</string>
+    <string name="lib_video_editor_video_effect_name_blues">蓝调</string>
+    <string name="lib_video_editor_video_effect_name_cool">清凉</string>
+    <string name="lib_video_editor_video_effect_name_japanese">日系</string>
 </resources>
