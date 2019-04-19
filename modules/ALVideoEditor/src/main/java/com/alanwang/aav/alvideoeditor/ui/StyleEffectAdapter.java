@@ -35,7 +35,7 @@ public class StyleEffectAdapter extends AWBaseAdapter<EffectBean> {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.aav_recycler_view_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.aav_item_effect_tray, parent, false);
         return new StyleEffectViewHolder(view);
     }
 

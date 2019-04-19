@@ -8,6 +8,8 @@
     <string name="lib_video_editor_record_too_short">The video must be over 3s</string>
 
     <!-- 风格滤镜 -->
+    <string name="lib_video_editor_video_effect_title_style">滤镜</string>
+
     <string name="lib_video_editor_video_effect_name_original">原图</string>
     <string name="lib_video_editor_video_effect_name_romantic">浪漫</string>
     <string name="lib_video_editor_video_effect_name_fresh">清新</string>

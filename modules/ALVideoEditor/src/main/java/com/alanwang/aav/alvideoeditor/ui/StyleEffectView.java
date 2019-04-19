@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import com.alanwang.aav.alvideoeditor.R;
 import com.alanwang.aav.alvideoeditor.beans.EffectBean;
 import com.alanwang.aav.alvideoeditor.common.EffectTypes;
@@ -39,6 +41,9 @@ public class StyleEffectView extends RelativeLayout implements EffectSelectListe
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.aav_recycler_view_layout, this);
 
+        TextView textView = findViewById(R.id.tv_title);
+        textView.setText(getContext().getText(R.string.lib_video_editor_video_effect_title_style));
+
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext(), LinearLayoutManager.HORIZONTAL, false));
 
@@ -60,7 +65,7 @@ public class StyleEffectView extends RelativeLayout implements EffectSelectListe
         effectList.add(new EffectBean(
                 EffectTypes.STYLE_TYPE_ORIGINAL,
                 getText(R.string.lib_video_editor_video_effect_name_original),
-                R.drawable.icon_style_orginal));
+                R.drawable.icon_style_original));
         effectList.add(new EffectBean(
                 EffectTypes.STYLE_TYPE_ROMANTIC,
                 getText(R.string.lib_video_editor_video_effect_name_romantic),

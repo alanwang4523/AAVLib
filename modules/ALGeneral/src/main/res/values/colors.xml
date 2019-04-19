@@ -28,7 +28,7 @@
     <color name="black_80">#CC000000</color>
     <color name="black_90">#E6000000</color>
 
-    <color name="colorTextDefault">#000000</color>
+    <color name="colorTextDefault">#FFFFFF</color>
     <color name="colorTextSelect">#F54E3F</color>
 
     <color name="lib_general_white_alpha_ff">#FFEEEEEE</color>
