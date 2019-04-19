@@ -13,7 +13,7 @@
         android:layout_width="@dimen/margin_normal_48"
         android:layout_height="@dimen/margin_normal_48"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/icon_style_original" />
 
     <TextView
         android:id="@+id/tv_name_effect_item"
