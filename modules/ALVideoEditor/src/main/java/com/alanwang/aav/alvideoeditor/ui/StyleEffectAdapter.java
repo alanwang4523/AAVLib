@@ -13,6 +13,8 @@ import com.alanwang.aav.alvideoeditor.beans.EffectBean;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Author: AlanWang4523.
  * Date: 19/4/18 09:02.
@@ -50,10 +52,12 @@ public class StyleEffectAdapter extends AWBaseAdapter<EffectBean> {
         boolean isSelect = selectIndex == position;
         if (isSelect) {
             viewHolder.tvName.setTextColor(mContext.getResources().getColor(R.color.colorTextSelect));
-            viewHolder.ivIcon.setBackgroundResource(R.drawable.image_border);
+            viewHolder.ivIcon.setBorderColor(mContext.getResources().getColor(R.color.colorTextSelect));
+            viewHolder.ivIcon.setBorderWidth(3);
         } else {
             viewHolder.tvName.setTextColor(mContext.getResources().getColor(R.color.colorTextDefault));
-            viewHolder.ivIcon.setBackgroundResource(android.R.color.transparent);
+            viewHolder.ivIcon.setBorderColor(mContext.getResources().getColor(R.color.transparent));
+            viewHolder.ivIcon.setBorderWidth(0);
         }
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +73,7 @@ public class StyleEffectAdapter extends AWBaseAdapter<EffectBean> {
     }
 
     private class StyleEffectViewHolder extends RecyclerView.ViewHolder {
-        public ImageView ivIcon;
+        public CircleImageView ivIcon;
         public TextView tvName;
 
         public StyleEffectViewHolder(View itemView) {
