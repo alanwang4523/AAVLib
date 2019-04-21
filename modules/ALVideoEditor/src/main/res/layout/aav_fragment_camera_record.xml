@@ -151,7 +151,7 @@
     <com.alanwang.aav.alvideoeditor.ui.StyleEffectView
         android:id="@+id/bottom_style_effect_view"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="wrap_content"
         android:background="@color/black_90"
         android:layout_alignParentBottom="true"
         android:layout_centerVertical="true"

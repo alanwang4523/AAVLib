@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="wrap_content"
-              android:layout_height="@dimen/margin_normal_100"
+              android:layout_height="wrap_content"
               android:gravity="center_horizontal"
               android:orientation="vertical">
 
@@ -10,16 +10,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/margin_normal_8"
+        android:layout_marginTop="@dimen/margin_normal_14"
+        android:layout_marginBottom="@dimen/margin_normal_14"
         android:text="@string/lib_video_editor_video_effect_title_style"
         android:textColor="@color/white"
+        android:textSize="@dimen/text_size_16"
         />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/white_30">
+    </View>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/margin_normal_80"
-        android:layout_marginTop="@dimen/margin_normal_10"
+        android:layout_height="@dimen/margin_normal_100"
+        android:layout_marginTop="@dimen/margin_normal_24"
         android:layout_alignParentBottom="true"
         android:layout_centerVertical="true"/>
 
