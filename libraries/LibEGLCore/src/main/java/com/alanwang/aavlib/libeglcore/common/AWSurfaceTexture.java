@@ -102,7 +102,7 @@ public class AWSurfaceTexture {
      * @param height
      * @return
      */
-    public int drawFrame(@NonNull AWFrameBufferObject frameBuffer, int width, int height) {
+    public int drawFrame(@NonNull AWFrameBuffer frameBuffer, int width, int height) {
         frameBuffer.checkInit(width, height);
         frameBuffer.bindFrameBuffer();
         GLES20.glViewport(0, 0, width, height);

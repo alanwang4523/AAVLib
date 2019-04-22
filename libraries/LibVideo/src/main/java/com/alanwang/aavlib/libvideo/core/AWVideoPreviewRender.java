@@ -1,6 +1,6 @@
 package com.alanwang.aavlib.libvideo.core;
 
-import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
+import com.alanwang.aavlib.libeglcore.common.AWFrameBuffer;
 import com.alanwang.aavlib.libeglcore.render.AWSurfaceRender;
 import com.alanwang.aavlib.libvideoeffect.effects.AWGrayEffect;
 
@@ -11,7 +11,7 @@ import com.alanwang.aavlib.libvideoeffect.effects.AWGrayEffect;
  */
 
 public class AWVideoPreviewRender {
-    private final AWFrameBufferObject mEffectFrameBuffer;
+    private final AWFrameBuffer mEffectFrameBuffer;
     private final AWGrayEffect mTestEffect;
     private final AWSurfaceRender mVideoRender;
 
@@ -19,7 +19,7 @@ public class AWVideoPreviewRender {
     private int mViewportHeight;
 
     public AWVideoPreviewRender() {
-        mEffectFrameBuffer = new AWFrameBufferObject();
+        mEffectFrameBuffer = new AWFrameBuffer();
         mTestEffect = new AWGrayEffect();
         mVideoRender = new AWSurfaceRender();
     }

@@ -2,103 +2,92 @@ package com.alanwang.aavlib.libeglcore.common;
 
 import android.opengl.GLES20;
 
+import com.alanwang.aavlib.libeglcore.egl.GlUtil;
+
 /**
+ * 自带 texture 的 AWFrameBuffer
  * Author: AlanWang4523.
- * Date: 19/1/22 00:50.
+ * Date: 19/1/22 00:58.
  * Mail: alanwang4523@gmail.com
  */
 
 public class AWFrameBuffer {
-    private int mFBO = -1;
+
+    private AWOnlyFrameBuffer mFrameBuffer;
     private long mLastThreadID = 0;
+    private int mOutputTextureId = -1;
+    private int mWidth = 0;
+    private int mHeight = 0;
 
     public AWFrameBuffer() {
-
+        mFrameBuffer = new AWOnlyFrameBuffer();
     }
 
-    /**
-     * 创建一个 FrameBuffer
-     */
-    private void createFrameBuffer() {
-        // 创建 FBO
-        int[] fboArr = new int[1];
-        GLES20.glGenFramebuffers(1, fboArr, 0);
-        mFBO = fboArr[0];
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-    }
-
-    /**
-     * 检测是否初始化
-     */
-    public void checkInit() {
+    public boolean checkInit(int width, int height) {
         long id = Thread.currentThread().getId();
         if (mLastThreadID != id && mLastThreadID > 0) {
             release();
-        } else if (mFBO != -1) {
-            return;
+        } else if (mWidth == width && mHeight == height && mOutputTextureId != -1) {
+            return true;
+        } else {
+            release();
         }
         mLastThreadID = id;
-        createFrameBuffer();
+        return createAndBindTexture(width, height);
     }
 
     /**
-     * 将 texture 绑定到 FrameBuffer
-     * @param textureId
+     * 创建 texture 并绑定到 FrameBuffer
+     * @param width
+     * @param height
+     * @return
      */
-    public void bindFBOWithTexture(int textureId) {
-        bindFrameBuffer();
-        bindTexture2FBO(textureId);
-    }
-
-    /**
-     * 将 texture 从 FrameBuffer 解绑
-     */
-    public void unBindFBOWithTexture() {
-        unBindTexture2FBO();
-        unbindFrameBuffer();
-    }
-
-    /**
-     * 绑定 texture 到 FrameBuffer，调该方法的前置条件是已经 bindFrameBuffer()
-     * 将其与 bindFrameBuffer() 拆分使调用更灵活
-     * @param textureId
-     */
-    public void bindTexture2FBO(int textureId) {
-        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, textureId, 0);
-    }
-
-    /**
-     * 解绑 texture
-     */
-    public void unBindTexture2FBO() {
-        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, 0, 0);
+    private boolean createAndBindTexture(int width, int height) {
+        mFrameBuffer.checkInit();
+        mFrameBuffer.bindFrameBuffer();
+        mOutputTextureId = GlUtil.create2DTexture(width, height);
+        if (mOutputTextureId >= 0) {
+            mFrameBuffer.bindTexture2FBO(mOutputTextureId);
+        }
+        mFrameBuffer.unbindFrameBuffer();
+        mWidth = width;
+        mHeight = height;
+        return (mOutputTextureId >= 0);
     }
 
     /**
      * 绑定 FrameBuffer
      */
     public void bindFrameBuffer() {
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFBO);
+        mFrameBuffer.bindFrameBuffer();
     }
 
     /**
      * 解绑 FrameBuffer
      */
     public void unbindFrameBuffer() {
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        mFrameBuffer.unbindFrameBuffer();
     }
 
     /**
-     * 释放资源
+     * 获取 FrameBuffer 的输出 Texture
+     * @return
+     */
+    public int getOutputTextureId() {
+        return mOutputTextureId;
+    }
+
+    /**
+     * 释放 FrameBuffer
      */
     public void release() {
-        if (mFBO != -1) {
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFBO);
-            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, 0, 0);
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-            GLES20.glDeleteFramebuffers(1, new int[]{mFBO}, 0);
+        mFrameBuffer.release();
+        if (mOutputTextureId != -1) {
+            GLES20.glDeleteTextures(1, new int[]{mOutputTextureId}, 0);
         }
-        this.mFBO = -1;
+        mWidth = 0;
+        mHeight = 0;
         mLastThreadID = 0;
+        mOutputTextureId = -1;
     }
 }

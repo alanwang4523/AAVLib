@@ -1,6 +1,6 @@
 package com.alanwang.aavlib.libvideoeffect.processors;
 
-import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
+import com.alanwang.aavlib.libeglcore.common.AWFrameBuffer;
 import com.alanwang.aavlib.libvideoeffect.effects.AWGrayEffect;
 
 /**
@@ -10,11 +10,11 @@ import com.alanwang.aavlib.libvideoeffect.effects.AWGrayEffect;
  */
 public class AWCameraPreviewVEProcessor {
 
-    private final AWFrameBufferObject mEffectFrameBuffer;
+    private final AWFrameBuffer mEffectFrameBuffer;
     private final AWGrayEffect mTestEffect;
 
     public AWCameraPreviewVEProcessor() {
-        mEffectFrameBuffer = new AWFrameBufferObject();
+        mEffectFrameBuffer = new AWFrameBuffer();
         mTestEffect = new AWGrayEffect();
     }
 

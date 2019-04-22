@@ -5,7 +5,7 @@ import android.opengl.GLES20;
 import android.view.Surface;
 import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
 import com.alanwang.aavlib.libeglcore.common.AWFrameAvailableListener;
-import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
+import com.alanwang.aavlib.libeglcore.common.AWFrameBuffer;
 import com.alanwang.aavlib.libeglcore.common.AWMessage;
 import com.alanwang.aavlib.libeglcore.common.AWSurfaceTexture;
 import com.alanwang.aavlib.libeglcore.common.GLLog;
@@ -77,7 +77,7 @@ public class AWIOSurfaceProxy {
 
     private AWMainGLEngine mMainGLEngine;
     private AWSurfaceTexture mInputSurfaceTexture;
-    private AWFrameBufferObject mInputFrameBuffer;
+    private AWFrameBuffer mInputFrameBuffer;
     private AWSurfaceRender mOutputSurfaceRender;
     private OnInputSurfaceListener mOnInputSurfaceListener;
     private OnOutputSurfaceListener mOnOutputSurfaceListener;
@@ -258,7 +258,7 @@ public class AWIOSurfaceProxy {
         public void onEngineStart() {
             GLLog.d("onEngineStart()--->>");
 
-            mInputFrameBuffer = new AWFrameBufferObject();
+            mInputFrameBuffer = new AWFrameBuffer();
             mInputSurfaceTexture = new AWSurfaceTexture();
             mInputSurfaceTexture.setFrameAvailableListener(mFrameAvailableListener);
             mOutputSurfaceRender = new AWSurfaceRender();

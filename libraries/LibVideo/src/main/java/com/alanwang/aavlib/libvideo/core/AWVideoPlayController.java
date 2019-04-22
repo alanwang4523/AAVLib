@@ -1,7 +1,8 @@
 package com.alanwang.aavlib.libvideo.core;
 
 import android.view.Surface;
-import com.alanwang.aavlib.libeglcore.common.AWFrameBufferObject;
+
+import com.alanwang.aavlib.libeglcore.common.AWFrameBuffer;
 import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.libvideo.player.AWVideoPlayer;
 import com.alanwang.aavlib.libvideo.player.IVideoPlayer;
@@ -28,7 +29,7 @@ public class AWVideoPlayController {
     private IVideoPlayer mVideoPlayer;
     private IControllerCallback iControllerCallback;
     private AWIOSurfaceProxy mIOSurfaceProxy;
-    private AWFrameBufferObject mEffectFrameBuffer;
+    private AWFrameBuffer mEffectFrameBuffer;
     private AWGrayEffect mTestEffect;
 
     public AWVideoPlayController() {
@@ -38,7 +39,7 @@ public class AWVideoPlayController {
         mIOSurfaceProxy.setOnInputSurfaceListener(new AWIOSurfaceProxy.OnInputSurfaceListener() {
             @Override
             public void onInputSurfaceCreated(Surface surface) {
-                mEffectFrameBuffer = new AWFrameBufferObject();
+                mEffectFrameBuffer = new AWFrameBuffer();
                 mTestEffect = new AWGrayEffect();
             }
 
