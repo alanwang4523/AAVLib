@@ -1,11 +1,11 @@
-/**
- * Copyright (c) 2019-present, AlanWang4523 (alanwang4523@gmail.com).
+/*
+ * Copyright (c) 2019-present AlanWang4523 <alanwang4523@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,9 @@
 package com.alanwang.aavlib.libvideo.common;
 
 /**
- * Author: wangjianjun.
+ * Author: AlanWang4523.
  * Date: 19/1/3 20:31.
- * Mail: alanwang6584@gmail.com
+ * Mail: alanwang4523@gmail.com
  */
 
 public class DefaultEncodeTimeProvider implements IEncodeTimeProvider {
