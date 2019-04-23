@@ -5,6 +5,7 @@
 **modules 目录下是各个功能模块的集合，可单独对 modules 封装一个 APP, 其依赖于 libraries 下面的 libs**
 ### ALVideoEditor:
 视频编辑模块:
+- 相机预览、录制
 - 视频播放预览
 - 视频编辑
 - 添加视频滤镜、特效
@@ -21,12 +22,9 @@
 
 ### LibAudioEffect:
 音效库，主要包含各音效效果实现：
-- 常用效果器；
-- 升降调：变调不变速；
-- 快慢速：变速不变调：
-- 音频降噪；
-- 音量均衡；
-- 音频混合；
+- 混响效果器（基于 SOX 实现）；
+- 升降调：变调不变速（基于 SoundTouch 实现）；
+- 快慢速：变速不变调（基于 SoundTouch 实现）：
 ---
 
 ### LibEGLCore:
@@ -82,3 +80,17 @@ Android 常用工具库：
 
 ### 个人联系方式：
 email: alanwang4523@gmail.com
+
+### LICENSE：
+```
+Copyright (c) 2019-present, AlanWang4523 (alanwang4523@gmail.com).
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
