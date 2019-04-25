@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alanwang.aavlib.libvideo.core;
+package com.alanwang.aavlib.video.core;
 
 import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.view.Surface;
 import com.alanwang.aavlib.libeglcore.common.AWMessage;
 import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
-import com.alanwang.aavlib.libvideo.camera.AWCamera;
-import com.alanwang.aavlib.libvideo.camera.AWCameraException;
-import com.alanwang.aavlib.libvideo.common.AWVideoSize;
-import com.alanwang.aavlib.libvideo.common.IEncodeTimeProvider;
+import com.alanwang.aavlib.video.camera.AWCamera;
+import com.alanwang.aavlib.video.camera.AWCameraException;
+import com.alanwang.aavlib.video.common.AWVideoSize;
+import com.alanwang.aavlib.video.common.IEncodeTimeProvider;
 import com.alanwang.aavlib.libvideoeffect.processors.AWCameraPreviewVEProcessor;
 
 /**

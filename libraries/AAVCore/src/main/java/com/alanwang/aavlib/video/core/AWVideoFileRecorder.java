@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alanwang.aavlib.libvideo.core;
+package com.alanwang.aavlib.video.core;
 
 import android.opengl.EGLContext;
 import android.os.Handler;
@@ -24,8 +24,8 @@ import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
 import com.alanwang.aavlib.libeglcore.egl.AWEGLCoreWrapper;
 import com.alanwang.aavlib.libeglcore.render.AWSurfaceRender;
 import com.alanwang.aavlib.media.encoder.AWVideoRecordEncoder;
-import com.alanwang.aavlib.libvideo.common.DefaultEncodeTimeProvider;
-import com.alanwang.aavlib.libvideo.common.IEncodeTimeProvider;
+import com.alanwang.aavlib.video.common.DefaultEncodeTimeProvider;
+import com.alanwang.aavlib.video.common.IEncodeTimeProvider;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 

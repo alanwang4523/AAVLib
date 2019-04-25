@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alanwang.aavlib.libvideo.surface;
+package com.alanwang.aavlib.video.surface;
 
 import android.content.Context;
 import android.graphics.PixelFormat;

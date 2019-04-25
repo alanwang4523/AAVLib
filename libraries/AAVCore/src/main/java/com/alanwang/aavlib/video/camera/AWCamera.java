@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alanwang.aavlib.libvideo.camera;
+package com.alanwang.aavlib.video.camera;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import com.alanwang.aavlib.libeglcore.common.AWSurfaceTexture;
 import com.alanwang.aavlib.utils.ALog;
-import com.alanwang.aavlib.libvideo.common.AWVideoSize;
+import com.alanwang.aavlib.video.common.AWVideoSize;
 import java.util.List;
 
 /**

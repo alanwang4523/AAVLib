@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alanwang.aavlib.libvideo.player;
+package com.alanwang.aavlib.video.player;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;

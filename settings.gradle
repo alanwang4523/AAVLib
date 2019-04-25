@@ -1,5 +1,4 @@
 include ':app', ':libraries:AAVCore',
-        ':libraries:LibVideo',
         ':libraries:LibVideoEffect',
         ':libraries:LibEGLCore',
         ':modules:ALVideoEditor',

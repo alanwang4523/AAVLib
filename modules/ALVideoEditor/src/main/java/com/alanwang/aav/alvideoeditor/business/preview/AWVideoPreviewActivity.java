@@ -26,9 +26,9 @@ import android.view.WindowManager;
 import android.widget.Toast;
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
-import com.alanwang.aavlib.libvideo.core.AWVideoPlayController;
-import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
-import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
+import com.alanwang.aavlib.video.core.AWVideoPlayController;
+import com.alanwang.aavlib.video.surface.AWSurfaceView;
+import com.alanwang.aavlib.video.surface.ISurfaceCallback;
 import com.alanwang.aavlib.utils.ALog;
 import java.io.File;
 
