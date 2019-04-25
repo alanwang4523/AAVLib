@@ -24,14 +24,12 @@ import android.view.Surface;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
-
 import com.alanwang.aav.algeneral.ui.EnhancedRelativeLayout;
 import com.alanwang.aav.alvideoeditor.R;
-import com.alanwang.aavlib.libutils.ALog;
 import com.alanwang.aavlib.libvideo.core.AWVideoPlayController;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
-
+import com.alanwang.aavlib.utils.ALog;
 import java.io.File;
 
 /**

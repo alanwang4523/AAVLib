@@ -17,9 +17,7 @@ package com.alanwang.aav.alvideoeditor.beans;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.alanwang.aavlib.libutils.FileUtils;
-
+import com.alanwang.aavlib.utils.FileUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

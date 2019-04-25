@@ -16,7 +16,7 @@
 package com.alanwang.aavlib.libvideo.camera;
 
 import android.hardware.Camera;
-import com.alanwang.aavlib.libutils.ALog;
+import com.alanwang.aavlib.utils.ALog;
 import com.alanwang.aavlib.libvideo.common.AWVideoSize;
 import java.util.ArrayList;
 import java.util.Collections;

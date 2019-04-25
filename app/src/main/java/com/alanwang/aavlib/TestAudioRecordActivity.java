@@ -20,8 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 import com.alanwang.aav.algeneral.ui.AWRecordButton;
 import com.alanwang.aav.algeneral.ui.render.AWAudioWaveView;
-import com.alanwang.aavlib.libaudio.recorder.AWAudioDefaultRecorder;
-import com.alanwang.aavlib.libmediacore.listener.AWDataAvailableListener;
+import com.alanwang.aavlib.audio.io.AWAudioDefaultRecorder;
+import com.alanwang.aavlib.media.listener.AWDataAvailableListener;
 
 /**
  * Author: AlanWang4523.

@@ -23,7 +23,7 @@ import android.os.Message;
 import com.alanwang.aavlib.libeglcore.common.AWCoordinateUtil;
 import com.alanwang.aavlib.libeglcore.egl.AWEGLCoreWrapper;
 import com.alanwang.aavlib.libeglcore.render.AWSurfaceRender;
-import com.alanwang.aavlib.libmediacore.encoder.AWVideoRecordEncoder;
+import com.alanwang.aavlib.media.encoder.AWVideoRecordEncoder;
 import com.alanwang.aavlib.libvideo.common.DefaultEncodeTimeProvider;
 import com.alanwang.aavlib.libvideo.common.IEncodeTimeProvider;
 import java.io.IOException;

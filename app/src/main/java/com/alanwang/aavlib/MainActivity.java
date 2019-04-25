@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.TextView;
 import com.alanwang.aav.alvideoeditor.business.preview.AWVideoPreviewActivity;
 import com.alanwang.aav.alvideoeditor.business.record.CameraRecordActivity;
-import com.alanwang.aavlib.libutils.RuntimePermissionsHelper;
+import com.alanwang.aavlib.utils.RuntimePermissionsHelper;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 

@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alanwang.aavlib.libvideo.camera;
-
-import com.alanwang.aavlib.media.exception.AWException;
+package com.alanwang.aavlib.media.exception;
 
 /**
  * Author: AlanWang4523.
- * Date: 19/3/31 21:43.
+ * Date: 19/3/5 00:37.
  * Mail: alanwang4523@gmail.com
  */
-public class AWCameraException extends AWException {
+public class AWMediaException extends AWException {
 
-    public final static int ERROR_CAMERA_UNKNOWN_ERROR = 1001;
-    public final static int ERROR_CAMERA_OPEN_FAILED = 1002;
-    public final static int ERROR_CAMERA_SETTING_FAILED = 1003;
-    public final static int ERROR_CAMERA_SET_EXPOSURE_FAILED = 1004;
-    public final static int ERROR_CAMERA_SET_FLASH_LIGHT_FAILED = 1005;
+    public AWMediaException(int errorCode) {
+        super(errorCode);
+    }
 
-    public AWCameraException(int errorCode, String errorMsg) {
+    public AWMediaException(String errorMsg) {
+        super(errorMsg);
+    }
+
+    public AWMediaException(int errorCode, String errorMsg) {
         super(errorCode, errorMsg);
     }
 
-    public AWCameraException(int errorCode, String errorMsg, Throwable cause) {
+    public AWMediaException(String errorMsg, Throwable cause) {
+        super(errorMsg, cause);
+    }
+
+    public AWMediaException(int errorCode, String errorMsg, Throwable cause) {
         super(errorCode, errorMsg, cause);
     }
 }

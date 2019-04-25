@@ -41,12 +41,11 @@ import com.alanwang.aav.alvideoeditor.business.preview.AWVideoPreviewActivity;
 import com.alanwang.aav.alvideoeditor.core.AWMediaConstants;
 import com.alanwang.aav.alvideoeditor.core.AWMp4ParserHelper;
 import com.alanwang.aav.alvideoeditor.ui.StyleEffectView;
-import com.alanwang.aavlib.libutils.ALog;
-import com.alanwang.aavlib.libutils.TimeUtils;
+import com.alanwang.aavlib.utils.ALog;
+import com.alanwang.aavlib.utils.TimeUtils;
 import com.alanwang.aavlib.libvideo.core.AWVideoCameraScheduler;
 import com.alanwang.aavlib.libvideo.surface.AWSurfaceView;
 import com.alanwang.aavlib.libvideo.surface.ISurfaceCallback;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
