@@ -16,7 +16,7 @@
 package com.alanwang.aavlib.video.opengl.common;
 
 import android.util.Log;
-import com.alanwang.aavlib.BuildConfig;
+import com.alanwang.aavlib.aavcore.BuildConfig;
 
 /**
  * Author: AlanWang4523.

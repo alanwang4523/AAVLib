@@ -1,7 +1,7 @@
 package com.alanwang.aavlib.utils;
 
 import android.util.Log;
-import com.alanwang.aavlib.BuildConfig;
+import com.alanwang.aavlib.aavcore.BuildConfig;
 
 /**
  * Author: AlanWang4523.

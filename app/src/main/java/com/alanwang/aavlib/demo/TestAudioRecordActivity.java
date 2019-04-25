@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alanwang.aavlib;
+package com.alanwang.aavlib.demo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
