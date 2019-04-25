@@ -24,7 +24,7 @@ import com.alanwang.aavlib.libeglcore.common.AWFrameBuffer;
 import com.alanwang.aavlib.libeglcore.common.AWMessage;
 import com.alanwang.aavlib.libeglcore.common.AWSurfaceTexture;
 import com.alanwang.aavlib.libeglcore.common.GLLog;
-import com.alanwang.aavlib.libeglcore.common.Type;
+import com.alanwang.aavlib.libeglcore.common.ScaleType;
 import com.alanwang.aavlib.libeglcore.engine.AWMainGLEngine;
 import com.alanwang.aavlib.libeglcore.engine.IGLEngineCallback;
 import java.util.concurrent.CountDownLatch;
@@ -100,7 +100,7 @@ public class AWIOSurfaceProxy {
     private OnMessageListener mOnMessageListener;
     private CountDownLatch mCountDownLatch;
 
-    private @Type.ScaleType int scaleType = Type.ScaleType.FIT_XY;
+    private @ScaleType int scaleType = ScaleType.FIT_XY;
     private volatile boolean mIsNeedUpdateTextureCoordinates = false;
     private volatile boolean mIsSurfaceReady = false;
     private int mVideoWidth;
@@ -197,7 +197,7 @@ public class AWIOSurfaceProxy {
      * 设置缩放模式，目前支持：FIT_XY, CENTER_CROP
      * @param scaleType
      */
-    public void setScaleType(@Type.ScaleType int scaleType) {
+    public void setScaleType(@ScaleType int scaleType) {
         if (this.scaleType != scaleType) {
             mIsNeedUpdateTextureCoordinates = true;
         }
@@ -318,7 +318,7 @@ public class AWIOSurfaceProxy {
         @Override
         public void onRender(AWMessage msg) {
             if (mIsNeedUpdateTextureCoordinates) {
-                if (scaleType == Type.ScaleType.CENTER_CROP) {
+                if (scaleType == ScaleType.CENTER_CROP) {
                     mOutputSurfaceRender.updateTextureCoordinates(AWCoordinateUtil.getCenterCropTextureCoordinates(
                             mVideoWidth, mVideoHeight, mViewportWidth, mViewportHeight));
                 } else {
