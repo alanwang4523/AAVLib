@@ -16,11 +16,11 @@
 package com.alanwang.aavlib.video.core;
 
 import android.view.Surface;
-import com.alanwang.aavlib.libeglcore.common.AWFrameBuffer;
-import com.alanwang.aavlib.libeglcore.render.AWIOSurfaceProxy;
+import com.alanwang.aavlib.video.opengl.common.AWFrameBuffer;
+import com.alanwang.aavlib.video.opengl.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.video.player.AWVideoPlayer;
 import com.alanwang.aavlib.video.player.IVideoPlayer;
-import com.alanwang.aavlib.libvideoeffect.effects.AWGrayEffect;
+import com.alanwang.aavlib.video.effect.effects.AWGrayEffect;
 
 /**
  * Author: AlanWang4523.
