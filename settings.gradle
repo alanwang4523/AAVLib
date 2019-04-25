@@ -1,4 +1,4 @@
-include ':app',
+include ':app', ':AAVCore',
         ':libraries:LibAudio',
         ':libraries:LibVideo',
         ':libraries:LibAudioEffect',
