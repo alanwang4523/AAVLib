@@ -32,6 +32,8 @@ import java.nio.FloatBuffer;
 public class AWSurfaceRender extends AWBaseRender {
 
     private FloatBuffer mTextureCoordinateFBuffer;
+    private int viewWidth;
+    private int viewHeight;
 
     public AWSurfaceRender() {
         super();
@@ -39,11 +41,29 @@ public class AWSurfaceRender extends AWBaseRender {
     }
 
     /**
+     * 更新显示窗口大小
+     * @param viewWidth
+     * @param viewHeight
+     */
+    public void updateViewSize(int viewWidth, int viewHeight) {
+        this.viewWidth = viewWidth;
+        this.viewHeight = viewHeight;
+    }
+
+    /**
      * 更新纹理坐标
      * @param fArr
      */
-    public void updateTextureCoord(float[] fArr) {
+    public void updateTextureCoordinates(float[] fArr) {
         this.mTextureCoordinateFBuffer.put(fArr).position(0);
+    }
+
+    /**
+     * 如果调用了 {@link #updateViewSize} 则可以调用该方法绘制
+     * @param textureId
+     */
+    public void drawFrame(int textureId) {
+        drawFrame(textureId, viewWidth, viewHeight);
     }
 
     /**

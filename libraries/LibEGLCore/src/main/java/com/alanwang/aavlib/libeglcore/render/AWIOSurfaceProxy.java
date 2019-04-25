@@ -295,6 +295,7 @@ public class AWIOSurfaceProxy {
             }
             mViewportWidth = width;
             mViewportHeight = height;
+            mOutputSurfaceRender.updateViewSize(width, height);
 
             if (mOnOutputSurfaceListener != null) {
                 mOnOutputSurfaceListener.onOutputSurfaceUpdated(surface, width, height);
@@ -318,10 +319,10 @@ public class AWIOSurfaceProxy {
         public void onRender(AWMessage msg) {
             if (mIsNeedUpdateTextureCoordinates) {
                 if (scaleType == Type.ScaleType.CENTER_CROP) {
-                    mOutputSurfaceRender.updateTextureCoord(AWCoordinateUtil.getCenterCropTextureCoords(
+                    mOutputSurfaceRender.updateTextureCoordinates(AWCoordinateUtil.getCenterCropTextureCoordinates(
                             mVideoWidth, mVideoHeight, mViewportWidth, mViewportHeight));
                 } else {
-                    mOutputSurfaceRender.updateTextureCoord(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
+                    mOutputSurfaceRender.updateTextureCoordinates(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
                 }
                 mIsNeedUpdateTextureCoordinates = false;
             }

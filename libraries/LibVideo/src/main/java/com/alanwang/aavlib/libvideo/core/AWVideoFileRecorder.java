@@ -93,7 +93,7 @@ public class AWVideoFileRecorder {
     private void handleSetupRecord(int width, int height, int bitRate) {
 
         mSurfaceRender = new AWSurfaceRender();
-        mSurfaceRender.updateTextureCoord(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
+        mSurfaceRender.updateTextureCoordinates(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
 
         mVideoWidth = width;
         mVideoHeight = height;

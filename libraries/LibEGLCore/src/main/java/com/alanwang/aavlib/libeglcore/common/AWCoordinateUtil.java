@@ -129,46 +129,46 @@ public class AWCoordinateUtil {
      * @return
      */
     public static float[] getTextureCoords(int angleDegree, boolean isHFlip, boolean isVFlip) {
-        float[] textureCoords;
+        float[] textureCoordinates;
 
         // 如果旋转了 90 或 180 度，因为原始的 X/Y 坐标互换了，因此水平翻转需要翻转的是 Y 坐标，垂直翻转需要翻转的是 X 坐标
         boolean isXCoordsFlip;
         boolean isYCoordsFlip;
         switch (angleDegree) {
             case 90:
-                textureCoords = TEXTURE_ROTATION_90.clone();
+                textureCoordinates = TEXTURE_ROTATION_90.clone();
                 isXCoordsFlip = isVFlip;
                 isYCoordsFlip = isHFlip;
                 break;
             case 180:
-                textureCoords = TEXTURE_ROTATION_180.clone();
+                textureCoordinates = TEXTURE_ROTATION_180.clone();
                 isXCoordsFlip = isHFlip;
                 isYCoordsFlip = isVFlip;
                 break;
             case 270:
-                textureCoords = TEXTURE_ROTATION_270.clone();
+                textureCoordinates = TEXTURE_ROTATION_270.clone();
                 isXCoordsFlip = isVFlip;
                 isYCoordsFlip = isHFlip;
                 break;
             default:
-                textureCoords = TEXTURE_NO_ROTATION.clone();
+                textureCoordinates = TEXTURE_NO_ROTATION.clone();
                 isXCoordsFlip = isHFlip;
                 isYCoordsFlip = isVFlip;
                 break;
         }
         if (isXCoordsFlip) {
-            textureCoords[0] = flip(textureCoords[0]);
-            textureCoords[2] = flip(textureCoords[2]);
-            textureCoords[4] = flip(textureCoords[4]);
-            textureCoords[6] = flip(textureCoords[6]);
+            textureCoordinates[0] = flip(textureCoordinates[0]);
+            textureCoordinates[2] = flip(textureCoordinates[2]);
+            textureCoordinates[4] = flip(textureCoordinates[4]);
+            textureCoordinates[6] = flip(textureCoordinates[6]);
         }
         if (isYCoordsFlip) {
-            textureCoords[1] = flip(textureCoords[1]);
-            textureCoords[3] = flip(textureCoords[3]);
-            textureCoords[5] = flip(textureCoords[5]);
-            textureCoords[7] = flip(textureCoords[7]);
+            textureCoordinates[1] = flip(textureCoordinates[1]);
+            textureCoordinates[3] = flip(textureCoordinates[3]);
+            textureCoordinates[5] = flip(textureCoordinates[5]);
+            textureCoordinates[7] = flip(textureCoordinates[7]);
         }
-        return textureCoords;
+        return textureCoordinates;
     }
 
     private static float flip(float f) {
@@ -187,7 +187,21 @@ public class AWCoordinateUtil {
      * @param dstHeight
      * @return
      */
-    public static float[] getCenterCropTextureCoords(int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+    public static float[] getCenterCropTextureCoordinates(int srcWidth, int srcHeight, int dstWidth, int dstHeight) {
+        return getCenterCropTextureCoordinates(srcWidth, srcHeight, dstWidth, dstHeight, false, false);
+    }
+
+    /**
+     * 获取 CenterCrop 模式下的纹理坐标
+     * @param srcWidth
+     * @param srcHeight
+     * @param dstWidth
+     * @param dstHeight
+     * @param isHFlip
+     * @param isVFlip
+     * @return
+     */
+    public static float[] getCenterCropTextureCoordinates(int srcWidth, int srcHeight, int dstWidth, int dstHeight, boolean isHFlip, boolean isVFlip) {
         float srcTextureAspectRatio = (float)srcHeight / (float)srcWidth;
         float dstTextureAspectRatio = (float)dstHeight / (float)dstWidth;
         float xOffset = 0.0f;
@@ -201,7 +215,32 @@ public class AWCoordinateUtil {
         }
         float texCoords[] = { xOffset, yOffset, (float)(1.0 - xOffset), yOffset, xOffset, (float)(1.0 - yOffset),
                 (float)(1.0 - xOffset), (float)(1.0 - yOffset) };
+        if (isHFlip) {
+            swap(texCoords, 0, 2);
+            swap(texCoords, 1, 3);
+            swap(texCoords, 4, 6);
+            swap(texCoords, 5, 7);
+        }
+
+        if (isVFlip) {
+            swap(texCoords, 0, 4);
+            swap(texCoords, 1, 5);
+            swap(texCoords, 2, 6);
+            swap(texCoords, 3, 7);
+        }
 
         return texCoords;
+    }
+
+    /**
+     * 交互数组中两个下标的值
+     * @param array
+     * @param i
+     * @param j
+     */
+    private static void swap(float[] array, int i, int j) {
+        float temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
     }
 }
