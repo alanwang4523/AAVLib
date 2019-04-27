@@ -17,7 +17,7 @@ package com.alanwang.aavlib.video.camera;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
-import com.alanwang.aavlib.video.opengl.common.AWSurfaceTexture;
+import com.alanwang.aavlib.opengl.common.AWSurfaceTexture;
 import com.alanwang.aavlib.utils.ALog;
 import com.alanwang.aavlib.video.common.AWVideoSize;
 import java.util.List;

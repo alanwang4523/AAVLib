@@ -18,13 +18,13 @@ package com.alanwang.aavlib.video.core;
 import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.view.Surface;
-import com.alanwang.aavlib.video.opengl.common.AWMessage;
-import com.alanwang.aavlib.video.opengl.render.AWIOSurfaceProxy;
+import com.alanwang.aavlib.opengl.common.AWMessage;
+import com.alanwang.aavlib.opengl.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.video.camera.AWCamera;
 import com.alanwang.aavlib.video.camera.AWCameraException;
 import com.alanwang.aavlib.video.common.AWVideoSize;
 import com.alanwang.aavlib.video.common.IEncodeTimeProvider;
-import com.alanwang.aavlib.video.effect.processors.AWCameraPreviewVEProcessor;
+import com.alanwang.aavlib.image.processors.AWCameraPreviewVEProcessor;
 
 /**
  * Author: AlanWang4523.
