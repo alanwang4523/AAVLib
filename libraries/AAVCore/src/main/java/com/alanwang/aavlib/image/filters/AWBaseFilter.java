@@ -15,9 +15,11 @@
  */
 package com.alanwang.aavlib.image.filters;
 
+import android.opengl.GLES20;
+import com.alanwang.aavlib.image.filters.common.FilterValue;
 import com.alanwang.aavlib.opengl.common.AWCoordinateUtil;
+import com.alanwang.aavlib.opengl.common.AWFrameBuffer;
 import com.alanwang.aavlib.opengl.egl.GlUtil;
-
 import java.nio.FloatBuffer;
 
 /**
@@ -39,6 +41,10 @@ public abstract class AWBaseFilter {
     protected FloatBuffer mVertexCoordinateBuffer;
     protected FloatBuffer mTextureCoordinateBuffer;
 
+    protected AWFrameBuffer mOutputFrameBuffer;
+    protected int mTextureWidth;
+    protected int mTextureHeight;
+
     public AWBaseFilter() {
         this(GlUtil.DIRECT_FILTER_VERTEX_SHADER, GlUtil.DIRECT_FILTER_FRAGMENT_SHADER);
     }
@@ -48,8 +54,129 @@ public abstract class AWBaseFilter {
         mFragmentShader = fragmentShader;
     }
 
-    public void initialize() {
-        mVertexCoordinateBuffer = GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_VERTEX_COORDS);
-        mTextureCoordinateBuffer = GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
+    public boolean initialize() {
+        if (mProgramHandle == -1) {
+            mProgramHandle = GlUtil.createProgram(mVertexShader, mFragmentShader);
+            if (mProgramHandle <= 0) {
+                return false;
+            }
+
+            mAVertexCoordinateLoc = GLES20.glGetAttribLocation(mProgramHandle, "aPosition");
+            mATextureCoordinateLoc = GLES20.glGetAttribLocation(mProgramHandle, "aTextureCoord");
+            mUTextureLoc = GLES20.glGetUniformLocation(mProgramHandle, "uTexture");
+
+            mVertexCoordinateBuffer = GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_VERTEX_COORDS);
+            mTextureCoordinateBuffer = GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
+        }
+        return true;
+    }
+
+    public void updateTextureSize(int textureWidth, int textureHeight) {
+        mTextureWidth = textureWidth;
+        mTextureHeight = textureHeight;
+    }
+
+    public boolean putInputTexture(String name, int texture) {
+
+        return true;
+    }
+
+    public boolean putInputValue(String name, FilterValue value) {
+
+        return true;
+    }
+
+    public void addTargetFilter(String name, AWBaseFilter outputFilter) {
+
+    }
+
+    public void onDraw() {
+        onDraw(null);
+    }
+
+    public void onDraw(AWFrameBuffer frameBuffer) {
+        onObtainFrameBuffer();
+        if (mOutputFrameBuffer != null) {
+            mOutputFrameBuffer.bindFrameBuffer();
+            mOutputFrameBuffer.checkInit(mTextureWidth, mTextureHeight);
+
+            onGlClear();
+            GLES20.glViewport(0, 0, mOutputFrameBuffer.getWidth(), mOutputFrameBuffer.getHeight());
+            GLES20.glUseProgram(mProgramHandle);
+
+            onPreDraw();
+            onBindCoordinate();
+            onInputTextures();
+            onInputValues();
+            onDrawArrays();
+            onPostDraw();
+
+            mOutputFrameBuffer.unbindFrameBuffer();
+
+            onOutputTarget();
+        }
+    }
+
+    public int getOutputTexture() {
+        return GlUtil.INVALID_TEXTURE_ID;
+    }
+
+    public void release() {
+        try {
+            if (this.mProgramHandle != -1) {
+                GLES20.glDeleteProgram(this.mProgramHandle);
+                this.mProgramHandle = -1;
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected boolean needSkip() {
+        return true;
+    }
+
+    protected void onObtainFrameBuffer() {
+
+    }
+
+    protected void onGlClear() {
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+    }
+
+    protected void onPreDraw() {
+
+    }
+
+    protected void onBindCoordinate() {
+        GLES20.glEnableVertexAttribArray(mAVertexCoordinateLoc);
+        GLES20.glVertexAttribPointer(mAVertexCoordinateLoc, 2, GLES20.GL_FLOAT,
+                false, 8, mVertexCoordinateBuffer);
+
+        GLES20.glEnableVertexAttribArray(mATextureCoordinateLoc);
+        GLES20.glVertexAttribPointer(mATextureCoordinateLoc, 2, GLES20.GL_FLOAT,
+                false, 8, mTextureCoordinateBuffer);
+
+    }
+
+    protected void onInputTextures() {
+
+    }
+
+    protected void onInputValues() {
+
+    }
+
+    protected void onDrawArrays() {
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+    protected void onPostDraw() {
+
+    }
+
+    protected void onOutputTarget() {
+
     }
 }

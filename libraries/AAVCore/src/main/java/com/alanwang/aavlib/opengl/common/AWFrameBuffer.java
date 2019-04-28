@@ -93,6 +93,22 @@ public class AWFrameBuffer {
     }
 
     /**
+     * 获取输出纹理的宽度
+     * @return
+     */
+    public int getWidth() {
+        return mWidth;
+    }
+
+    /**
+     * 获取输出纹理的高度
+     * @return
+     */
+    public int getHeight() {
+        return mHeight;
+    }
+
+    /**
      * 释放 FrameBuffer
      */
     public void release() {

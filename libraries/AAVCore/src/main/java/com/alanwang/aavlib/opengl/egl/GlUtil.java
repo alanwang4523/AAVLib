@@ -44,7 +44,7 @@ public class GlUtil {
         Matrix.setIdentityM(IDENTITY_MATRIX, 0);
     }
 
-    public static final int NO_TEXTURE = -1;
+    public static final int INVALID_TEXTURE_ID = -1;
 
     private static final int SIZEOF_FLOAT = 4;
     private static final int SIZEOF_SHORT = 2;
@@ -233,8 +233,12 @@ public class GlUtil {
     }
 
     public static int loadImageTexture(Bitmap bmp) {
+        return loadImageTexture(bmp, true);
+    }
+
+    public static int loadImageTexture(Bitmap bmp, boolean needRecycleBmp) {
         if (bmp == null || bmp.isRecycled()) {
-            return 0;
+            return INVALID_TEXTURE_ID;
         }
 
         // Generate Textures, if more needed, alter these numbers.
@@ -259,8 +263,10 @@ public class GlUtil {
         // Load the bitmap into the bound texture.
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
-        // We are done using the bitmap so we should recycle it.
-        bmp.recycle();
+        if (needRecycleBmp) {
+            // We are done using the bitmap so we should recycle it.
+            bmp.recycle();
+        }
         return textures[0];
     }
 
