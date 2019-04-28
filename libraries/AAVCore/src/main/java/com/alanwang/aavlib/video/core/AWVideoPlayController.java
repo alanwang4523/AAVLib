@@ -20,7 +20,7 @@ import com.alanwang.aavlib.opengl.common.AWFrameBuffer;
 import com.alanwang.aavlib.opengl.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.video.player.AWVideoPlayer;
 import com.alanwang.aavlib.video.player.IVideoPlayer;
-import com.alanwang.aavlib.image.effect.AWGrayEffect;
+import com.alanwang.aavlib.image.filters.AWGrayEffect;
 
 /**
  * Author: AlanWang4523.

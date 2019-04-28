@@ -307,4 +307,20 @@ public class GlUtil {
                 GLES20.GL_CLAMP_TO_EDGE);
         checkGlError("glTexParameter");
     }
+
+    public static final String DIRECT_FILTER_VERTEX_SHADER = "\n" +
+	        "attribute vec4 position;\n" +
+            "attribute vec2 inputTextureCoordinate;\n" +
+            "varying highp vec2 textureCoordinate;\n" +
+            "void main() {\n" +
+            "    gl_Position = position;\n" +
+            "    textureCoordinate = inputTextureCoordinate;\n" +
+            "}";
+    public static final String DIRECT_FILTER_FRAGMENT_SHADER = "\n" +
+            "varying highp vec2 textureCoordinate;\n" +
+            "uniform sampler2D inputImageTexture;\n" +
+            "void main()\n" +
+            "{\n" +
+            "    gl_FragColor = texture2D(inputImageTexture, textureCoordinate);\n" +
+            "}";
 }

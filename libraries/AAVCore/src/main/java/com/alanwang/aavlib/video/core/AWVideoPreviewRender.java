@@ -17,7 +17,7 @@ package com.alanwang.aavlib.video.core;
 
 import com.alanwang.aavlib.opengl.common.AWFrameBuffer;
 import com.alanwang.aavlib.opengl.render.AWSurfaceRender;
-import com.alanwang.aavlib.image.effect.AWGrayEffect;
+import com.alanwang.aavlib.image.filters.AWGrayEffect;
 
 /**
  * Author: AlanWang4523.
