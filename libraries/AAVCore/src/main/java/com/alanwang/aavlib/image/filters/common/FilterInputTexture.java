@@ -17,16 +17,11 @@ package com.alanwang.aavlib.image.filters.common;
 
 /**
  * Author: AlanWang4523.
- * Date: 19/4/28 23:13.
+ * Date: 19/4/30 00:28.
  * Mail: alanwang4523@gmail.com
  */
-public class FilterValue {
+public class FilterInputTexture {
     public int location;
     public String name;
-    public @ValueType int valueType;
-    public float[] values;
-
-    public FilterValue() {
-        values = new float[8];
-    }
+    public int textureId;
 }
