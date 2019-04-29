@@ -44,7 +44,8 @@ public class GlUtil {
         Matrix.setIdentityM(IDENTITY_MATRIX, 0);
     }
 
-    public static final int INVALID_TEXTURE_ID = -1;
+    public static final int GL_INVALID_TEXTURE_ID = -1;
+    public static final int GL_PROGRAM_INVALID_ID = -1;
 
     private static final int SIZEOF_FLOAT = 4;
     private static final int SIZEOF_SHORT = 2;
@@ -64,12 +65,12 @@ public class GlUtil {
     public static int createProgram(String vertexSource, String fragmentSource) {
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
         if (vertexShader == 0) {
-            return 0;
+            return GL_PROGRAM_INVALID_ID;
         }
         int pixelShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSource);
         if (pixelShader == 0) {
             GLES20.glDeleteShader(vertexShader);
-            return 0;
+            return GL_PROGRAM_INVALID_ID;
         }
         int program = GLES20.glCreateProgram();
         checkGlError("glCreateProgram");
@@ -87,7 +88,7 @@ public class GlUtil {
             Log.e(TAG, "Could not link program: ");
             Log.e(TAG, GLES20.glGetProgramInfoLog(program));
             GLES20.glDeleteProgram(program);
-            program = 0;
+            program = GL_PROGRAM_INVALID_ID;
         }
         GLES20.glDeleteShader(vertexShader);
         GLES20.glDeleteShader(pixelShader);
@@ -238,7 +239,7 @@ public class GlUtil {
 
     public static int loadImageTexture(Bitmap bmp, boolean needRecycleBmp) {
         if (bmp == null || bmp.isRecycled()) {
-            return INVALID_TEXTURE_ID;
+            return GL_INVALID_TEXTURE_ID;
         }
 
         // Generate Textures, if more needed, alter these numbers.

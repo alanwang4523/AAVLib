@@ -19,11 +19,14 @@ import android.opengl.GLES20;
 import android.text.TextUtils;
 import com.alanwang.aavlib.image.filters.common.FilterInputTexture;
 import com.alanwang.aavlib.image.filters.common.FilterInputValue;
+import com.alanwang.aavlib.image.filters.common.FilterTargetFilter;
 import com.alanwang.aavlib.image.filters.common.ValueType;
 import com.alanwang.aavlib.opengl.common.AWCoordinateUtil;
 import com.alanwang.aavlib.opengl.common.AWFrameBuffer;
 import com.alanwang.aavlib.opengl.egl.GlUtil;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -33,19 +36,26 @@ import java.util.HashMap;
  */
 public abstract class AWBaseFilter {
 
+    protected static final int MAX_INPUT_TEXTURE_SIZE = 8;
+    private static final int GL_TEXTURES[] = {
+        GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1, GLES20.GL_TEXTURE2, GLES20.GL_TEXTURE3,
+        GLES20.GL_TEXTURE4, GLES20.GL_TEXTURE5, GLES20.GL_TEXTURE5, GLES20.GL_TEXTURE7
+    };
+
     protected String mVertexShader;
     protected String mFragmentShader;
-    protected int mProgramHandle = -1;
+    protected int mProgramHandle = GlUtil.GL_PROGRAM_INVALID_ID;
 
     // locations
-    protected int mAVertexCoordinateLoc;
-    protected int mATextureCoordinateLoc;
-    protected int mUTextureLoc;
+    protected int mVertexCoordinateLoc;
+    protected int mTextureCoordinateLoc;
+    protected int mInputTextureLoc;
 
     protected FloatBuffer mVertexCoordinateBuffer;
     protected FloatBuffer mTextureCoordinateBuffer;
     protected HashMap<String, FilterInputValue> mInputValueMap = new HashMap<>();
     protected HashMap<String, FilterInputTexture> mInputTextureMap = new HashMap<>();
+    protected ArrayList<FilterTargetFilter> mTargetFilterList = new ArrayList<>();
     protected AWFrameBuffer mOutputFrameBuffer;
     protected int mTextureWidth;
     protected int mTextureHeight;
@@ -64,17 +74,31 @@ public abstract class AWBaseFilter {
      * @return
      */
     public boolean initialize() {
+        if (mProgramHandle != GlUtil.GL_PROGRAM_INVALID_ID) {
+            GLES20.glDeleteProgram(mProgramHandle);
+        }
         mProgramHandle = GlUtil.createProgram(mVertexShader, mFragmentShader);
         if (mProgramHandle <= 0) {
             return false;
         }
 
-        mAVertexCoordinateLoc = GLES20.glGetAttribLocation(mProgramHandle, "aPosition");
-        mATextureCoordinateLoc = GLES20.glGetAttribLocation(mProgramHandle, "aTextureCoord");
-        mUTextureLoc = GLES20.glGetUniformLocation(mProgramHandle, "uTexture");
+        mVertexCoordinateLoc = GLES20.glGetAttribLocation(mProgramHandle, "position");
+        mTextureCoordinateLoc = GLES20.glGetAttribLocation(mProgramHandle, "textureCoordinate");
+        mInputTextureLoc = GLES20.glGetUniformLocation(mProgramHandle, "inputImageTexture");
 
         mVertexCoordinateBuffer = GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_VERTEX_COORDS);
         mTextureCoordinateBuffer = GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
+
+        Collection<FilterInputTexture> filterInputTextureCollection = mInputTextureMap.values();
+        for (FilterInputTexture filterInputTexture : filterInputTextureCollection) {
+            filterInputTexture.location = GLES20.glGetUniformLocation(mProgramHandle, filterInputTexture.name);
+        }
+
+        Collection<FilterInputValue> filterInputValueCollection = mInputValueMap.values();
+        for (FilterInputValue filterInputValue : filterInputValueCollection) {
+            filterInputValue.location = GLES20.glGetUniformLocation(mProgramHandle, filterInputValue.name);
+        }
+
         return true;
     }
 
@@ -100,11 +124,25 @@ public abstract class AWBaseFilter {
         }
         FilterInputTexture filterInputTexture = mInputTextureMap.get(name);
         if (filterInputTexture == null) {
+            if (mInputValueMap.size() > MAX_INPUT_TEXTURE_SIZE) {
+                return false;
+            }
             filterInputTexture = new FilterInputTexture();
+            filterInputTexture.name = name;
         }
-        filterInputTexture.name = name;
         filterInputTexture.textureId = textureId;
+        mInputTextureMap.put(name, filterInputTexture);
         return true;
+    }
+
+    /**
+     * 输入一个 float 型参数
+     * @param name
+     * @param value
+     * @return
+     */
+    public boolean putInputValue(String name, float value) {
+        return putInputValue(name, ValueType.FLOAT_1, new float[]{value});
     }
 
     /**
@@ -135,7 +173,17 @@ public abstract class AWBaseFilter {
      * @param outputFilter
      */
     public void addTargetFilter(String name, AWBaseFilter outputFilter) {
+        FilterTargetFilter targetFilter = new FilterTargetFilter();
+        targetFilter.name = name;
+        targetFilter.filter = outputFilter;
+        mTargetFilterList.add(targetFilter);
+    }
 
+    /**
+     * 清除所有目标 filter
+     */
+    public void clearTargetFilters() {
+        mTargetFilterList.clear();
     }
 
     /**
@@ -179,7 +227,7 @@ public abstract class AWBaseFilter {
         if (mOutputFrameBuffer != null) {
             return mOutputFrameBuffer.getOutputTextureId();
         }
-        return GlUtil.INVALID_TEXTURE_ID;
+        return GlUtil.GL_INVALID_TEXTURE_ID;
     }
 
     /**
@@ -195,9 +243,12 @@ public abstract class AWBaseFilter {
      */
     public void release() {
         try {
-            if (this.mProgramHandle != -1) {
-                GLES20.glDeleteProgram(this.mProgramHandle);
-                this.mProgramHandle = -1;
+            if (mProgramHandle != GlUtil.GL_PROGRAM_INVALID_ID) {
+                GLES20.glDeleteProgram(mProgramHandle);
+                mProgramHandle = GlUtil.GL_PROGRAM_INVALID_ID;
+            }
+            if (mOutputFrameBuffer != null) {
+                mOutputFrameBuffer.release();
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -248,12 +299,12 @@ public abstract class AWBaseFilter {
      * 绑定顶点左边和纹理坐标
      */
     protected void onBindCoordinate() {
-        GLES20.glEnableVertexAttribArray(mAVertexCoordinateLoc);
-        GLES20.glVertexAttribPointer(mAVertexCoordinateLoc, 2, GLES20.GL_FLOAT,
+        GLES20.glEnableVertexAttribArray(mVertexCoordinateLoc);
+        GLES20.glVertexAttribPointer(mVertexCoordinateLoc, 2, GLES20.GL_FLOAT,
                 false, 8, mVertexCoordinateBuffer);
 
-        GLES20.glEnableVertexAttribArray(mATextureCoordinateLoc);
-        GLES20.glVertexAttribPointer(mATextureCoordinateLoc, 2, GLES20.GL_FLOAT,
+        GLES20.glEnableVertexAttribArray(mTextureCoordinateLoc);
+        GLES20.glVertexAttribPointer(mTextureCoordinateLoc, 2, GLES20.GL_FLOAT,
                 false, 8, mTextureCoordinateBuffer);
 
     }
@@ -262,14 +313,39 @@ public abstract class AWBaseFilter {
      * 激活并使用输入纹理
      */
     protected void onInputTextures() {
-
+        int i = 0;
+        Collection<FilterInputTexture> filterInputTextureCollection = mInputTextureMap.values();
+        for (FilterInputTexture filterInputTexture : filterInputTextureCollection) {
+            if (filterInputTexture.textureId != GlUtil.GL_INVALID_TEXTURE_ID) {
+                GLES20.glActiveTexture(GL_TEXTURES[i]);
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, filterInputTexture.textureId);
+                GLES20.glUniform1i(filterInputTexture.location, i);
+            }
+            i++;
+        }
     }
 
     /**
      * 激活并使用输入参数
      */
     protected void onInputValues() {
-
+        int i = 0;
+        Collection<FilterInputValue> filterInputValueCollection = mInputValueMap.values();
+        for (FilterInputValue inputValue : filterInputValueCollection) {
+            if (inputValue.valueType == ValueType.FLOAT_1) {
+                GLES20.glUniform1f(inputValue.location, inputValue.values[0]);
+            } else if (inputValue.valueType == ValueType.FLOAT_2) {
+                GLES20.glUniform2f(inputValue.location, inputValue.values[0], inputValue.values[1]);
+            } else if (inputValue.valueType == ValueType.FLOAT_3) {
+                GLES20.glUniform3f(inputValue.location, inputValue.values[0], inputValue.values[1], inputValue.values[2]);
+            } else if (inputValue.valueType == ValueType.FLOAT_4) {
+                GLES20.glUniform4f(inputValue.location, inputValue.values[0], inputValue.values[1],
+                        inputValue.values[2], inputValue.values[3]);
+            } else if (inputValue.valueType == ValueType.INT_1) {
+                GLES20.glUniform1i(inputValue.location, (int) inputValue.values[0]);
+            }
+            i++;
+        }
     }
 
     /**
@@ -290,6 +366,8 @@ public abstract class AWBaseFilter {
      * 将结果输出到目标 filter
      */
     protected void onOutputTarget() {
-
+        for (FilterTargetFilter targetFilter : mTargetFilterList) {
+            targetFilter.filter.putInputTexture(targetFilter.name, mOutputFrameBuffer.getOutputTextureId());
+        }
     }
 }

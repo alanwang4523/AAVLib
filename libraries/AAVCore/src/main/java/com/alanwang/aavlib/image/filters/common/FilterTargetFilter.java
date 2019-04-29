@@ -15,23 +15,14 @@
  */
 package com.alanwang.aavlib.image.filters.common;
 
-import android.support.annotation.IntDef;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.alanwang.aavlib.image.filters.AWBaseFilter;
 
 /**
  * Author: AlanWang4523.
- * Date: 19/4/28 23:16.
+ * Date: 19/4/30 00:45.
  * Mail: alanwang4523@gmail.com
  */
-@Retention(RetentionPolicy.SOURCE)
-@IntDef({ValueType.FLOAT_1, ValueType.FLOAT_2, ValueType.FLOAT_3, ValueType.FLOAT_4,
-        ValueType.INT_1})
-public @interface ValueType {
-    int FLOAT_1 = 101;
-    int FLOAT_2 = 102;
-    int FLOAT_3 = 103;
-    int FLOAT_4 = 104;
-
-    int INT_1   = 201;
+public class FilterTargetFilter {
+    public AWBaseFilter filter;
+    public String name;
 }
