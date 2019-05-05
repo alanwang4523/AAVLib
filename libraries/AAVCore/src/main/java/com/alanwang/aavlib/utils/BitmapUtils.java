@@ -1,5 +1,6 @@
 package com.alanwang.aavlib.utils;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +9,7 @@ import android.support.annotation.RawRes;
 import android.text.TextUtils;
 import android.util.Log;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +22,65 @@ import java.io.InputStream;
 
 public class BitmapUtils {
     private static final String TAG = BitmapUtils.class.getSimpleName();
+    
+    public static final String SUFFIX_ASSETS = "assets://";
+    public static final String SUFFIX_INFILE = "infile://";
+    public static final String SUFFIX_EXFILE = "exfile://";
+
+    /**
+     * 根据路径获取 bitmap
+     * @param context
+     * @param str
+     * @return
+     */
+    public static Bitmap getBitmapByPath(Context context, String str) {
+        ALog.e("getBitmap()--->>str = " + str);
+        if (isAssetsPath(str)) {
+            return getBmpFromAssets(context, str.replace(SUFFIX_ASSETS, ""));
+        } else if (isInfilePath(str)) {
+            return getBmpFromInFile(context, str.replace(SUFFIX_INFILE, ""));
+        } else if (isExfilePath(str)) {
+            return getBmpFromFile(str.replace(SUFFIX_EXFILE, ""));
+        } else {
+            return null;
+        }
+    }
+
+    private static boolean isAssetsPath(String str) {
+        return str.startsWith(SUFFIX_ASSETS);
+    }
+
+    private static boolean isInfilePath(String str) {
+        return str.startsWith(SUFFIX_INFILE);
+    }
+
+    private static boolean isExfilePath(String str) {
+        return str.startsWith(SUFFIX_EXFILE);
+    }
+
+    private static Bitmap getBmpFromAssets(Context context, String str) {
+        try {
+            return BitmapFactory.decodeStream(context.getAssets().open(str));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static Bitmap getBmpFromInFile(Context context, String str) {
+        try {
+            return BitmapFactory.decodeStream(context.openFileInput(str));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static Bitmap getBmpFromFile(String str) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        return BitmapFactory.decodeFile(str, options);
+    }
 
     /**
      * 从资源文件获取 bitmap
