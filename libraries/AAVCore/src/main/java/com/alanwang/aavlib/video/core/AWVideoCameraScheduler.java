@@ -39,7 +39,7 @@ public class AWVideoCameraScheduler {
     private AWVideoFileRecorder mVideoFileRecorder;
     
     private boolean mIsCameraOpen = false;
-    private boolean mTestEnableEffect = false;// 测试是否使用滤镜
+    private boolean mTestEnableEffect = true;// 测试是否使用滤镜
 
     public AWVideoCameraScheduler() {
         mCamera = new AWCamera();

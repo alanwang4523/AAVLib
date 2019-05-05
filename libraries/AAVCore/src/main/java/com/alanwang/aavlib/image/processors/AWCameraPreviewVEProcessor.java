@@ -15,8 +15,7 @@
  */
 package com.alanwang.aavlib.image.processors;
 
-import com.alanwang.aavlib.opengl.common.AWFrameBuffer;
-import com.alanwang.aavlib.image.filters.AWGrayEffect;
+import com.alanwang.aavlib.image.filters.AWStyleFilter;
 
 /**
  * Author: AlanWang4523.
@@ -25,12 +24,11 @@ import com.alanwang.aavlib.image.filters.AWGrayEffect;
  */
 public class AWCameraPreviewVEProcessor {
 
-    private final AWFrameBuffer mEffectFrameBuffer;
-    private final AWGrayEffect mTestEffect;
+    private boolean isInit = false;
+    private final AWStyleFilter mTestEffect;
 
     public AWCameraPreviewVEProcessor() {
-        mEffectFrameBuffer = new AWFrameBuffer();
-        mTestEffect = new AWGrayEffect();
+        mTestEffect = new AWStyleFilter();
     }
 
     /**
@@ -40,19 +38,20 @@ public class AWCameraPreviewVEProcessor {
      * @param textureHeight
      */
     public int processFrame(int textureId, int textureWidth, int textureHeight) {
-        mEffectFrameBuffer.checkInit(textureWidth, textureHeight);
-        mEffectFrameBuffer.bindFrameBuffer();
-        mTestEffect.drawFrame(textureId);
-        mEffectFrameBuffer.unbindFrameBuffer();
+        if (!isInit) {
+            mTestEffect.initialize();
+            isInit = true;
+        }
+        mTestEffect.updateTextureSize(textureWidth, textureHeight);
+        mTestEffect.onDraw(textureId);
 
-        return mEffectFrameBuffer.getOutputTextureId();
+        return mTestEffect.getOutputTextureId();
     }
 
     /**
      * 释放资源
      */
     public void release() {
-        mEffectFrameBuffer.release();
         mTestEffect.release();
     }
 }

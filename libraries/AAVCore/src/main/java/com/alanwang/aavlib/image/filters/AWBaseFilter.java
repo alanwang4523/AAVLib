@@ -41,6 +41,7 @@ public abstract class AWBaseFilter {
         GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1, GLES20.GL_TEXTURE2, GLES20.GL_TEXTURE3,
         GLES20.GL_TEXTURE4, GLES20.GL_TEXTURE5, GLES20.GL_TEXTURE5, GLES20.GL_TEXTURE7
     };
+    protected static final String DEFAULT_TEXTURE_NAME = "inputImageTexture";
 
     protected String mVertexShader;
     protected String mFragmentShader;
@@ -49,7 +50,6 @@ public abstract class AWBaseFilter {
     // locations
     protected int mVertexCoordinateLoc;
     protected int mTextureCoordinateLoc;
-    protected int mInputTextureLoc;
 
     protected FloatBuffer mVertexCoordinateBuffer;
     protected FloatBuffer mTextureCoordinateBuffer;
@@ -64,8 +64,8 @@ public abstract class AWBaseFilter {
         this(GlUtil.DIRECT_FILTER_VERTEX_SHADER, GlUtil.DIRECT_FILTER_FRAGMENT_SHADER);
     }
 
-    public AWBaseFilter(String vertexSHader, String fragmentShader) {
-        mVertexShader = vertexSHader;
+    public AWBaseFilter(String vertexShader, String fragmentShader) {
+        mVertexShader = vertexShader;
         mFragmentShader = fragmentShader;
     }
 
@@ -83,8 +83,7 @@ public abstract class AWBaseFilter {
         }
 
         mVertexCoordinateLoc = GLES20.glGetAttribLocation(mProgramHandle, "position");
-        mTextureCoordinateLoc = GLES20.glGetAttribLocation(mProgramHandle, "textureCoordinate");
-        mInputTextureLoc = GLES20.glGetUniformLocation(mProgramHandle, "inputImageTexture");
+        mTextureCoordinateLoc = GLES20.glGetAttribLocation(mProgramHandle, "inputTextureCoordinate");
 
         mVertexCoordinateBuffer = GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_VERTEX_COORDS);
         mTextureCoordinateBuffer = GlUtil.createFloatBuffer(AWCoordinateUtil.DEFAULT_TEXTURE_COORDS);
@@ -202,7 +201,9 @@ public abstract class AWBaseFilter {
         if (frameBuffer != null) {
             frameBuffer.bindFrameBuffer();
 
-            onGlClear();
+            if (sharedFrameBuffer == null) {
+                onGlClear();
+            }
             GLES20.glViewport(0, 0, frameBuffer.getWidth(), frameBuffer.getHeight());
             GLES20.glUseProgram(mProgramHandle);
 
@@ -214,8 +215,8 @@ public abstract class AWBaseFilter {
             onPostDraw();
 
             frameBuffer.unbindFrameBuffer();
-
             onOutputTarget();
+            GLES20.glUseProgram(0);
         }
     }
 
@@ -223,7 +224,7 @@ public abstract class AWBaseFilter {
      * 获取输出纹理
      * @return
      */
-    public int getOutputTexture() {
+    public int getOutputTextureId() {
         if (mOutputFrameBuffer != null) {
             return mOutputFrameBuffer.getOutputTextureId();
         }
@@ -284,7 +285,7 @@ public abstract class AWBaseFilter {
      * 清除 GL 缓冲区
      */
     protected void onGlClear() {
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
     }
 
@@ -329,7 +330,6 @@ public abstract class AWBaseFilter {
      * 激活并使用输入参数
      */
     protected void onInputValues() {
-        int i = 0;
         Collection<FilterInputValue> filterInputValueCollection = mInputValueMap.values();
         for (FilterInputValue inputValue : filterInputValueCollection) {
             if (inputValue.valueType == ValueType.FLOAT_1) {
@@ -344,7 +344,6 @@ public abstract class AWBaseFilter {
             } else if (inputValue.valueType == ValueType.INT_1) {
                 GLES20.glUniform1i(inputValue.location, (int) inputValue.values[0]);
             }
-            i++;
         }
     }
 
@@ -359,7 +358,9 @@ public abstract class AWBaseFilter {
      * 后绘制
      */
     protected void onPostDraw() {
-
+        GLES20.glDisableVertexAttribArray(mVertexCoordinateLoc);
+        GLES20.glDisableVertexAttribArray(mTextureCoordinateLoc);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
     }
 
     /**
