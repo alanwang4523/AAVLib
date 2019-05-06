@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import com.alanwang.aavlib.image.filters.common.Constants;
 
 /**
  * Author: AlanWang4523.
@@ -23,10 +24,6 @@ import java.io.InputStream;
 public class BitmapUtils {
     private static final String TAG = BitmapUtils.class.getSimpleName();
     
-    public static final String SUFFIX_ASSETS = "assets://";
-    public static final String SUFFIX_INFILE = "infile://";
-    public static final String SUFFIX_EXFILE = "exfile://";
-
     /**
      * 根据路径获取 bitmap
      * @param context
@@ -36,26 +33,26 @@ public class BitmapUtils {
     public static Bitmap getBitmapByPath(Context context, String str) {
         ALog.e("getBitmap()--->>str = " + str);
         if (isAssetsPath(str)) {
-            return getBmpFromAssets(context, str.replace(SUFFIX_ASSETS, ""));
+            return getBmpFromAssets(context, str.replace(Constants.SUFFIX_ASSETS, ""));
         } else if (isInfilePath(str)) {
-            return getBmpFromInFile(context, str.replace(SUFFIX_INFILE, ""));
+            return getBmpFromInFile(context, str.replace(Constants.SUFFIX_INFILE, ""));
         } else if (isExfilePath(str)) {
-            return getBmpFromFile(str.replace(SUFFIX_EXFILE, ""));
+            return getBmpFromFile(str.replace(Constants.SUFFIX_EXFILE, ""));
         } else {
             return null;
         }
     }
 
     private static boolean isAssetsPath(String str) {
-        return str.startsWith(SUFFIX_ASSETS);
+        return str.startsWith(Constants.SUFFIX_ASSETS);
     }
 
     private static boolean isInfilePath(String str) {
-        return str.startsWith(SUFFIX_INFILE);
+        return str.startsWith(Constants.SUFFIX_INFILE);
     }
 
     private static boolean isExfilePath(String str) {
-        return str.startsWith(SUFFIX_EXFILE);
+        return str.startsWith(Constants.SUFFIX_EXFILE);
     }
 
     private static Bitmap getBmpFromAssets(Context context, String str) {

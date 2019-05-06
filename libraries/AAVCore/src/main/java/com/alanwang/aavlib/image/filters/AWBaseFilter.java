@@ -257,6 +257,13 @@ public abstract class AWBaseFilter {
     }
 
     /**
+     * 设置滤镜参数
+     * @param type
+     * @param argStr
+     */
+    protected abstract void setArgs(int type, String argStr);
+
+    /**
      * 是否需要跳过该 filter
      * @return
      */

@@ -15,7 +15,12 @@
  */
 package com.alanwang.aavlib.image.filters;
 
+import com.alanwang.aavlib.image.filters.args.AlphaArg;
+import com.alanwang.aavlib.image.filters.args.FilterArg;
+import com.alanwang.aavlib.image.filters.args.StyleFilterArg;
 import com.alanwang.aavlib.opengl.egl.GlUtil;
+import com.alanwang.aavlib.utils.GsonUtils;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * Author: AlanWang4523.
@@ -24,21 +29,31 @@ import com.alanwang.aavlib.opengl.egl.GlUtil;
  */
 public class AWStyleFilter extends AWBaseFilter {
 
-    private static final String TEST_FRAGMENT_SHADER =
-        "precision highp float;\n" +
-        "varying vec2 textureCoordinate;\n" +
-        "uniform sampler2D inputImageTexture;\n" +
-        "const highp vec3 W = vec3(0.2125, 0.7154, 0.0721);\n" +
-        "void main()\n" +
-        "{\n" +
-        "    lowp vec4 textureColor = texture2D(inputImageTexture, textureCoordinate);\n" +
-        "    float luminance = dot(textureColor.rgb, W);\n" +
-        "    gl_FragColor = vec4(vec3(luminance), textureColor.a);\n" +
-        "}";
+    private volatile boolean mIsNeedUpdateProgram = false;
+    private StyleFilterArg mStyleFilterArg;
+    private float alpha = 0.5f;
 
     public AWStyleFilter() {
-        super(GlUtil.DIRECT_FILTER_VERTEX_SHADER, TEST_FRAGMENT_SHADER);
+        super();
         putInputTexture(DEFAULT_TEXTURE_NAME, GlUtil.GL_INVALID_TEXTURE_ID);
+    }
+
+    @Override
+    protected void setArgs(int type, String argStr) {
+        if (type == FilterArg.TYPE_RESOURCE) {
+            try {
+                mStyleFilterArg = GsonUtils.getGson().fromJson(argStr, StyleFilterArg.class);
+                mIsNeedUpdateProgram = true;
+            } catch (JsonSyntaxException e) {
+                e.printStackTrace();
+            }
+        } else if (type == FilterArg.TYPE_ALPHA) {
+            try {
+                alpha = Float.valueOf(argStr);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void onDraw(int textureId) {
