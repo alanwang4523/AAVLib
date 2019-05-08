@@ -32,7 +32,7 @@ public class AWStyleFilter extends AWBaseFilter {
     private volatile boolean mIsNeedUpdateProgram = false;
     private StyleFilterArg mStyleFilterArg;
     private int mImgNum = 0;
-    private float mAlpha = 0.0f;
+    private float mAlpha = 0.5f;
 
     public AWStyleFilter() {
         super();
