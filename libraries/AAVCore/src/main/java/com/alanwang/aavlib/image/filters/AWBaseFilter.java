@@ -20,6 +20,8 @@ import android.text.TextUtils;
 import com.alanwang.aavlib.image.filters.common.FilterInputTexture;
 import com.alanwang.aavlib.image.filters.common.FilterInputValue;
 import com.alanwang.aavlib.image.filters.common.FilterTargetFilter;
+import com.alanwang.aavlib.image.filters.common.ImageTextureCallback;
+import com.alanwang.aavlib.image.filters.common.InputStreamCallback;
 import com.alanwang.aavlib.image.filters.common.ValueType;
 import com.alanwang.aavlib.opengl.common.AWCoordinateUtil;
 import com.alanwang.aavlib.opengl.common.AWFrameBuffer;
@@ -57,6 +59,8 @@ public abstract class AWBaseFilter {
     protected HashMap<String, FilterInputTexture> mInputTextureMap = new HashMap<>();
     protected ArrayList<FilterTargetFilter> mTargetFilterList = new ArrayList<>();
     protected AWFrameBuffer mOutputFrameBuffer;
+    protected ImageTextureCallback mImageTextureCallback;
+    protected InputStreamCallback mInputStreamCallback;
     protected int mTextureWidth;
     protected int mTextureHeight;
 
@@ -67,6 +71,22 @@ public abstract class AWBaseFilter {
     public AWBaseFilter(String vertexShader, String fragmentShader) {
         mVertexShader = vertexShader;
         mFragmentShader = fragmentShader;
+    }
+
+    /**
+     * 设置纹理回调
+     * @param imageTextureCallback
+     */
+    public void setImageTextureCallback(ImageTextureCallback imageTextureCallback) {
+        this.mImageTextureCallback = imageTextureCallback;
+    }
+
+    /**
+     * 设置获取输入流回调
+     * @param inputStreamCallback
+     */
+    public void setInputStreamCallback(InputStreamCallback inputStreamCallback) {
+        this.mInputStreamCallback = inputStreamCallback;
     }
 
     /**

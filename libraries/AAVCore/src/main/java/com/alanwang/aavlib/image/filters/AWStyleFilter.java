@@ -15,10 +15,10 @@
  */
 package com.alanwang.aavlib.image.filters;
 
-import com.alanwang.aavlib.image.filters.args.AlphaArg;
 import com.alanwang.aavlib.image.filters.args.FilterArg;
 import com.alanwang.aavlib.image.filters.args.StyleFilterArg;
 import com.alanwang.aavlib.opengl.egl.GlUtil;
+import com.alanwang.aavlib.utils.FileUtils;
 import com.alanwang.aavlib.utils.GsonUtils;
 import com.google.gson.JsonSyntaxException;
 
@@ -31,7 +31,8 @@ public class AWStyleFilter extends AWBaseFilter {
 
     private volatile boolean mIsNeedUpdateProgram = false;
     private StyleFilterArg mStyleFilterArg;
-    private float alpha = 0.5f;
+    private int mImgNum = 0;
+    private float mAlpha = 0.0f;
 
     public AWStyleFilter() {
         super();
@@ -39,17 +40,28 @@ public class AWStyleFilter extends AWBaseFilter {
     }
 
     @Override
+    protected boolean needSkip() {
+        if (mAlpha <= 0.01f) {
+            return true;
+        }
+        return super.needSkip();
+    }
+
+    @Override
     protected void setArgs(int type, String argStr) {
         if (type == FilterArg.TYPE_RESOURCE) {
             try {
                 mStyleFilterArg = GsonUtils.getGson().fromJson(argStr, StyleFilterArg.class);
+                if (mStyleFilterArg.resource.imgList != null) {
+                    mImgNum = mStyleFilterArg.resource.imgList.size();
+                }
                 mIsNeedUpdateProgram = true;
             } catch (JsonSyntaxException e) {
                 e.printStackTrace();
             }
         } else if (type == FilterArg.TYPE_ALPHA) {
             try {
-                alpha = Float.valueOf(argStr);
+                mAlpha = Float.valueOf(argStr);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
@@ -57,7 +69,22 @@ public class AWStyleFilter extends AWBaseFilter {
     }
 
     public void onDraw(int textureId) {
+        putInputValue("alpha", mAlpha);
         putInputTexture(DEFAULT_TEXTURE_NAME, textureId);
+        if (mStyleFilterArg != null) {
+            if (mImgNum > 0) {
+                for (StyleFilterArg.ImgArg imgArg : mStyleFilterArg.resource.imgList) {
+                    putInputTexture(imgArg.name, mImageTextureCallback.getTextureId(imgArg.path));
+                }
+            }
+            if (mIsNeedUpdateProgram) {
+                mFragmentShader = new String(FileUtils.getBytes(
+                        mInputStreamCallback.getInputStream(
+                        mStyleFilterArg.resource.fshPath)));
+                initialize();
+                mIsNeedUpdateProgram = false;
+            }
+        }
         super.onDraw();
     }
 }
