@@ -49,10 +49,10 @@ public class FilterCallbackImpl implements ImageTextureCallback, InputStreamCall
                     textureMap.put(imgPath, textureId);
                 }
             }
+            ALog.e("getImageTexture()--->>textureId = " + textureId + ", imgPath = " + imgPath);
         } else {
             textureId = textureMap.get(imgPath);
         }
-        ALog.e("getImageTexture()--->>textureId = " + textureId + ", imgPath = " + imgPath);
         return textureId;
     }
 

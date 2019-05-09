@@ -28,7 +28,16 @@ import com.google.gson.JsonSyntaxException;
  * Mail: alanwang4523@gmail.com
  */
 public class AWStyleFilter extends AWBaseFilter {
+    private static final String DEFAULT_STYLE_FRAGMENT_SHADER = "\n" +
+            "varying highp vec2 textureCoordinate;\n" +
+            "uniform sampler2D inputImageTexture;\n" +
+            "uniform highp float alpha;\n" +
+            "void main()\n" +
+            "{\n" +
+            "    gl_FragColor = texture2D(inputImageTexture, textureCoordinate);\n" +
+            "}";
 
+    private static final String NAME_ALPHA = "alpha";
     private volatile boolean mIsNeedUpdateProgram = false;
     private StyleFilterArg mStyleFilterArg;
     private int mImgNum = 0;
@@ -37,6 +46,7 @@ public class AWStyleFilter extends AWBaseFilter {
     public AWStyleFilter() {
         super();
         putInputTexture(DEFAULT_TEXTURE_NAME, GlUtil.GL_INVALID_TEXTURE_ID);
+        putInputValue(NAME_ALPHA, mAlpha);
     }
 
     @Override
@@ -48,12 +58,12 @@ public class AWStyleFilter extends AWBaseFilter {
     }
 
     @Override
-    protected void setArgs(int type, String argStr) {
+    public void setArgs(int type, String argStr) {
         if (type == FilterArg.TYPE_RESOURCE) {
             try {
                 mStyleFilterArg = GsonUtils.getGson().fromJson(argStr, StyleFilterArg.class);
-                if (mStyleFilterArg.resource.imgList != null) {
-                    mImgNum = mStyleFilterArg.resource.imgList.size();
+                if (mStyleFilterArg.imgList != null) {
+                    mImgNum = mStyleFilterArg.imgList.size();
                 }
                 mIsNeedUpdateProgram = true;
             } catch (JsonSyntaxException e) {
@@ -69,18 +79,18 @@ public class AWStyleFilter extends AWBaseFilter {
     }
 
     public void onDraw(int textureId) {
-        putInputValue("alpha", mAlpha);
+        putInputValue(NAME_ALPHA, mAlpha);
         putInputTexture(DEFAULT_TEXTURE_NAME, textureId);
         if (mStyleFilterArg != null) {
             if (mImgNum > 0) {
-                for (StyleFilterArg.ImgArg imgArg : mStyleFilterArg.resource.imgList) {
+                for (StyleFilterArg.ImgArg imgArg : mStyleFilterArg.imgList) {
                     putInputTexture(imgArg.name, mImageTextureCallback.getTextureId(imgArg.path));
                 }
             }
             if (mIsNeedUpdateProgram) {
                 mFragmentShader = new String(FileUtils.getBytes(
                         mInputStreamCallback.getInputStream(
-                        mStyleFilterArg.resource.fshPath)));
+                        mStyleFilterArg.fshPath)));
                 initialize();
                 mIsNeedUpdateProgram = false;
             }

@@ -16,6 +16,14 @@
 package com.alanwang.aavlib.image.processors;
 
 import com.alanwang.aavlib.image.filters.AWStyleFilter;
+import com.alanwang.aavlib.image.filters.args.StyleFilterArg;
+import com.alanwang.aavlib.image.filters.common.Constants;
+import com.alanwang.aavlib.image.filters.common.FilterCallbackImpl;
+import com.alanwang.aavlib.utils.ALog;
+import com.alanwang.aavlib.utils.APP;
+import com.alanwang.aavlib.utils.FileUtils;
+import com.alanwang.aavlib.utils.GsonUtils;
+import java.io.IOException;
 
 /**
  * Author: AlanWang4523.
@@ -26,9 +34,14 @@ public class AWCameraPreviewVEProcessor {
 
     private boolean isInit = false;
     private final AWStyleFilter mTestEffect;
+    private FilterCallbackImpl mFilterCallback;
+    private int testCount = 0;
 
     public AWCameraPreviewVEProcessor() {
+        mFilterCallback = new FilterCallbackImpl();
         mTestEffect = new AWStyleFilter();
+        mTestEffect.setImageTextureCallback(mFilterCallback);
+        mTestEffect.setInputStreamCallback(mFilterCallback);
     }
 
     /**
@@ -45,6 +58,11 @@ public class AWCameraPreviewVEProcessor {
         mTestEffect.updateTextureSize(textureWidth, textureHeight);
         mTestEffect.onDraw(textureId);
 
+        testCount++;
+        if (testCount == 100) {
+            testStyleFilter();
+        }
+
         return mTestEffect.getOutputTextureId();
     }
 
@@ -53,5 +71,28 @@ public class AWCameraPreviewVEProcessor {
      */
     public void release() {
         mTestEffect.release();
+    }
+
+    private void testStyleFilter() {
+        try {
+            mTestEffect.setArgs(StyleFilterArg.TYPE_ALPHA, String.valueOf(0.5f));
+            String basePath = "filters/style/style_romantic/%s";
+            String jsonString = new String(FileUtils.getBytes(
+                    APP.INSTANCE.getAssets().open(String.format(basePath, "config.json"))));
+
+            StyleFilterArg styleFilterArg = GsonUtils.getGson().fromJson(jsonString, StyleFilterArg.class);
+
+            styleFilterArg.fshPath = Constants.SUFFIX_ASSETS + styleFilterArg.fshPath;
+            for (StyleFilterArg.ImgArg imgArg : styleFilterArg.imgList) {
+                imgArg.path = Constants.SUFFIX_ASSETS + String.format(basePath, imgArg.path);
+            }
+
+            ALog.e("src_json : " + jsonString);
+            String finalJsonStr = GsonUtils.getGson().toJson(styleFilterArg);
+            ALog.e("arg_json : " + finalJsonStr);
+            mTestEffect.setArgs(StyleFilterArg.TYPE_RESOURCE, finalJsonStr);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

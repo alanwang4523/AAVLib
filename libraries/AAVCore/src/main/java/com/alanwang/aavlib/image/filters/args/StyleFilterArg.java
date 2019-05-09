@@ -24,21 +24,15 @@ import java.util.ArrayList;
  */
 public class StyleFilterArg extends FilterArg {
 
-    public ResourceArg resource;
+    /**
+     * fragment shader 路径
+     */
+    public String fshPath;
 
-    public static class ResourceArg {
-
-        /**
-         * fragment shader 路径
-         */
-        public String fshPath;
-
-        /**
-         * 资源文件列表
-         */
-        public ArrayList<ImgArg> imgList;
-
-    }
+    /**
+     * 资源文件列表
+     */
+    public ArrayList<ImgArg> imgList;
 
     public static class ImgArg {
         public String name;
