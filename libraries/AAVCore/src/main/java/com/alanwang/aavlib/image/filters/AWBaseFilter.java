@@ -281,7 +281,7 @@ public abstract class AWBaseFilter {
      * @param type
      * @param argStr
      */
-    protected abstract void setArgs(int type, String argStr);
+    public abstract void setArgs(int type, String argStr);
 
     /**
      * 是否需要跳过该 filter
