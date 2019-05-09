@@ -13,27 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alanwang.aavlib.image.filters.common;
+package com.alanwang.aavlib.utils;
+
+import android.content.Context;
+import android.content.res.AssetManager;
 
 /**
  * Author: AlanWang4523.
- * Date: 19/5/6 00:25.
+ * Date: 19/5/9 23:36.
  * Mail: alanwang4523@gmail.com
  */
-public class Constants {
-    public static final String SUFFIX_ASSETS = "assets://";
-    public static final String SUFFIX_INFILE = "infile://";
-    public static final String SUFFIX_EXFILE = "exfile://";
+public class APP {
+    public final static APP INSTANCE = new APP();
 
-    public static boolean isAssetsPath(String str) {
-        return str.startsWith(Constants.SUFFIX_ASSETS);
+    private Context context;
+    private APP() {
     }
 
-    public static boolean isInfilePath(String str) {
-        return str.startsWith(Constants.SUFFIX_INFILE);
+    public Context getContext() {
+        return context;
     }
 
-    public static boolean isExfilePath(String str) {
-        return str.startsWith(Constants.SUFFIX_EXFILE);
+    public AssetManager getAssets() {
+        return context.getAssets();
+    }
+
+    public void setContext(Context context) {
+        this.context = context.getApplicationContext();
     }
 }
