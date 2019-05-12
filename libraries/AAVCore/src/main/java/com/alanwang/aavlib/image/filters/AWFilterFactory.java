@@ -22,13 +22,13 @@ import com.alanwang.aavlib.image.filters.common.FilterCategory;
  * Date: 19/5/11 23:03.
  * Mail: alanwang4523@gmail.com
  */
-public class FilterFactory {
+public class AWFilterFactory {
 
     private static class SingletonFactory {
-        private static FilterFactory sInstance = new FilterFactory();
+        private static AWFilterFactory sInstance = new AWFilterFactory();
     }
 
-    public static FilterFactory getInstance() {
+    public static AWFilterFactory getInstance() {
         return SingletonFactory.sInstance;
     }
 
@@ -47,5 +47,5 @@ public class FilterFactory {
         return filter;
     }
 
-    private FilterFactory() {}
+    private AWFilterFactory() {}
 }
