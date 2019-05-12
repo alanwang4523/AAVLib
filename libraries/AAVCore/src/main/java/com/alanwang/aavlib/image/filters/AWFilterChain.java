@@ -84,11 +84,24 @@ public class AWFilterChain {
     }
 
     /**
+     * set the arguments for the filter
+     * @param filterCategory
+     * @param argType
+     * @param argString
+     */
+    public void setFilterArg(@FilterCategory int filterCategory, int argType, String argString) {
+        FilterElement filterElement = mFilterList.get(filterCategory);
+        if (filterElement != null) {
+            filterElement.filter.setArgs(argType, argString);
+        }
+    }
+
+    /**
      * let the input texture pass whole filter chain
      * @param inputTextureId
      * @return
      */
-    public int draw(int inputTextureId) {
+    public int draw(int inputTextureId, int textureWidth, int textureHeight) {
         boolean isFirstFilter = true;
         int outputTextureId = inputTextureId;
         for (int i = 0; i < mFilterList.size(); i++) {
@@ -106,6 +119,7 @@ public class AWFilterChain {
                 } else {
                     curFilter.clearTargetFilters();
                 }
+                curFilter.updateTextureSize(textureWidth, textureHeight);
                 curFilter.onDraw();
                 outputTextureId = curFilter.getOutputTextureId();
             }
@@ -120,6 +134,16 @@ public class AWFilterChain {
      */
     public int getFilterCount() {
         return mFilterList.size();
+    }
+
+    /**
+     * release all filters
+     */
+    public void release() {
+        for (int i = 0; i < mFilterList.size(); i++) {
+            FilterElement filterElement = mFilterList.valueAt(i);
+            filterElement.filter.release();
+        }
     }
 
     /**

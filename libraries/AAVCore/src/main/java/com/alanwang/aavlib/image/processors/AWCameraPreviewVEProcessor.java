@@ -15,10 +15,12 @@
  */
 package com.alanwang.aavlib.image.processors;
 
+import com.alanwang.aavlib.image.filters.AWFilterChain;
 import com.alanwang.aavlib.image.filters.AWStyleFilter;
 import com.alanwang.aavlib.image.filters.args.StyleFilterArg;
 import com.alanwang.aavlib.image.filters.common.Constants;
 import com.alanwang.aavlib.image.filters.common.FilterCallbackImpl;
+import com.alanwang.aavlib.image.filters.common.FilterCategory;
 import com.alanwang.aavlib.utils.ALog;
 import com.alanwang.aavlib.utils.APP;
 import com.alanwang.aavlib.utils.FileUtils;
@@ -33,13 +35,13 @@ import java.io.IOException;
 public class AWCameraPreviewVEProcessor {
 
     private boolean isInit = false;
-    private final AWStyleFilter mTestEffect;
+    private final AWFilterChain mTestEffect;
     private FilterCallbackImpl mFilterCallback;
     private int testCount = 0;
 
     public AWCameraPreviewVEProcessor() {
         mFilterCallback = new FilterCallbackImpl();
-        mTestEffect = new AWStyleFilter();
+        mTestEffect = new AWFilterChain(new int[]{FilterCategory.FC_STYLE});
         mTestEffect.setImageTextureCallback(mFilterCallback);
         mTestEffect.setInputStreamCallback(mFilterCallback);
     }
@@ -53,17 +55,17 @@ public class AWCameraPreviewVEProcessor {
     public int processFrame(int textureId, int textureWidth, int textureHeight) {
         if (!isInit) {
             mTestEffect.initialize();
+            mTestEffect.setFilterEnable(FilterCategory.FC_STYLE, true);
             isInit = true;
         }
-        mTestEffect.updateTextureSize(textureWidth, textureHeight);
-        mTestEffect.onDraw(textureId);
+        int outTextureId = mTestEffect.draw(textureId, textureWidth, textureHeight);
 
         testCount++;
         if (testCount == 100) {
             testStyleFilter();
         }
 
-        return mTestEffect.getOutputTextureId();
+        return outTextureId;
     }
 
     /**
@@ -75,7 +77,7 @@ public class AWCameraPreviewVEProcessor {
 
     private void testStyleFilter() {
         try {
-            mTestEffect.setArgs(StyleFilterArg.TYPE_ALPHA, String.valueOf(0.5f));
+            mTestEffect.setFilterArg(FilterCategory.FC_STYLE, StyleFilterArg.TYPE_ALPHA, String.valueOf(0.5f));
             String basePath = "filters/style/style_romantic/%s";
             String jsonString = new String(FileUtils.getBytes(
                     APP.INSTANCE.getAssets().open(String.format(basePath, "config.json"))));
@@ -90,7 +92,7 @@ public class AWCameraPreviewVEProcessor {
             ALog.e("src_json : " + jsonString);
             String finalJsonStr = GsonUtils.getGson().toJson(styleFilterArg);
             ALog.e("arg_json : " + finalJsonStr);
-            mTestEffect.setArgs(StyleFilterArg.TYPE_RESOURCE, finalJsonStr);
+            mTestEffect.setFilterArg(FilterCategory.FC_STYLE, StyleFilterArg.TYPE_RESOURCE, finalJsonStr);
         } catch (IOException e) {
             e.printStackTrace();
         }

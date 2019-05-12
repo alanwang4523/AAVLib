@@ -28,15 +28,6 @@ import com.google.gson.JsonSyntaxException;
  * Mail: alanwang4523@gmail.com
  */
 public class AWStyleFilter extends AWBaseFilter {
-    private static final String DEFAULT_STYLE_FRAGMENT_SHADER = "\n" +
-            "varying highp vec2 textureCoordinate;\n" +
-            "uniform sampler2D inputImageTexture;\n" +
-            "uniform highp float alpha;\n" +
-            "void main()\n" +
-            "{\n" +
-            "    gl_FragColor = texture2D(inputImageTexture, textureCoordinate);\n" +
-            "}";
-
     private static final String NAME_ALPHA = "alpha";
     private volatile boolean mIsNeedUpdateProgram = false;
     private StyleFilterArg mStyleFilterArg;
@@ -78,9 +69,9 @@ public class AWStyleFilter extends AWBaseFilter {
         }
     }
 
-    public void onDraw(int textureId) {
+    @Override
+    public void onDraw() {
         putInputValue(NAME_ALPHA, mAlpha);
-        putInputTexture(DEFAULT_TEXTURE_NAME, textureId);
         if (mStyleFilterArg != null) {
             if (mImgNum > 0) {
                 for (StyleFilterArg.ImgArg imgArg : mStyleFilterArg.imgList) {
