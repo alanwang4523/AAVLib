@@ -74,7 +74,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 设置纹理回调
+     * set image texture callback
      * @param imageTextureCallback
      */
     public void setImageTextureCallback(ImageTextureCallback imageTextureCallback) {
@@ -82,7 +82,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 设置获取输入流回调
+     * set input stream callback
      * @param inputStreamCallback
      */
     public void setInputStreamCallback(InputStreamCallback inputStreamCallback) {
@@ -90,7 +90,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 初始化
+     * initialize the filter
      * @return
      */
     public boolean initialize() {
@@ -122,7 +122,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 更新纹理大小
+     * update the texture size
      * @param textureWidth
      * @param textureHeight
      */
@@ -132,7 +132,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 传入输入纹理
+     * put input texture
      * @param name
      * @param textureId
      * @return
@@ -155,7 +155,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 输入一个 float 型参数
+     * put input a float value
      * @param name
      * @param value
      * @return
@@ -165,7 +165,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 传入输出参数
+     * put input values with type
      * @param name
      * @param valueType
      * @param values
@@ -187,7 +187,8 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 添加当前 filter 输出的目标 filter，当前的输出会作为下个目标 filter 的输入
+     * add the target filter for the current filter, then the current filter's output texture
+     * will be the target filter's input texture
      * @param name
      * @param outputFilter
      */
@@ -199,21 +200,21 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 清除所有目标 filter
+     * clear all target filters
      */
     public void clearTargetFilters() {
         mTargetFilterList.clear();
     }
 
     /**
-     * 绘制
+     * to draw the input textures
      */
     public void onDraw() {
         onDraw(null);
     }
 
     /**
-     * 绘制，可以由外部传入共享的 frame buffer
+     * draw the input textures to the shared frame buffer
      * @param sharedFrameBuffer
      */
     public void onDraw(AWFrameBuffer sharedFrameBuffer) {
@@ -241,7 +242,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 获取输出纹理
+     * get the output texture id
      * @return
      */
     public int getOutputTextureId() {
@@ -252,7 +253,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 获取输出的 frame buffer
+     * get the output frame buffer
      * @return
      */
     public AWFrameBuffer getOutputFrameBuffer() {
@@ -260,7 +261,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 释放资源
+     * release
      */
     public void release() {
         try {
@@ -277,14 +278,15 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 设置滤镜参数
+     * an abstract function, implement by sub class,
+     * sub class analyze the type and arg string by it's function
      * @param type
      * @param argStr
      */
     public abstract void setArgs(int type, String argStr);
 
     /**
-     * 是否需要跳过该 filter
+     * is need skip the filter
      * @return
      */
     protected boolean needSkip() {
@@ -292,7 +294,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 获取 frame buffer
+     * get the frame buffer
      * @param sharedFrameBuffer
      * @return
      */
@@ -309,7 +311,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 清除 GL 缓冲区
+     * clear GL buffer
      */
     protected void onGlClear() {
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -317,14 +319,14 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 预绘制
+     * prepare draw
      */
     protected void onPreDraw() {
 
     }
 
     /**
-     * 绑定顶点左边和纹理坐标
+     * bind vertex coordinates and texture coordinates
      */
     protected void onBindCoordinate() {
         GLES20.glEnableVertexAttribArray(mVertexCoordinateLoc);
@@ -338,7 +340,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 激活并使用输入纹理
+     * active and bind all input textures
      */
     protected void onInputTextures() {
         int i = 0;
@@ -354,7 +356,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 激活并使用输入参数
+     * active and use all input values
      */
     protected void onInputValues() {
         Collection<FilterInputValue> filterInputValueCollection = mInputValueMap.values();
@@ -375,14 +377,14 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 绘制
+     * draw arrays
      */
     protected void onDrawArrays() {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
     }
 
     /**
-     * 后绘制
+     * after draw
      */
     protected void onPostDraw() {
         GLES20.glDisableVertexAttribArray(mVertexCoordinateLoc);
@@ -391,7 +393,7 @@ public abstract class AWBaseFilter {
     }
 
     /**
-     * 将结果输出到目标 filter
+     * put the current filter's output as the target filter's input
      */
     protected void onOutputTarget() {
         for (FilterTargetFilter targetFilter : mTargetFilterList) {
