@@ -16,9 +16,9 @@
 package com.alanwang.aavlib.image.filters;
 
 import android.util.SparseArray;
+
+import com.alanwang.aavlib.image.filters.common.FilterCallbackImpl;
 import com.alanwang.aavlib.image.filters.common.FilterCategory;
-import com.alanwang.aavlib.image.filters.common.ImageTextureCallback;
-import com.alanwang.aavlib.image.filters.common.InputStreamCallback;
 
 /**
  * Author: AlanWang4523.
@@ -27,37 +27,19 @@ import com.alanwang.aavlib.image.filters.common.InputStreamCallback;
  */
 public class AWFilterChain {
     private SparseArray<FilterElement> mFilterList;
+    private FilterCallbackImpl mFilterCallback;
 
     public AWFilterChain(@FilterCategory int[] filterCategoryArr) {
         mFilterList = new SparseArray<>(5);
+        mFilterCallback = new FilterCallbackImpl();
         for (@FilterCategory int filterCategory : filterCategoryArr) {
             FilterElement filterElement = new FilterElement();
             filterElement.filter = AWFilterFactory.getInstance().createFilter(filterCategory);
+            filterElement.filter.setImageTextureCallback(mFilterCallback);
+            filterElement.filter.setInputStreamCallback(mFilterCallback);
             filterElement.filterCategory = filterCategory;
             filterElement.enable = false;
             mFilterList.put(filterCategory, filterElement);
-        }
-    }
-
-    /**
-     * set image texture callback
-     * @param imageTextureCallback
-     */
-    public void setImageTextureCallback(ImageTextureCallback imageTextureCallback) {
-        for (int i = 0; i < mFilterList.size(); i++) {
-            FilterElement filterElement = mFilterList.valueAt(i);
-            filterElement.filter.setImageTextureCallback(imageTextureCallback);
-        }
-    }
-
-    /**
-     * set input stream callback
-     * @param inputStreamCallback
-     */
-    public void setInputStreamCallback(InputStreamCallback inputStreamCallback) {
-        for (int i = 0; i < mFilterList.size(); i++) {
-            FilterElement filterElement = mFilterList.valueAt(i);
-            filterElement.filter.setInputStreamCallback(inputStreamCallback);
         }
     }
 
@@ -144,6 +126,7 @@ public class AWFilterChain {
             FilterElement filterElement = mFilterList.valueAt(i);
             filterElement.filter.release();
         }
+        mFilterCallback.release();
     }
 
     /**

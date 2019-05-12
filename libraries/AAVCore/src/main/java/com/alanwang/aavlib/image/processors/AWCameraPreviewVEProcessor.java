@@ -16,10 +16,8 @@
 package com.alanwang.aavlib.image.processors;
 
 import com.alanwang.aavlib.image.filters.AWFilterChain;
-import com.alanwang.aavlib.image.filters.AWStyleFilter;
 import com.alanwang.aavlib.image.filters.args.StyleFilterArg;
 import com.alanwang.aavlib.image.filters.common.Constants;
-import com.alanwang.aavlib.image.filters.common.FilterCallbackImpl;
 import com.alanwang.aavlib.image.filters.common.FilterCategory;
 import com.alanwang.aavlib.utils.ALog;
 import com.alanwang.aavlib.utils.APP;
@@ -36,14 +34,10 @@ public class AWCameraPreviewVEProcessor {
 
     private boolean isInit = false;
     private final AWFilterChain mTestEffect;
-    private FilterCallbackImpl mFilterCallback;
     private int testCount = 0;
 
     public AWCameraPreviewVEProcessor() {
-        mFilterCallback = new FilterCallbackImpl();
         mTestEffect = new AWFilterChain(new int[]{FilterCategory.FC_STYLE});
-        mTestEffect.setImageTextureCallback(mFilterCallback);
-        mTestEffect.setInputStreamCallback(mFilterCallback);
     }
 
     /**

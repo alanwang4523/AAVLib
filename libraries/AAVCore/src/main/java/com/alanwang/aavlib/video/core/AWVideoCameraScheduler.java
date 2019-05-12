@@ -18,13 +18,14 @@ package com.alanwang.aavlib.video.core;
 import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.view.Surface;
+import com.alanwang.aavlib.image.filters.AWFilterChain;
+import com.alanwang.aavlib.image.filters.common.FilterCategory;
 import com.alanwang.aavlib.opengl.common.AWMessage;
 import com.alanwang.aavlib.opengl.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.video.camera.AWCamera;
 import com.alanwang.aavlib.video.camera.AWCameraException;
 import com.alanwang.aavlib.video.common.AWVideoSize;
 import com.alanwang.aavlib.video.common.IEncodeTimeProvider;
-import com.alanwang.aavlib.image.processors.AWCameraPreviewVEProcessor;
 
 /**
  * Author: AlanWang4523.
@@ -35,15 +36,14 @@ public class AWVideoCameraScheduler {
 
     private AWCamera mCamera;
     private AWIOSurfaceProxy mIOSurfaceProxy;
-    private AWCameraPreviewVEProcessor mVEProcessor;
     private AWVideoFileRecorder mVideoFileRecorder;
+    private AWFilterChain mFilterChain;
     
     private boolean mIsCameraOpen = false;
-    private boolean mTestEnableEffect = true;// 测试是否使用滤镜
 
     public AWVideoCameraScheduler() {
         mCamera = new AWCamera();
-        mVEProcessor = new AWCameraPreviewVEProcessor();
+        mFilterChain = new AWFilterChain(new int[]{FilterCategory.FC_STYLE});
         
         mIOSurfaceProxy = new AWIOSurfaceProxy();
         mIOSurfaceProxy.setOnInputSurfaceListener(mOnInputSurfaceListener);
@@ -86,6 +86,25 @@ public class AWVideoCameraScheduler {
      */
     public void destroySurface() {
         mIOSurfaceProxy.destroySurface();
+    }
+
+    /**
+     * enable or disable the filter
+     * @param filterCategory
+     * @param enable
+     */
+    public void setFilterEnable(@FilterCategory int filterCategory, boolean enable) {
+        mFilterChain.setFilterEnable(filterCategory, enable);
+    }
+
+    /**
+     * 设置滤镜参数
+     * @param filterCategory
+     * @param argType
+     * @param argString
+     */
+    public void setFilterArg(@FilterCategory int filterCategory, int argType, String argString) {
+        mFilterChain.setFilterArg(filterCategory, argType, argString);
     }
 
     /**
@@ -169,12 +188,12 @@ public class AWVideoCameraScheduler {
     private AWIOSurfaceProxy.OnInputSurfaceListener mOnInputSurfaceListener = new AWIOSurfaceProxy.OnInputSurfaceListener() {
         @Override
         public void onInputSurfaceCreated(Surface surface) {
-
+            mFilterChain.initialize();
         }
 
         @Override
         public void onInputSurfaceDestroyed() {
-
+            mFilterChain.release();
         }
     };
 
@@ -199,7 +218,6 @@ public class AWVideoCameraScheduler {
         @Override
         public void onOutputSurfaceDestroyed() {
             mCamera.release();
-            mVEProcessor.release();
             mIsCameraOpen = false;
         }
     };
@@ -207,10 +225,7 @@ public class AWVideoCameraScheduler {
     private AWIOSurfaceProxy.OnPassFilterListener mOnPassFilterListener = new AWIOSurfaceProxy.OnPassFilterListener() {
         @Override
         public int onPassFilter(int textureId, int width, int height) {
-            int outputTexture = textureId;
-            if (mTestEnableEffect) {
-                outputTexture = mVEProcessor.processFrame(textureId, width, height);
-            }
+            int outputTexture = mFilterChain.draw(textureId, width, height);
             GLES20.glFinish();
             if (mVideoFileRecorder != null) {
                 mVideoFileRecorder.encodeFrame(outputTexture);
