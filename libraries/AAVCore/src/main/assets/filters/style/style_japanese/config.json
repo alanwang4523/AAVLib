@@ -1,0 +1,9 @@
+{
+	"fshPath": "filters/shader/style_8x8.fsh",
+	"imgList": [
+		{
+			"name":"inputImageTexture_1",
+			"path":"tex_img_1.png"
+		}
+	]
+}
