@@ -16,7 +16,6 @@
 package com.alanwang.aavlib.image.filters;
 
 import android.util.SparseArray;
-
 import com.alanwang.aavlib.image.filters.common.FilterCallbackImpl;
 import com.alanwang.aavlib.image.filters.common.FilterCategory;
 
