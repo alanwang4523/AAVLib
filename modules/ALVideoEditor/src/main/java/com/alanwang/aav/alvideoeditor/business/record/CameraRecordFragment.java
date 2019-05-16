@@ -309,6 +309,7 @@ public class CameraRecordFragment extends Fragment implements
     @Override
     public void onEffectSelect(int type) {
         ALog.e("onEffectSelect = " + type + ", name = " + FiltersHelper.getStyleFilterBean(type).name);
+        mVideoCameraScheduler.setFilter(type, 0.5f);
     }
 
     public void onBackPressed() {

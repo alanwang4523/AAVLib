@@ -41,7 +41,16 @@ public class AWFilterProcessor {
     }
 
     /**
-     * set filter with the default alpha 0.5f
+     * initialize
+     */
+    public void initialize() {
+        mFilterChain.initialize();
+        handleFilterArgSetBeforeInit();
+        mIsInit = true;
+    }
+
+    /**
+     * set filter with the default level 0.5f
      * @param filterTYpe
      */
     public void setFilter(@FilterType int filterTYpe) {
@@ -49,15 +58,15 @@ public class AWFilterProcessor {
     }
 
     /**
-     * set filter with the default alpha
+     * set filter with the default level
      * @param filterTYpe
-     * @param alpha
+     * @param level
      */
-    public void setFilter(@FilterType int filterTYpe, float alpha) {
+    public void setFilter(@FilterType int filterTYpe, float level) {
         if (!mIsInit) {
-            mFilterLevelSetBeforeInit.put(filterTYpe, alpha);
+            mFilterLevelSetBeforeInit.put(filterTYpe, level);
         }
-        styleFilterArgSetter.setFilter(filterTYpe, alpha);
+        styleFilterArgSetter.setFilter(filterTYpe, level);
     }
 
     /**
@@ -69,9 +78,7 @@ public class AWFilterProcessor {
      */
     public int processFrame(int textureId, int textureWidth, int textureHeight) {
         if (!mIsInit) {
-            mFilterChain.initialize();
-            handleFilterArgSetBeforeInit();
-            mIsInit = true;
+            initialize();
         }
         return mFilterChain.draw(textureId, textureWidth, textureHeight);
     }
