@@ -30,7 +30,7 @@ import com.alanwang.aav.alvideoeditor.common.FiltersHelper;
  * Date: 19/4/18 08:49.
  * Mail: alanwang4523@gmail.com
  */
-public class StyleFilterView extends RelativeLayout implements EffectSelectListener {
+public class StyleFilterView extends RelativeLayout {
 
     private StyleFilterAdapter effectAdapter;
 
@@ -59,14 +59,12 @@ public class StyleFilterView extends RelativeLayout implements EffectSelectListe
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         effectAdapter = new StyleFilterAdapter(getContext());
-        effectAdapter.setEffectSelectListener(this);
-        effectAdapter.setItemList(FiltersHelper.getStyleFilteList());
+        effectAdapter.setItemList(FiltersHelper.getStyleFilterList());
 
         recyclerView.setAdapter(effectAdapter);
     }
 
-    @Override
-    public void onEffectSelect(int type) {
-
+    public void setEffectSelectListener(EffectSelectListener effectSelectListener) {
+        effectAdapter.setEffectSelectListener(effectSelectListener);
     }
 }

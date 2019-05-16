@@ -38,8 +38,10 @@ import com.alanwang.aav.alvideoeditor.R;
 import com.alanwang.aav.alvideoeditor.beans.AWRecVideoInfo;
 import com.alanwang.aav.alvideoeditor.beans.AWSegmentInfo;
 import com.alanwang.aav.alvideoeditor.business.preview.AWVideoPreviewActivity;
+import com.alanwang.aav.alvideoeditor.common.FiltersHelper;
 import com.alanwang.aav.alvideoeditor.core.AWMediaConstants;
 import com.alanwang.aav.alvideoeditor.core.AWMp4ParserHelper;
+import com.alanwang.aav.alvideoeditor.ui.EffectSelectListener;
 import com.alanwang.aav.alvideoeditor.ui.StyleFilterView;
 import com.alanwang.aavlib.utils.ALog;
 import com.alanwang.aavlib.utils.TimeUtils;
@@ -60,7 +62,8 @@ public class CameraRecordFragment extends Fragment implements
         ISurfaceCallback,
         AWTimer.TimerListener,
         View.OnClickListener,
-        View.OnTouchListener {
+        View.OnTouchListener,
+        EffectSelectListener {
 
     public interface CameraRecordFragmentListener {
 
@@ -169,6 +172,7 @@ public class CameraRecordFragment extends Fragment implements
         btnStyleFilter.setOnClickListener(this);
 
         styleFilterView = view.findViewById(R.id.bottom_style_effect_view);
+        styleFilterView.setEffectSelectListener(this);
 
         btnRecord = view.findViewById(R.id.btn_camera_record);
         btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
@@ -300,6 +304,11 @@ public class CameraRecordFragment extends Fragment implements
             pauseRecord();
         }
         mSegmentProgressBar.setProgress(mCurRecordProgress);
+    }
+
+    @Override
+    public void onEffectSelect(int type) {
+        ALog.e("onEffectSelect = " + type + ", name = " + FiltersHelper.getStyleFilterBean(type).name);
     }
 
     public void onBackPressed() {
