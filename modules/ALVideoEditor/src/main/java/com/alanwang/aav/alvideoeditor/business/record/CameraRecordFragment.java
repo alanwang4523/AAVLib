@@ -414,8 +414,13 @@ public class CameraRecordFragment extends Fragment implements
         btnStyleFilter.setVisibility(View.VISIBLE);
         btnDeleteSegment.setVisibility(View.VISIBLE);
 
-        btnRecordDone.setVisibility(View.VISIBLE);
-        btnRecordDone.setAlpha(mCurRecordProgress > mMinRecordProgress ? 1.0f : 0.5f);
+        if (mRecVideoInfo.getSegmentsSize() <= 0) {
+            btnDeleteSegment.setVisibility(View.GONE);
+            btnRecordDone.setVisibility(View.GONE);
+        } else {
+            btnRecordDone.setVisibility(View.VISIBLE);
+            btnRecordDone.setAlpha(mCurRecordProgress > mMinRecordProgress ? 1.0f : 0.5f);
+        }
     }
 
     /**

@@ -16,11 +16,12 @@
 package com.alanwang.aavlib.video.core;
 
 import android.view.Surface;
-import com.alanwang.aavlib.opengl.common.AWFrameBuffer;
+import com.alanwang.aavlib.image.filters.common.FilterCategory;
+import com.alanwang.aavlib.image.filters.common.FilterType;
+import com.alanwang.aavlib.image.processors.AWFilterProcessor;
 import com.alanwang.aavlib.opengl.render.AWIOSurfaceProxy;
 import com.alanwang.aavlib.video.player.AWVideoPlayer;
 import com.alanwang.aavlib.video.player.IVideoPlayer;
-import com.alanwang.aavlib.image.filters.AWGrayEffect;
 
 /**
  * Author: AlanWang4523.
@@ -43,34 +44,28 @@ public class AWVideoPlayController {
     private IVideoPlayer mVideoPlayer;
     private IControllerCallback iControllerCallback;
     private AWIOSurfaceProxy mIOSurfaceProxy;
-    private AWFrameBuffer mEffectFrameBuffer;
-    private AWGrayEffect mTestEffect;
+    private AWFilterProcessor mFilterProcessor;
 
     public AWVideoPlayController() {
         mVideoPlayer = new AWVideoPlayer();
         mIOSurfaceProxy = new AWIOSurfaceProxy();
+        mFilterProcessor = new AWFilterProcessor(new int[]{FilterCategory.FC_STYLE});
 
         mIOSurfaceProxy.setOnInputSurfaceListener(new AWIOSurfaceProxy.OnInputSurfaceListener() {
             @Override
             public void onInputSurfaceCreated(Surface surface) {
-                mEffectFrameBuffer = new AWFrameBuffer();
-                mTestEffect = new AWGrayEffect();
+                mFilterProcessor.initialize();
             }
 
             @Override
             public void onInputSurfaceDestroyed() {
-                mEffectFrameBuffer.release();
-                mTestEffect.release();
+                mFilterProcessor.release();
             }
         });
         mIOSurfaceProxy.setOnPassFilterListener(new AWIOSurfaceProxy.OnPassFilterListener() {
             @Override
             public int onPassFilter(int textureId, int width, int height) {
-                mEffectFrameBuffer.checkInit(width, height);
-                mEffectFrameBuffer.bindFrameBuffer();
-                mTestEffect.drawFrame(textureId);
-                mEffectFrameBuffer.unbindFrameBuffer();
-                return mEffectFrameBuffer.getOutputTextureId();
+                return mFilterProcessor.processFrame(textureId, width, height);
             }
         });
 
@@ -103,6 +98,15 @@ public class AWVideoPlayController {
             mVideoPlayer.stop();
         }
         mVideoPlayer.preparePlayer(videoPath);
+    }
+
+    /**
+     * 设置滤镜参数
+     * @param filterType
+     * @param level
+     */
+    public void setFilter(@FilterType int filterType, float level) {
+        mFilterProcessor.setFilter(filterType, level);
     }
 
     /**

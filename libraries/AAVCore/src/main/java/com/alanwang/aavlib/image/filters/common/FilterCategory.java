@@ -27,5 +27,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.SOURCE)
 @IntDef({FilterCategory.FC_STYLE})
 public @interface FilterCategory {
-    int FC_STYLE = 1001; // AWStyleFilter
+    int FC_STYLE = 1000; // AWStyleFilter
 }
