@@ -35,14 +35,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Date: 19/4/18 09:02.
  * Mail: alanwang4523@gmail.com
  */
-public class StyleEffectAdapter extends AWBaseAdapter<EffectBean> {
+public class StyleFilterAdapter extends AWBaseAdapter<EffectBean> {
 
     private int selectIndex = 0;
     private EffectSelectListener effectSelectListener;
     private RequestOptions glideOptions = new RequestOptions()
             .centerCrop().placeholder(R.drawable.ic_launcher);
 
-    public StyleEffectAdapter(Context mContext) {
+    public StyleFilterAdapter(Context mContext) {
         super(mContext);
     }
 

@@ -40,7 +40,7 @@ import com.alanwang.aav.alvideoeditor.beans.AWSegmentInfo;
 import com.alanwang.aav.alvideoeditor.business.preview.AWVideoPreviewActivity;
 import com.alanwang.aav.alvideoeditor.core.AWMediaConstants;
 import com.alanwang.aav.alvideoeditor.core.AWMp4ParserHelper;
-import com.alanwang.aav.alvideoeditor.ui.StyleEffectView;
+import com.alanwang.aav.alvideoeditor.ui.StyleFilterView;
 import com.alanwang.aavlib.utils.ALog;
 import com.alanwang.aavlib.utils.TimeUtils;
 import com.alanwang.aavlib.video.core.AWVideoCameraScheduler;
@@ -90,7 +90,7 @@ public class CameraRecordFragment extends Fragment implements
     private AWRecordButton btnRecord;
     private ImageView btnRecordDone;
 
-    private StyleEffectView styleEffectView;
+    private StyleFilterView styleFilterView;
 
     private AWVideoCameraScheduler mVideoCameraScheduler;
     private boolean mIsFrontCamera = true;
@@ -168,7 +168,7 @@ public class CameraRecordFragment extends Fragment implements
         btnStyleFilter = view.findViewById(R.id.iv_btn_record_filter);
         btnStyleFilter.setOnClickListener(this);
 
-        styleEffectView = view.findViewById(R.id.bottom_style_effect_view);
+        styleFilterView = view.findViewById(R.id.bottom_style_effect_view);
 
         btnRecord = view.findViewById(R.id.btn_camera_record);
         btnRecord.setRecordListener(new AWRecordButton.OnRecordListener() {
@@ -222,8 +222,8 @@ public class CameraRecordFragment extends Fragment implements
         btnDeleteSegment.setSelected(false);
         btnDeleteSegment.setBackgroundResource(R.drawable.record_delete_video_bg_normal);
 
-        if (styleEffectView.getVisibility() == View.VISIBLE) {
-            styleEffectView.setVisibility(View.GONE);
+        if (styleFilterView.getVisibility() == View.VISIBLE) {
+            styleFilterView.setVisibility(View.GONE);
             showOperationViews();
             btnRecord.setVisibility(View.VISIBLE);
         }
@@ -265,7 +265,7 @@ public class CameraRecordFragment extends Fragment implements
             // 滤镜按钮
             hiddenOperationViews();
             btnRecord.setVisibility(View.GONE);
-            styleEffectView.setVisibility(View.VISIBLE);
+            styleFilterView.setVisibility(View.VISIBLE);
         } else if (v.getId() == R.id.btn_video_segment_delete) {
             if (mRecVideoInfo.getSegmentsSize() <= 0) {
                 return;

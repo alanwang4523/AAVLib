@@ -148,7 +148,7 @@
     </RelativeLayout>
 
 
-    <com.alanwang.aav.alvideoeditor.ui.StyleEffectView
+    <com.alanwang.aav.alvideoeditor.ui.StyleFilterView
         android:id="@+id/bottom_style_effect_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -157,7 +157,7 @@
         android:layout_centerVertical="true"
         android:visibility="gone">
 
-    </com.alanwang.aav.alvideoeditor.ui.StyleEffectView>
+    </com.alanwang.aav.alvideoeditor.ui.StyleFilterView>
 
 
 </RelativeLayout>
