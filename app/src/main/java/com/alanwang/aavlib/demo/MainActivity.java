@@ -21,9 +21,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
+import com.alanwang.aav.algeneral.utils.RuntimePermissionsManager;
 import com.alanwang.aav.alvideoeditor.business.preview.AWVideoPreviewActivity;
 import com.alanwang.aav.alvideoeditor.business.record.CameraRecordActivity;
-import com.alanwang.aavlib.utils.RuntimePermissionsHelper;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -32,11 +33,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RuntimePermissionsHelper runtimePermissionsHelper = RuntimePermissionsHelper.create(this, null,
+        RuntimePermissionsManager runtimePermissionsHelper = new RuntimePermissionsManager(this,
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.CAMERA,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (!runtimePermissionsHelper.allPermissionsGranted()) {
+        if (!runtimePermissionsHelper.isAllPermissionsGranted()) {
             runtimePermissionsHelper.makeRequest();
         }
 
